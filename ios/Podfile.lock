@@ -53,6 +53,8 @@ PODS:
     - ExpoModulesCore
   - ExpoLinking (7.1.5):
     - ExpoModulesCore
+  - ExpoLocalization (16.1.5):
+    - ExpoModulesCore
   - ExpoModulesCore (2.4.0):
     - DoubleConversion
     - glog
@@ -90,6 +92,9 @@ PODS:
   - FBLazyVector (0.79.3)
   - fmt (11.0.2)
   - glog (0.3.5)
+  - GoogleMaps (9.4.0):
+    - GoogleMaps/Maps (= 9.4.0)
+  - GoogleMaps/Maps (9.4.0)
   - hermes-engine (0.79.3):
     - hermes-engine/Pre-built (= 0.79.3)
   - hermes-engine/Pre-built (0.79.3)
@@ -2082,6 +2087,7 @@ DEPENDENCIES:
   - ExpoImage (from `../node_modules/expo-image/ios`)
   - ExpoKeepAwake (from `../node_modules/expo-keep-awake/ios`)
   - ExpoLinking (from `../node_modules/expo-linking/ios`)
+  - ExpoLocalization (from `../node_modules/expo-localization/ios`)
   - ExpoModulesCore (from `../node_modules/expo-modules-core`)
   - ExpoSplashScreen (from `../node_modules/expo-splash-screen/ios`)
   - ExpoSymbols (from `../node_modules/expo-symbols/ios`)
@@ -2091,6 +2097,7 @@ DEPENDENCIES:
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
+  - GoogleMaps
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCT-Folly/Fabric (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
@@ -2165,6 +2172,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - GoogleMaps
     - libavif
     - libdav1d
     - libwebp
@@ -2201,6 +2209,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-keep-awake/ios"
   ExpoLinking:
     :path: "../node_modules/expo-linking/ios"
+  ExpoLocalization:
+    :path: "../node_modules/expo-localization/ios"
   ExpoModulesCore:
     :path: "../node_modules/expo-modules-core"
   ExpoSplashScreen:
@@ -2373,6 +2383,7 @@ SPEC CHECKSUMS:
   ExpoImage: 01564db38c4a19f61413a1fb8cc7b4464d3c7fe4
   ExpoKeepAwake: bf0811570c8da182bfb879169437d4de298376e7
   ExpoLinking: b85ff4eafeae6fc638c6cace60007ae521af0ef4
+  ExpoLocalization: f6c6aaa3bfff77b666bb958bdfeb5c55df21d990
   ExpoModulesCore: d431ffe83c8673d02cb38425594a5f5480fd3061
   ExpoSplashScreen: 03ef991c0f9575a10269e08083cb4bd10e0989bc
   ExpoSymbols: c5612a90fb9179cdaebcd19bea9d8c69e5d3b859
@@ -2382,6 +2393,7 @@ SPEC CHECKSUMS:
   FBLazyVector: a62a7a5760929b6265e27bc01ab7598dde93ebd3
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
+  GoogleMaps: 0608099d4870cac8754bdba9b6953db543432438
   hermes-engine: 94ed01537bdeccaab1adbf94b040d115d6fa1a7f
   libavif: 84bbb62fb232c3018d6f1bab79beea87e35de7b7
   libdav1d: 23581a4d8ec811ff171ed5e2e05cd27bad64c39f
@@ -2460,6 +2472,6 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 29f74a5b77dca8c37669e1e1e867e5f4e12407df
 
-PODFILE CHECKSUM: 4b4c2e1becdbc3c6664198695b7334e002cc8ccf
+PODFILE CHECKSUM: 891e1f80bbb0aa9fc66e2c106f2a4d5a4b1a62ab
 
 COCOAPODS: 1.16.2
