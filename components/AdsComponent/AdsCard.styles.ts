@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-export const listingCardStyles = StyleSheet.create({
+export const adsCardStyles = StyleSheet.create({
   card: {
     borderRadius: 18,
     overflow: 'hidden',
@@ -10,7 +10,7 @@ export const listingCardStyles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 350,
+    height: 150,
   },
   bookNow: {
     position: 'absolute',

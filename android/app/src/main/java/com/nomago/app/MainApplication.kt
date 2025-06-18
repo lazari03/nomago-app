@@ -1,4 +1,4 @@
-package com.nomago
+package com.nomago.app
 
 import android.app.Application
 import android.content.res.Configuration

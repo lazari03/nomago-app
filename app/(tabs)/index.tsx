@@ -1,10 +1,9 @@
+import { CategoriesComponent } from '@/components/CategoriesComponent/CategoriesComponent';
 import { HomeHeader } from '@/components/HeaderComponent/HomeHeader';
-import { HelloWave } from '@/components/HelloWave';
 import { ListingCard } from '@/components/ListingCard/ListingComponent';
-import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useRef } from 'react';
-import { Animated, Platform, StyleSheet, View } from 'react-native';
+import { Animated, StyleSheet, View } from 'react-native';
 
 export default function HomeScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -18,11 +17,9 @@ export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
-
-      <Animated.View style={[styles.animatedHeader, { opacity: headerOpacity }]}>
-      <HomeHeader />
-
-      </Animated.View>
+      <View style={styles.stickyHeader}>
+        <HomeHeader />
+      </View>      
       <Animated.ScrollView
         contentContainerStyle={{ paddingTop: 140, paddingHorizontal: 16, paddingBottom: 32 }}
         onScroll={Animated.event(
@@ -32,8 +29,9 @@ export default function HomeScreen() {
         scrollEventThrottle={16}
       >
         <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">Welcome!</ThemedText>
-          <HelloWave />
+        <CategoriesComponent/>
+        </ThemedView>
+        <ThemedView style={styles.titleContainer}>
         </ThemedView>
         <ListingCard
           image="https://images.unsplash.com/photo-1506744038136-46273834b3fb"
@@ -42,36 +40,13 @@ export default function HomeScreen() {
           onBookNow={() => alert('Book Now pressed!')}
         />
         <ThemedView style={styles.stepContainer}>
-          <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-          <ThemedText>
-            Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-            Press{' '}
-            <ThemedText type="defaultSemiBold">
-              {Platform.select({
-                ios: 'cmd + d',
-                android: 'cmd + m',
-                web: 'F12',
-              })}
-            </ThemedText>{' '}
-            to open developer tools.
-          </ThemedText>
-        </ThemedView>
-        <ThemedView style={styles.stepContainer}>
-          <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          <ThemedText>
-            {`Tap the Explore tab to learn more about what's included in this starter app.`}
-          </ThemedText>
-        </ThemedView>
-        <ThemedView style={styles.stepContainer}>
-          <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-          <ThemedText>
-            {`When you're ready, run `}
-            <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-            <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-            <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-            <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-          </ThemedText>
-        </ThemedView>
+        <ListingCard
+          image="https://images.unsplash.com/photo-1506744038136-46273834b3fb"
+          title="ads 1"
+          subtitle="ART RESIDENCE"
+          onBookNow={() => alert('Book Now pressed!')}
+        />
+        </ThemedView>  
       </Animated.ScrollView>
     </View>
   );
@@ -80,7 +55,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   logoContainer: {
     position: 'absolute',
-    top: 40,
     left: 0,
     right: 0,
     zIndex: 10,
@@ -93,18 +67,16 @@ const styles = StyleSheet.create({
     width: 140,
     resizeMode: 'contain',
   },
-  animatedHeader: {
+  stickyHeader: {
     position: 'absolute',
-    top: 100,
+    top: 0,
     left: 0,
     right: 0,
-    zIndex: 9,
-    alignItems: 'center',
+    zIndex: 10,
     backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingBottom: 12,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    height: 120,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   titleContainer: {
     flexDirection: 'row',
