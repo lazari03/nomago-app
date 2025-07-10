@@ -2,38 +2,18 @@ import { CategoriesComponent } from '@/components/CategoriesComponent/Categories
 import { HomeHeader } from '@/components/HeaderComponent/HomeHeader';
 import { PropertyCard } from '@/components/PropertyCard/PropertyCard';
 import { ThemedView } from '@/components/ThemedView';
-import useCatalogStore from '@/stores/useCatalogStore';
+import { listingsByCategory } from '@/constants/mockListings';
 import { useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 
-interface CatalogItem {
-  id: number;
-  name: string;
-}
-
 export default function ExplorePage() {
-  const { category = 'Default Category' } = useLocalSearchParams();
-
-  const { items, fetchCatalog } = useCatalogStore();
-  const [filteredItems, setFilteredItems] = useState<CatalogItem[]>([]);
-
+  const { category } = useLocalSearchParams<{ category?: string }>();
   const scrollY = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    fetchCatalog();
-  }, [fetchCatalog]);
-
-  useEffect(() => {
-    const filtered = items.filter((item) => item.name.toLowerCase() === String(category).toLowerCase());
-    setFilteredItems(filtered);
-  }, [items, category]);
-
-  const headerOpacity = scrollY.interpolate({
-    inputRange: [0, 80],
-    outputRange: [1, 0],
-    extrapolate: 'clamp',
-  });
+  type CategoryKey = keyof typeof listingsByCategory;
+  const validCategory = (category && Object.keys(listingsByCategory).includes(category)) ? (category as CategoryKey) : undefined;
+  const listings = validCategory ? listingsByCategory[validCategory] : [];
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -51,27 +31,33 @@ export default function ExplorePage() {
         <ThemedView style={styles.titleContainer}>
           <CategoriesComponent />
         </ThemedView>
+        <Text style={styles.categoryTitle}>Explore {category}</Text>
 
         <ThemedView style={styles.stepContainer}>
-          {filteredItems.length > 0 ? (
-            filteredItems.map((item) => (
+          {listings.length > 0 ? (
+            listings.map((item: { id: string; title: string; image: string; price: string }) => (
               <PropertyCard
                 key={item.id}
-                id={item.id.toString()}
-                title={item.name}
-                location={Array.isArray(category) ? category[0] : category}
-                price="$100"
+                id={item.id}
+                title={item.title}
+                location={category || ''}
+                price={item.price}
                 rating={4.5}
-                image="https://via.placeholder.com/150"
+                image={item.image}
                 amenities={{ bedType: 'King Bed', bathroom: '2 Bathrooms', wifi: true, breakfast: true }}
+                onPress={() => {
+                  // Use the correct dynamic route navigation for expo-router
+                  const { router } = require('expo-router');
+                  router.push({ pathname: '/property/[id]', params: { id: item.id } });
+                }}
               />
             ))
           ) : (
-            <Text>No items found for {category}.</Text>
+            <Text>No listings found for {category}.</Text>
           )}
         </ThemedView>
-        <Text style={styles.categoryTitle}>Explore {category}</Text>
       </Animated.ScrollView>
+
     </View>
   );
 }
