@@ -1,8 +1,15 @@
 import axios, { AxiosInstance } from 'axios';
 import Constants from 'expo-constants';
 
+// Debug: Log what Constants contains
+console.log('Constants.expoConfig:', Constants.expoConfig);
+console.log('Constants.expoConfig?.extra:', Constants.expoConfig?.extra);
+
 const apiUrl = Constants.expoConfig?.extra?.STRAPI_API_URL;
 const token = Constants.expoConfig?.extra?.STRAPI_API_TOKEN;
+
+console.log('Loaded API URL:', apiUrl);
+console.log('Loaded Token:', token ? 'Present' : 'Missing');
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: apiUrl,
@@ -20,7 +27,7 @@ apiClient.interceptors.request.use(
       ? `${config.baseURL.replace(/\/$/, '')}${config.url?.startsWith('/') ? '' : '/'}${config.url}`
       : config.url;
     console.log('API Request URL:', fullUrl);
-    console.log('API Token:', token);
+    console.log('API Token:', token ? 'Present' : 'undefined');
 
     if (token) {
       config.headers = config.headers || {};

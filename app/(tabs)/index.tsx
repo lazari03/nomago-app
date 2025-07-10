@@ -1,7 +1,8 @@
-import { CategoriesComponent } from '@/components/CategoriesComponent/CategoriesComponent';
-import { HomeHeader } from '@/components/HeaderComponent/HomeHeader';
-import { ListingCard } from '@/components/ListingCard/ListingComponent';
-import { ThemedView } from '@/components/ThemedView';
+import { HomeBottomCards } from '@/components/HomeBottomCards';
+import { HomeDateBar } from '@/components/HomeDateBar';
+import { HomeMainCarousel } from '@/components/HomeMainCarousel';
+import { HomeTabBar } from '@/components/HomeTabBar';
+import { HomeTopBar } from '@/components/HomeTopBar';
 import { useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 
@@ -17,37 +18,11 @@ export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      <View style={styles.stickyHeader}>
-        <HomeHeader />
-      </View>      
-      <Animated.ScrollView
-        contentContainerStyle={{ paddingTop: 140, paddingHorizontal: 16, paddingBottom: 32 }}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
-        )}
-        scrollEventThrottle={16}
-      >
-        <ThemedView style={styles.titleContainer}>
-        <CategoriesComponent/>
-        </ThemedView>
-        <ThemedView style={styles.titleContainer}>
-        </ThemedView>
-        <ListingCard
-          image="https://images.unsplash.com/photo-1506744038136-46273834b3fb"
-          title="KOOPERATIVA E ARTIT"
-          subtitle="ART RESIDENCE"
-          onBookNow={() => alert('Book Now pressed!')}
-        />
-        <ThemedView style={styles.stepContainer}>
-        <ListingCard
-          image="https://images.unsplash.com/photo-1506744038136-46273834b3fb"
-          title="ads 1"
-          subtitle="ART RESIDENCE"
-          onBookNow={() => alert('Book Now pressed!')}
-        />
-        </ThemedView>  
-      </Animated.ScrollView>
+      <HomeTopBar />
+      <HomeDateBar />
+      <HomeTabBar />
+      <HomeMainCarousel />
+      <HomeBottomCards />
     </View>
   );
 }

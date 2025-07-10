@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { Image, StyleSheet, Text, View, ViewStyle } from 'react-native';
 
 type HomeHeaderProps = {
   style?: ViewStyle; // Add style prop
@@ -8,10 +8,14 @@ type HomeHeaderProps = {
 export function HomeHeader({ style, showText = true }: HomeHeaderProps) {
   return (
     <View style={[styles.container, style]}>
-      <Text style={styles.logo}>Nomago</Text>
       {showText && (
         <View>
-          <Text style={styles.title}>HEY THERE{'\n'}GLOBAL EXPLORER!</Text>
+          <Image
+            source={require('@/assets/images/logo.png')}
+            style={{ width: 80, height: 80, resizeMode: 'contain', alignSelf: 'center', marginBottom: 8 }}
+            accessibilityLabel="Nomago Logo"
+          />
+          <Text style={styles.title}>HEY THERE{''}GLOBAL EXPLORER!</Text>
           <Text style={styles.subtitle}>Join the nomad life-style, made easy</Text>
         </View>
       )}
@@ -24,15 +28,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     paddingHorizontal: 20,
-    paddingTop: 40,
+    paddingTop: 60,
     paddingBottom: 12,
   },
   logo: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#111',
+    paddingLeft: 10,
   },
   title: {
+    alignContent: 'flex-start',
     fontWeight: 'bold',
     fontSize: 26,
     color: '#111',
