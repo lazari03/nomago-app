@@ -1,29 +1,56 @@
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import useCatalogStore from '@/stores/useCatalogStore';
+import { useCategoryStore } from '@/stores/useCategoryStore';
 import React, { useEffect } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
-
+import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export function CategoriesComponent() {
-    const { items, fetchCatalog } = useCatalogStore();
+    const { categories, loading, error, fetchCategories, category, setCategory } = useCategoryStore();
 
     useEffect(() => {
-        fetchCatalog();
-    }, [fetchCatalog]);
+        fetchCategories();
+    }, [fetchCategories]);
 
+    if (loading) {
+        return (
+            <ThemedView style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color="#0066CC" />
+                <ThemedText style={styles.loadingText}>Loading categories...</ThemedText>
+            </ThemedView>
+        );
+    }
+
+    if (error) {
+        return (
+            <ThemedView style={styles.errorContainer}>
+                <ThemedText style={styles.errorText}>Error: {error}</ThemedText>
+            </ThemedView>
+        );
+    }
 
     return (
         <ThemedView>
-            {items.length === 0 ? (
+            {categories.length === 0 ? (
                 <ThemedText>No categories found.</ThemedText>
             ) : (
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     <View style={styles.row}>
-                        {items.map((item) => (
-                            <View key={item.id} style={styles.categoryPill}>
-                                <ThemedText style={styles.categoryText}>{item.name}</ThemedText>
-                            </View>
+                        {categories.map((item) => (
+                            <TouchableOpacity 
+                                key={item.id} 
+                                style={[
+                                    styles.categoryPill,
+                                    category === item.name && styles.selectedCategoryPill
+                                ]}
+                                onPress={() => setCategory(item.name)}
+                            >
+                                <ThemedText style={[
+                                    styles.categoryText,
+                                    category === item.name && styles.selectedCategoryText
+                                ]}>
+                                    {item.name}
+                                </ThemedText>
+                            </TouchableOpacity>
                         ))}
                     </View>
                 </ScrollView>
@@ -37,7 +64,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f8f8f8',
-},
+  },
   categoryPill: {
     backgroundColor: '#fff',
     borderRadius: 20,
@@ -50,8 +77,32 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
   },
+  selectedCategoryPill: {
+    backgroundColor: '#0066CC',
+  },
   categoryText: {
     color: '#222',
     fontWeight: '600',
+  },
+  selectedCategoryText: {
+    color: '#fff',
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginLeft: 10,
+    color: '#666',
+  },
+  errorContainer: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  errorText: {
+    color: '#ff4444',
+    textAlign: 'center',
   },
 });
