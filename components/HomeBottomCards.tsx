@@ -32,7 +32,9 @@ export function HomeBottomCards() {
     },
   };
 
-  const { leftTitle, leftSubtitle, rightImage, rightText } = data[category];
+  const item = data[category];
+  if (!item) return null;
+  const { leftTitle, leftSubtitle, rightImage, rightText } = item;
 
   return (
     <View style={styles.row}>

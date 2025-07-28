@@ -31,13 +31,13 @@ export interface MappedCategory {
 
 export async function getCategories(): Promise<MappedCategory[]> {
   try {
-    const response = await axios.get<CategoryResponse>('http://localhost:1337/api/categories', {
+    const response = await axios.get<CategoryResponse>('http://xgs8swck0g8cgs8gcososwg8.168.231.78.121.sslip.io/api/categories', {
       headers: {
-        'Authorization': 'Bearer 3cc4fcdc4e832666d02e71cbb307a6f573e38b61b524945757171b5fca48e991cf133f562a550b5862c0aa516184d393b88f76886a2f31045a244af71c97a67841cc25866438be2bc452732b340f9fd1550595640f668efed4040075ac7a295f72d237b160ee88afc8942e93e19b277bb303593a2bf6ff9ccc8ef1fb51889325',
+        'Authorization': 'Bearer 838fa8553dd791f616d8577fb194259a6c8b78c39525ab1c22e44cbab06d18c793cea6d7e4a2f9903090baeeb117795578ed1f114959158809a609fbb203e96c66806d72a99ee2b86f86cdbd4c2707a49045faec2779500236e6fd6f130d72799e7c9846363a4fd51e8b714d844b982c56e54d251afdb5790fc43733f1b0dab9',
         'Content-Type': 'application/json'
       }
     });
-    console.log('API Response:', response.data);
+    console.log('API Response: Category', response.data);
 
     // Map the response data to a cleaner format for the app
     return response.data.data.map((category: Category) => ({

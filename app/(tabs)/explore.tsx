@@ -1,38 +1,36 @@
-import { CategoriesComponent } from '@/components/CategoriesComponent/CategoriesComponent';
-import { HomeHeader } from '@/components/HeaderComponent/HomeHeader';
+import { HomeDateBar } from '@/components/HomeDateBar';
+import { HomeTopBar } from '@/components/HomeTopBar';
 import { PropertyCard } from '@/components/PropertyCard/PropertyCard';
 import { ThemedView } from '@/components/ThemedView';
 import { listingsByCategory } from '@/constants/mockListings';
 import { useLocalSearchParams } from 'expo-router';
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 
+
 export default function ExplorePage() {
-  const { category } = useLocalSearchParams<{ category?: string }>();
   const scrollY = useRef(new Animated.Value(0)).current;
+
+  const { category } = useLocalSearchParams<{ category?: string }>();
 
   type CategoryKey = keyof typeof listingsByCategory;
   const validCategory = (category && Object.keys(listingsByCategory).includes(category)) ? (category as CategoryKey) : undefined;
   const listings = validCategory ? listingsByCategory[validCategory] : [];
 
+
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      <View style={styles.stickyHeader}>
-        <HomeHeader />
-      </View>
-      <Animated.ScrollView
-        contentContainerStyle={{ paddingTop: 140, paddingHorizontal: 16, paddingBottom: 32 }}
+      <HomeTopBar />
+      <HomeDateBar />
+       <Animated.ScrollView
+        contentContainerStyle={{ paddingTop: 0, paddingHorizontal: 16, paddingBottom: 32 }}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: true }
         )}
         scrollEventThrottle={16}
       >
-        <ThemedView style={styles.titleContainer}>
-          <CategoriesComponent />
-        </ThemedView>
         <Text style={styles.categoryTitle}>Explore {category}</Text>
-
         <ThemedView style={styles.stepContainer}>
           {listings.length > 0 ? (
             listings.map((item: { id: string; title: string; image: string; price: string }) => (
@@ -57,7 +55,6 @@ export default function ExplorePage() {
           )}
         </ThemedView>
       </Animated.ScrollView>
-
     </View>
   );
 }

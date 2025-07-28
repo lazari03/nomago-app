@@ -47,7 +47,7 @@ export default function TabLayout() {
         options={{
           title: 'Explore',
           tabBarIcon: ({ color, focused }) => (
-            <IconSymbol size={28} name="paperplane.fill" color={focused ? ColorTokens.purple : color} />
+            <IconSymbol size={28} name="magnifyingglass" color={focused ? ColorTokens.purple : color} />
           ),
         }}
       />
