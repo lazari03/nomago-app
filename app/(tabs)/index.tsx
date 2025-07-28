@@ -3,11 +3,15 @@ import { HomeDateBar } from '@/components/HomeDateBar';
 import { HomeMainCarousel } from '@/components/HomeMainCarousel';
 import { HomeTabBar } from '@/components/HomeTabBar';
 import { HomeTopBar } from '@/components/HomeTopBar';
+import { useListingsStore } from '@/stores/useListingsStore';
+import { usePullToRefresh } from '@/utils/usePullToRefresh';
 import { useRef } from 'react';
-import { Animated, StyleSheet, View } from 'react-native';
+import { Animated, RefreshControl, StyleSheet, View } from 'react-native';
 
 export default function HomeScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
+  const { fetchListings } = useListingsStore();
+  const { refreshControlProps } = usePullToRefresh(fetchListings);
 
   // Fade out header between 0 and 80px of scroll
   const headerOpacity = scrollY.interpolate({
@@ -21,8 +25,19 @@ export default function HomeScreen() {
       <HomeTopBar />
       <HomeDateBar />
       <HomeTabBar />
-      <HomeMainCarousel />
-      <HomeBottomCards />
+      <Animated.ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1 }}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+        scrollEventThrottle={16}
+        refreshControl={<RefreshControl {...refreshControlProps} />}
+      >
+        <HomeMainCarousel />
+        <HomeBottomCards />
+      </Animated.ScrollView>
     </View>
   );
 }

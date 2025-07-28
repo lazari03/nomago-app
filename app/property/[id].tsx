@@ -8,12 +8,13 @@ function hasAmenities(obj: any): obj is { amenities: { bedType?: string; bathroo
 function getImageUrl(obj: any): string {
   return obj.imageUrl || obj.image || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2';
 }
+
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { useListingsStore } from '@/stores/useListingsStore';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 
 
@@ -49,9 +50,16 @@ function getListingById(id: string) {
 }
 
 
+
+// Hide the native navigation header using Expo Router Stack options
+export const screenOptions = {
+  headerShown: false,
+};
+
 export default function PropertyDetailScreen() {
   const { id } = useLocalSearchParams();
   const { selectedProperty } = useListingsStore();
+  const router = useRouter();
 
   // Use Zustand property if available, else fallback to mock/demo lookup
   const property = selectedProperty && String(selectedProperty.id) === String(id)
@@ -67,7 +75,18 @@ export default function PropertyDetailScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      {/* Custom Header - Explore style */}
+      <View style={styles.headerContainer}>
+        <TouchableOpacity style={styles.circleBackButton} onPress={() => router.back()}>
+          <View style={styles.iconCircle}>
+            <ThemedText style={styles.iconArrow}>←</ThemedText>
+          </View>
+        </TouchableOpacity>
+        <ThemedText style={styles.inlineTitle} numberOfLines={1} ellipsizeMode="tail">
+          {property.title}
+        </ThemedText>
+      </View>
       <ParallaxScrollView
         headerImage={
           <Image
@@ -148,11 +167,63 @@ export default function PropertyDetailScreen() {
           <ThemedText style={styles.bookButtonText}>Book Now</ThemedText>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8, // Lower than before
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 2,
+    zIndex: 10,
+  },
+  inlineTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#222',
+    marginLeft: 12,
+    flexShrink: 1,
+  },
+  circleBackButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F3F0FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 4,
+  },
+  iconCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconArrow: {
+    fontSize: 22,
+    color: '#6C4DF6',
+    fontWeight: 'bold',
+    marginLeft: 2,
+    marginTop: -2,
+  },
+  headerTitle: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#222',
+    marginHorizontal: 8,
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',

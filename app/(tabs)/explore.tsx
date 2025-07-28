@@ -4,8 +4,9 @@ import { PropertyCard } from '@/components/PropertyCard/PropertyCard';
 import { ThemedView } from '@/components/ThemedView';
 import { useCategoryStore } from '@/stores/useCategoryStore';
 import { useListingsStore } from '@/stores/useListingsStore';
+import { usePullToRefresh } from '@/utils/usePullToRefresh';
 import React, { useRef } from 'react';
-import { Animated, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Animated, RefreshControl, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 
 
@@ -14,11 +15,19 @@ export default function ExplorePage() {
   const { category, categories } = useCategoryStore();
   const { currentCategoryListings, categoryLoading, fetchListingsByCategory, setSelectedProperty } = useListingsStore();
 
+
   React.useEffect(() => {
     if (category) {
       fetchListingsByCategory(category);
     }
   }, [category]);
+
+  // Pull-to-refresh logic
+  const { refreshControlProps } = usePullToRefresh(async () => {
+    if (category) {
+      await fetchListingsByCategory(category);
+    }
+  });
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -32,6 +41,7 @@ export default function ExplorePage() {
             { useNativeDriver: true }
           )}
           scrollEventThrottle={16}
+          refreshControl={<RefreshControl {...refreshControlProps} />}
         >
           <Text style={styles.categoryTitle}>Explore {category}</Text>
           <ThemedView style={styles.stepContainer}>

@@ -1,31 +1,25 @@
-import { listingsByCategory } from '@/constants/mockListings';
 import { goToExplore } from '@/services/navigationService';
-import { useCategoryStore } from '@/stores/useCategoryStore';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const HomeBottomCards = React.memo(() => {
-  const category = useCategoryStore((state) => state.category);
-  const listings = listingsByCategory[category as keyof typeof listingsByCategory] || [];
-  if (!listings.length) return null;
+  // Hardcoded mock card for bottom section
   return (
     <View>
-      {listings.map((item) => (
-        <View style={styles.row} key={item.id}>
-          <TouchableOpacity
-            style={styles.leftCard}
-            onPress={() => goToExplore(category)}
-          >
-            <Text style={styles.leftTitle}>{item.title}</Text>
-            <Text style={styles.leftSubtitle}>{item.price}</Text>
-          </TouchableOpacity>
-          <View style={styles.rightCard}>
-            <Text style={styles.sponsor}>sponsor</Text>
-            <Image source={{ uri: item.image }} style={styles.scooterImg} />
-            <Text style={styles.rightText}>there is more to EXPLORE</Text>
-          </View>
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.leftCard}
+          onPress={() => goToExplore('Apartments')}
+        >
+          <Text style={styles.leftTitle}>Find a Studio Apartment</Text>
+          <Text style={styles.leftSubtitle}>from €900/mo</Text>
+        </TouchableOpacity>
+        <View style={styles.rightCard}>
+          <Text style={styles.sponsor}>sponsor</Text>
+          <Image source={{ uri: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2' }} style={styles.scooterImg} />
+          <Text style={styles.rightText}>there is more to EXPLORE</Text>
         </View>
-      ))}
+      </View>
     </View>
   );
 });
