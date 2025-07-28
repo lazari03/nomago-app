@@ -1,5 +1,16 @@
+// Type guard helpers
+function hasHost(obj: any): obj is { host: { name: string; avatar: string; joined: string } } {
+  return obj && typeof obj.host === 'object' && typeof obj.host.name === 'string';
+}
+function hasAmenities(obj: any): obj is { amenities: { bedType?: string; bathroom?: string; wifi?: boolean; breakfast?: boolean } } {
+  return obj && typeof obj.amenities === 'object';
+}
+function getImageUrl(obj: any): string {
+  return obj.imageUrl || obj.image || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2';
+}
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
+import { useListingsStore } from '@/stores/useListingsStore';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
@@ -40,7 +51,12 @@ function getListingById(id: string) {
 
 export default function PropertyDetailScreen() {
   const { id } = useLocalSearchParams();
-  const property = getListingById(id as string);
+  const { selectedProperty } = useListingsStore();
+
+  // Use Zustand property if available, else fallback to mock/demo lookup
+  const property = selectedProperty && String(selectedProperty.id) === String(id)
+    ? selectedProperty
+    : getListingById(id as string);
 
   if (!property) {
     return (
@@ -54,7 +70,10 @@ export default function PropertyDetailScreen() {
     <View style={styles.container}>
       <ParallaxScrollView
         headerImage={
-          <Image source={{ uri: property.image }} style={styles.heroImage} />
+          <Image
+            source={{ uri: getImageUrl(property) }}
+            style={styles.heroImage}
+          />
         }
         headerBackgroundColor={{ light: '#fff', dark: '#222' }}
         withTabBarPadding={false}
@@ -66,13 +85,15 @@ export default function PropertyDetailScreen() {
         </View>
 
         {/* Host Info */}
-        <View style={styles.hostSection}>
-          <Image source={{ uri: property.host.avatar }} style={styles.hostAvatar} />
-          <View style={styles.hostInfo}>
-            <ThemedText style={styles.hostName}>Hosted by {property.host.name}</ThemedText>
-            <ThemedText style={styles.hostJoined}>Host since {property.host.joined}</ThemedText>
+        {hasHost(property) && (
+          <View style={styles.hostSection}>
+            <Image source={{ uri: property.host.avatar }} style={styles.hostAvatar} />
+            <View style={styles.hostInfo}>
+              <ThemedText style={styles.hostName}>Hosted by {property.host.name}</ThemedText>
+              <ThemedText style={styles.hostJoined}>Host since {property.host.joined}</ThemedText>
+            </View>
           </View>
-        </View>
+        )}
 
         {/* Description */}
         <View style={styles.descriptionSection}>
@@ -81,35 +102,37 @@ export default function PropertyDetailScreen() {
         </View>
 
         {/* Amenities */}
-        <View style={styles.amenitiesSection}>
-          <ThemedText style={styles.sectionTitle}>Amenities</ThemedText>
-          <View style={styles.amenitiesList}>
-            {property.amenities.bedType && (
-              <View style={styles.amenityItem}>
-                <ThemedText style={styles.amenityIcon}>🛏️</ThemedText>
-                <ThemedText style={styles.amenityText}>{property.amenities.bedType}</ThemedText>
-              </View>
-            )}
-            {property.amenities.bathroom && (
-              <View style={styles.amenityItem}>
-                <ThemedText style={styles.amenityIcon}>🚿</ThemedText>
-                <ThemedText style={styles.amenityText}>{property.amenities.bathroom}</ThemedText>
-              </View>
-            )}
-            {property.amenities.wifi && (
-              <View style={styles.amenityItem}>
-                <ThemedText style={styles.amenityIcon}>📶</ThemedText>
-                <ThemedText style={styles.amenityText}>Free Wi-Fi</ThemedText>
-              </View>
-            )}
-            {property.amenities.breakfast && (
-              <View style={styles.amenityItem}>
-                <ThemedText style={styles.amenityIcon}>🍳</ThemedText>
-                <ThemedText style={styles.amenityText}>Breakfast included</ThemedText>
-              </View>
-            )}
+        {hasAmenities(property) && (
+          <View style={styles.amenitiesSection}>
+            <ThemedText style={styles.sectionTitle}>Amenities</ThemedText>
+            <View style={styles.amenitiesList}>
+              {property.amenities.bedType && (
+                <View style={styles.amenityItem}>
+                  <ThemedText style={styles.amenityIcon}>🛏️</ThemedText>
+                  <ThemedText style={styles.amenityText}>{property.amenities.bedType}</ThemedText>
+                </View>
+              )}
+              {property.amenities.bathroom && (
+                <View style={styles.amenityItem}>
+                  <ThemedText style={styles.amenityIcon}>🚿</ThemedText>
+                  <ThemedText style={styles.amenityText}>{property.amenities.bathroom}</ThemedText>
+                </View>
+              )}
+              {property.amenities.wifi && (
+                <View style={styles.amenityItem}>
+                  <ThemedText style={styles.amenityIcon}>📶</ThemedText>
+                  <ThemedText style={styles.amenityText}>Free Wi-Fi</ThemedText>
+                </View>
+              )}
+              {property.amenities.breakfast && (
+                <View style={styles.amenityItem}>
+                  <ThemedText style={styles.amenityIcon}>🍳</ThemedText>
+                  <ThemedText style={styles.amenityText}>Breakfast included</ThemedText>
+                </View>
+              )}
+            </View>
           </View>
-        </View>
+        )}
       </ParallaxScrollView>
 
       {/* Bottom Action Bar */}

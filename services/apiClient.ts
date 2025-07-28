@@ -1,53 +1,28 @@
-import axios, { AxiosInstance } from 'axios';
-import Constants from 'expo-constants';
+import axios from 'axios';
 
-// Debug: Log what Constants contains
-console.log('Constants.expoConfig:', Constants.expoConfig);
-console.log('Constants.expoConfig?.extra:', Constants.expoConfig?.extra);
+const BASE_URL = 'http://localhost:1337/api';
+const AUTH_HEADER = 'Bearer 16b6055fb458f239370fd6e3fd487134c02ffc439706c884c48b4b828ae8324e4c57d7b708f882a1a46781966ed89f2962fa8a46dec71bbd54e9b612ed2ebe89e94992b5ab61554611cc7a6ad2127ce5266fbaa0de04d2b146d5b9cdc49afe3e57859c72f0b2e42d0fd445652252b86e8580dfa92f2f1c6898c9b5dfdc8f26dd';
 
-const apiUrl = Constants.expoConfig?.extra?.STRAPI_API_URL;
-const token = Constants.expoConfig?.extra?.STRAPI_API_TOKEN;
-
-console.log('Loaded API URL:', apiUrl);
-console.log('Loaded Token:', token ? 'Present' : 'Missing');
-
-const apiClient: AxiosInstance = axios.create({
-  baseURL: apiUrl,
-  timeout: 10000,
+const api = axios.create({
+  baseURL: BASE_URL,
   headers: {
+    Authorization: AUTH_HEADER,
     'Content-Type': 'application/json',
   },
 });
 
-// Add a request interceptor to include the token and log debug info
-apiClient.interceptors.request.use(
-  (config) => {
-    // Debug: log the full URL and token
-    const fullUrl = config.baseURL
-      ? `${config.baseURL.replace(/\/$/, '')}${config.url?.startsWith('/') ? '' : '/'}${config.url}`
-      : config.url;
-    console.log('API Request URL:', fullUrl);
-    console.log('API Token:', token ? 'Present' : 'undefined');
-
-    if (token) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    console.error('Request Error:', error.message);
-    return Promise.reject(error);
+// Usage: apiClient.categories(), apiClient.listings(), etc.
+export const apiClient = new Proxy({}, {
+  get: (_, resource: string) => {
+    return (options: { method?: 'get' | 'post' | 'put' | 'delete', params?: any, data?: any } = {}) => {
+      const method = options.method || 'get';
+      const url = `/${resource}`;
+      return api.request({
+        url,
+        method,
+        params: options.params,
+        data: options.data,
+      });
+    };
   }
-);
-
-// Add a response interceptor for error handling
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    console.error('API Error:', error.response?.data || error.message);
-    return Promise.reject(error);
-  }
-);
-
-export default apiClient;
+}) as Record<string, (options?: { method?: 'get' | 'post' | 'put' | 'delete', params?: any, data?: any }) => Promise<any>>;

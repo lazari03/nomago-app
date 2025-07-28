@@ -1,8 +1,9 @@
-import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ColorTokens } from '@/constants/Colors';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { ColorTokens } from '@/constants/Colors';
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import React from 'react';
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Tab config: icon, label, route
 const TABS = [
@@ -12,23 +13,23 @@ const TABS = [
     route: '/'
   },
   {
-    name: 'Explore',
+    name: 'explore',
     icon: 'paperplane.fill',
-    route: '/Explore'
+    route: '/explore'
   },
   {
-    name: 'Contact',
+    name: 'contact',
     icon: 'chevron.left.forwardslash.chevron.right',
-    route: '/Contact'
+    route: '/contact'
   },
   {
-    name: 'SignIn',
+    name: 'signin',
     icon: 'person.fill', // You may need to add this mapping in IconSymbol
-    route: '/SignIn'
+    route: '/signin'
   },
 ];
 
-export function CustomTabBar({ state, descriptors, navigation }) {
+export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   return (
     <View style={[styles.tabBar, { paddingBottom: insets.bottom }]}> 
@@ -44,7 +45,7 @@ export function CustomTabBar({ state, descriptors, navigation }) {
             activeOpacity={0.8}
           >
             <IconSymbol
-              name={tab.icon}
+              name={tab.icon as any}
               size={28}
               color={isFocused ? ColorTokens.white : ColorTokens.darkPurple}
             />

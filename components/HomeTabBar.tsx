@@ -16,12 +16,12 @@ export function HomeTabBar() {
   // Ensure we always have tabs to display
   const tabsToShow = categories.length > 0 ? categories : fallbackTabs.map(name => ({ id: name, name, documentId: '' }));
 
-  // Select first tab if none selected
+  // Select first tab in categories as default if none selected
   React.useEffect(() => {
-    if (!category && tabsToShow.length > 0) {
-      setCategory(tabsToShow[0].name);
+    if ((!category || !categories.some(cat => cat.name === category)) && categories.length > 0) {
+      setCategory(categories[0].name);
     }
-  }, [category, setCategory, tabsToShow]);
+  }, [category, setCategory, categories]);
 
   if (loading) {
     return (

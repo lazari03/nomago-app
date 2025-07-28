@@ -1,15 +1,12 @@
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useCategoryStore } from '@/stores/useCategoryStore';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export function HomeCategoriesBar() {
-  const { categories, loading, error, fetchCategories, category, setCategory } = useCategoryStore();
-
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+  const { categories, loading, error, category, setCategory } = useCategoryStore();
+  // Data is now fetched at app launch in _layout.tsx
 
   if (loading) {
     return (

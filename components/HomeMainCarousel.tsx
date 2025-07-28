@@ -1,3 +1,4 @@
+
 import { useCategoryStore } from '@/stores/useCategoryStore';
 import { useListingsStore } from '@/stores/useListingsStore';
 import React from 'react';
@@ -5,19 +6,7 @@ import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } fr
 
 export function HomeMainCarousel() {
   const { category } = useCategoryStore();
-  const { featuredListings, featuredLoading, fetchFeaturedListings, currentCategoryListings, fetchListingsByCategory, categoryLoading } = useListingsStore();
-
-  // Fetch featured listings on mount
-  React.useEffect(() => {
-    fetchFeaturedListings();
-  }, [fetchFeaturedListings]);
-
-  // Fetch listings for current category
-  React.useEffect(() => {
-    if (category) {
-      fetchListingsByCategory(category);
-    }
-  }, [category, fetchListingsByCategory]);
+  const { currentCategoryListings, categoryLoading } = useListingsStore();
 
   // Fallback data for when no listings are available
   const fallbackData: Record<string, { image: string; title: string; subtitle: string }> = {
@@ -48,14 +37,12 @@ export function HomeMainCarousel() {
     },
   };
 
-  // Use category-specific listings if available, otherwise use featured listings, otherwise fallback
+  // Use category-specific listings if available, otherwise fallback
   const displayListing = currentCategoryListings.length > 0 
     ? currentCategoryListings[0] 
-    : featuredListings.length > 0 
-      ? featuredListings[0] 
-      : null;
+    : null;
 
-  if (categoryLoading || featuredLoading) {
+  if (categoryLoading) {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
         <ActivityIndicator size="large" color="#6C4DF6" />
@@ -80,7 +67,7 @@ export function HomeMainCarousel() {
           )}
         </View>
         <TouchableOpacity style={styles.reserveBtnNearText}>
-          <Text style={styles.reserveText}>BOOK NOW</Text>
+          <Text style={styles.reserveText}>Book Now</Text>
         </TouchableOpacity>
       </View>
     );

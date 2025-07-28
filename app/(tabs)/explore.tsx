@@ -1,60 +1,67 @@
-import { HomeDateBar } from '@/components/HomeDateBar';
-import { HomeTopBar } from '@/components/HomeTopBar';
+import { HeaderFilter } from '@/components/HeaderFilter';
+import { HomeTabBar } from '@/components/HomeTabBar';
 import { PropertyCard } from '@/components/PropertyCard/PropertyCard';
 import { ThemedView } from '@/components/ThemedView';
-import { listingsByCategory } from '@/constants/mockListings';
-import { useLocalSearchParams } from 'expo-router';
+import { useCategoryStore } from '@/stores/useCategoryStore';
+import { useListingsStore } from '@/stores/useListingsStore';
 import React, { useRef } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+
 
 
 export default function ExplorePage() {
   const scrollY = useRef(new Animated.Value(0)).current;
+  const { category, categories } = useCategoryStore();
+  const { currentCategoryListings, categoryLoading, fetchListingsByCategory, setSelectedProperty } = useListingsStore();
 
-  const { category } = useLocalSearchParams<{ category?: string }>();
-
-  type CategoryKey = keyof typeof listingsByCategory;
-  const validCategory = (category && Object.keys(listingsByCategory).includes(category)) ? (category as CategoryKey) : undefined;
-  const listings = validCategory ? listingsByCategory[validCategory] : [];
-
+  React.useEffect(() => {
+    if (category) {
+      fetchListingsByCategory(category);
+    }
+  }, [category]);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      <HomeTopBar />
-      <HomeDateBar />
-       <Animated.ScrollView
-        contentContainerStyle={{ paddingTop: 0, paddingHorizontal: 16, paddingBottom: 32 }}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
-        )}
-        scrollEventThrottle={16}
-      >
-        <Text style={styles.categoryTitle}>Explore {category}</Text>
-        <ThemedView style={styles.stepContainer}>
-          {listings.length > 0 ? (
-            listings.map((item: { id: string; title: string; image: string; price: string }) => (
-              <PropertyCard
-                key={item.id}
-                id={item.id}
-                title={item.title}
-                location={category || ''}
-                price={item.price}
-                rating={4.5}
-                image={item.image}
-                amenities={{ bedType: 'King Bed', bathroom: '2 Bathrooms', wifi: true, breakfast: true }}
-                onPress={() => {
-                  // Use the correct dynamic route navigation for expo-router
-                  const { router } = require('expo-router');
-                  router.push({ pathname: '/property/[id]', params: { id: item.id } });
-                }}
-              />
-            ))
-          ) : (
-            <Text>No listings found for {category}.</Text>
+      <SafeAreaView style={{ flex: 1 }}>
+        <HeaderFilter />  
+        <HomeTabBar />
+        <Animated.ScrollView
+          contentContainerStyle={{ paddingTop: 0, paddingHorizontal: 16, paddingBottom: 32 }}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: true }
           )}
-        </ThemedView>
-      </Animated.ScrollView>
+          scrollEventThrottle={16}
+        >
+          <Text style={styles.categoryTitle}>Explore {category}</Text>
+          <ThemedView style={styles.stepContainer}>
+            {categoryLoading ? (
+              <Text>Loading...</Text>
+            ) : currentCategoryListings.length > 0 ? (
+              currentCategoryListings.map((item) => (
+                <PropertyCard
+                  key={item.id}
+                  id={String(item.id)}
+                  title={item.title}
+                  location={category || ''}
+                  price={item.price !== undefined ? String(item.price) : ''}
+                  rating={4.5}
+                  image={item.imageUrl || ''}
+                  amenities={{ bedType: 'King Bed', bathroom: '2 Bathrooms', wifi: true, breakfast: true }}
+                  onPress={() => {
+                    setSelectedProperty(item);
+                    const { router } = require('expo-router');
+                    router.push({ pathname: '/property/[id]', params: { id: item.id } });
+                  }}
+                />
+              ))
+            ) : (
+              <Text>No listings found for {category}.</Text>
+            )}
+          </ThemedView>
+        </Animated.ScrollView>
+      </SafeAreaView>
+      <HomeTabBar/>
     </View>
   );
 }
@@ -99,5 +106,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     margin: 16,
+  },
+   tabBar: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 100,
   },
 });
