@@ -9,11 +9,13 @@ function getImageUrl(obj: any): string {
   return obj.imageUrl || obj.image || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2';
 }
 
+
+import BookingForm from '@/components/BookingForm';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { useListingsStore } from '@/stores/useListingsStore';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 
@@ -57,6 +59,8 @@ export const screenOptions = {
 };
 
 export default function PropertyDetailScreen() {
+  // Modal state for booking form (must be inside component)
+  const [modalVisible, setModalVisible] = useState(false);
   const { id } = useLocalSearchParams();
   const { selectedProperty } = useListingsStore();
   const router = useRouter();
@@ -162,11 +166,19 @@ export default function PropertyDetailScreen() {
         </View>
         <TouchableOpacity 
           style={styles.bookButton}
-          onPress={() => alert(`Book ${property.title}`)}
+          onPress={() => setModalVisible(true)}
         >
           <ThemedText style={styles.bookButtonText}>Book Now</ThemedText>
         </TouchableOpacity>
       </View>
+
+      {/* Booking Modal (must be at root, not inside bottomBar) */}
+      <BookingForm
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        propertyId={String(property.id)}
+        propertyTitle={property.title}
+      />
     </SafeAreaView>
   );
 }
