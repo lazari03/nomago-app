@@ -1,3 +1,4 @@
+// apiClient.ts
 import axios from 'axios';
 
 const BASE_URL = 'http://localhost:1337/api';
@@ -11,18 +12,18 @@ const api = axios.create({
   },
 });
 
-// Usage: apiClient.categories(), apiClient.listings(), etc.
-export const apiClient = new Proxy({}, {
-  get: (_, resource: string) => {
-    return (options: { method?: 'get' | 'post' | 'put' | 'delete', params?: any, data?: any } = {}) => {
+export const apiClient = new Proxy(
+  {},
+  {
+    get: (_, resource: string) => (options: { method?: 'get' | 'post' | 'put' | 'delete'; params?: any; data?: any; url?: string } = {}) => {
       const method = options.method || 'get';
-      const url = `/${resource}`;
+      const url = options.url || `/${resource}`;
       return api.request({
         url,
         method,
         params: options.params,
         data: options.data,
       });
-    };
+    },
   }
-}) as Record<string, (options?: { method?: 'get' | 'post' | 'put' | 'delete', params?: any, data?: any }) => Promise<any>>;
+) as Record<string, (options?: { method?: 'get' | 'post' | 'put' | 'delete'; params?: any; data?: any; url?: string }) => Promise<any>>;

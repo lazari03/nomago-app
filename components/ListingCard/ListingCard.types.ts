@@ -1,8 +1,15 @@
 export interface ListingSlide {
-  id: string;
-  image: string;
+  id: number;
+  documentId: string;
   title: string;
-  subtitle: string;
+  subtitle?: string;
+  description: string;
+  price?: number;
+  location?: string;
+  featured: boolean;
+  imageUrls: string[];
+  categoryId?: number;
+  categoryName?: string;
 }
 
 export interface ListingCardProps {

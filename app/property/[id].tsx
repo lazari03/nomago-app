@@ -2,9 +2,7 @@
 function hasHost(obj: any): obj is { host: { name: string; avatar: string; joined: string } } {
   return obj && typeof obj.host === 'object' && typeof obj.host.name === 'string';
 }
-function hasAmenities(obj: any): obj is { amenities: { bedType?: string; bathroom?: string; wifi?: boolean; breakfast?: boolean } } {
-  return obj && typeof obj.amenities === 'object';
-}
+// Amenities removed
 function getImageUrl(obj: any): string {
   return obj.imageUrl || obj.image || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2';
 }
@@ -21,35 +19,7 @@ import { Image, SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-n
 
 
 
-import { listingsByCategory } from '@/constants/mockListings';
 
-
-// Extend listing with mock details for demo
-function getListingById(id: string) {
-  for (const category of Object.values(listingsByCategory)) {
-    const found = category.find((item) => item.id === id);
-    if (found) {
-      // Add mock details for demo
-      return {
-        ...found,
-        location: 'Sample Location',
-        description: 'This is a sample property description for demo purposes.',
-        amenities: {
-          bedType: 'King Bed',
-          bathroom: '2 Bathrooms',
-          wifi: true,
-          breakfast: true,
-        },
-        host: {
-          name: 'John Doe',
-          avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b1a0',
-          joined: '2021',
-        },
-      };
-    }
-  }
-  return undefined;
-}
 
 
 
@@ -65,10 +35,10 @@ export default function PropertyDetailScreen() {
   const { selectedProperty } = useListingsStore();
   const router = useRouter();
 
-  // Use Zustand property if available, else fallback to mock/demo lookup
+  // Use Zustand property only
   const property = selectedProperty && String(selectedProperty.id) === String(id)
     ? selectedProperty
-    : getListingById(id as string);
+    : null;
 
   if (!property) {
     return (
@@ -124,38 +94,7 @@ export default function PropertyDetailScreen() {
           <ThemedText style={styles.description}>{property.description}</ThemedText>
         </View>
 
-        {/* Amenities */}
-        {hasAmenities(property) && (
-          <View style={styles.amenitiesSection}>
-            <ThemedText style={styles.sectionTitle}>Amenities</ThemedText>
-            <View style={styles.amenitiesList}>
-              {property.amenities.bedType && (
-                <View style={styles.amenityItem}>
-                  <ThemedText style={styles.amenityIcon}>🛏️</ThemedText>
-                  <ThemedText style={styles.amenityText}>{property.amenities.bedType}</ThemedText>
-                </View>
-              )}
-              {property.amenities.bathroom && (
-                <View style={styles.amenityItem}>
-                  <ThemedText style={styles.amenityIcon}>🚿</ThemedText>
-                  <ThemedText style={styles.amenityText}>{property.amenities.bathroom}</ThemedText>
-                </View>
-              )}
-              {property.amenities.wifi && (
-                <View style={styles.amenityItem}>
-                  <ThemedText style={styles.amenityIcon}>📶</ThemedText>
-                  <ThemedText style={styles.amenityText}>Free Wi-Fi</ThemedText>
-                </View>
-              )}
-              {property.amenities.breakfast && (
-                <View style={styles.amenityItem}>
-                  <ThemedText style={styles.amenityIcon}>🍳</ThemedText>
-                  <ThemedText style={styles.amenityText}>Breakfast included</ThemedText>
-                </View>
-              )}
-            </View>
-          </View>
-        )}
+        {/* Amenities removed */}
       </ParallaxScrollView>
 
       {/* Bottom Action Bar */}
@@ -176,7 +115,6 @@ export default function PropertyDetailScreen() {
       <BookingForm
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        propertyId={String(property.id)}
         propertyTitle={property.title}
       />
     </SafeAreaView>

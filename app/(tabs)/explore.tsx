@@ -12,9 +12,15 @@ import { Animated, RefreshControl, SafeAreaView, StyleSheet, Text, View } from '
 
 export default function ExplorePage() {
   const scrollY = useRef(new Animated.Value(0)).current;
-  const { category, categories } = useCategoryStore();
-  const { currentCategoryListings, categoryLoading, fetchListingsByCategory, setSelectedProperty } = useListingsStore();
-
+  const { category } = useCategoryStore();
+  const {
+    currentCategoryListings,
+    categoryLoading,
+    fetchListingsByCategory,
+    setSelectedProperty,
+    error,
+    clearError,
+  } = useListingsStore();
 
   React.useEffect(() => {
     if (category) {
@@ -32,7 +38,7 @@ export default function ExplorePage() {
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <SafeAreaView style={{ flex: 1 }}>
-        <HeaderFilter />  
+        <HeaderFilter />
         <HomeTabBar />
         <Animated.ScrollView
           contentContainerStyle={{ paddingTop: 0, paddingHorizontal: 16, paddingBottom: 32 }}
@@ -47,21 +53,20 @@ export default function ExplorePage() {
           <ThemedView style={styles.stepContainer}>
             {categoryLoading ? (
               <Text>Loading...</Text>
+            ) : error ? (
+              <Text>Error: {error}</Text>
             ) : currentCategoryListings.length > 0 ? (
               currentCategoryListings.map((item) => (
                 <PropertyCard
                   key={item.id}
-                  id={String(item.id)}
-                  title={item.title}
-                  location={category || ''}
-                  price={item.price !== undefined ? String(item.price) : ''}
-                  rating={4.5}
-                  image={item.imageUrl || ''}
-                  amenities={{ bedType: 'King Bed', bathroom: '2 Bathrooms', wifi: true, breakfast: true }}
+                  listing={item}
                   onPress={() => {
                     setSelectedProperty(item);
-                    const { router } = require('expo-router');
-                    router.push({ pathname: '/property/[id]', params: { id: item.id } });
+                    // Use useRouter for navigation
+                    import('expo-router').then(({ useRouter }) => {
+                      const router = useRouter();
+                      router.push({ pathname: '/property/[id]', params: { id: item.id } });
+                    });
                   }}
                 />
               ))
@@ -71,7 +76,7 @@ export default function ExplorePage() {
           </ThemedView>
         </Animated.ScrollView>
       </SafeAreaView>
-      <HomeTabBar/>
+      <HomeTabBar />
     </View>
   );
 }

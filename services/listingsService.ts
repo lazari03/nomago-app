@@ -1,87 +1,119 @@
+// listingsService.ts
+import qs from 'qs';
 import { apiClient } from './apiClient';
 
-// Define interfaces for the API response structure
 export interface Listing {
   id: number;
   documentId: string;
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  title: string;
-  subtitle: string;
+  propertyName?: string;
+  title?: string;
+  subtitle?: string;
   description: string;
   price?: number;
   location?: string;
   featured: boolean;
   status: 'active' | 'inactive' | 'pending';
-  image?: {
-    url: string;
-    alternativeText?: string;
+  images?: {
+    data: Array<{
+      id: number;
+      attributes: {
+        url: string;
+        formats?: {
+          small?: { url: string };
+          thumbnail?: { url: string };
+        };
+      };
+    }>;
   };
-  images?: Array<{
-    url: string;
-    alternativeText?: string;
-  }>;
   category?: {
-    id: number;
-    name: string;
-    documentId: string;
-  };
+    id?: number;
+    name?: string;
+    data?: {
+      id: number;
+      attributes: {
+        name: string;
+        documentId: string;
+      };
+    } | null;
+  } | null;
 }
 
-export interface ListingsResponse {
-  data: Listing[];
-  meta: {
-    pagination: {
-      page: number;
-      pageSize: number;
-      pageCount: number;
-      total: number;
-    };
-  };
-}
-
-// Mapped listing interface for app usage
 export interface MappedListing {
   id: number;
   documentId: string;
   title: string;
-  subtitle: string;
+  subtitle?: string;
   description: string;
   price?: number;
   location?: string;
   featured: boolean;
-  imageUrl?: string;
+  imageUrls: string[];
   categoryId?: number;
   categoryName?: string;
 }
 
+function mapListing(listing: Listing): MappedListing {
+  let imageUrls: string[] = [];
 
-export async function getListings(categoryName?: string): Promise<MappedListing[]> {
+  // Debug: log raw images object
+  console.log('Raw images object:', JSON.stringify(listing.images, null, 2));
+  if (Array.isArray(listing.images)) {
+    imageUrls = listing.images.map(img => img.url).filter(Boolean);
+  } else if (listing.images?.data && Array.isArray(listing.images.data)) {
+    imageUrls = listing.images.data.map(img => img.attributes?.url).filter(Boolean);
+  }
+
+  if (imageUrls.length === 0) {
+    imageUrls = ['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2'];
+  }
+
+  return {
+    id: listing.id,
+    documentId: listing.documentId,
+    title: listing.propertyName || listing.title || '',
+    subtitle: listing.subtitle,
+    description: listing.description,
+    price: listing.price,
+    location: listing.location,
+    featured: listing.featured,
+    imageUrls,
+    categoryId: listing.category?.id ?? listing.category?.data?.id,
+    categoryName: listing.category?.name ?? listing.category?.data?.attributes?.name,
+  };
+}
+
+export async function fetchListings(categoryName?: string): Promise<MappedListing[]> {
+  const query = qs.stringify(
+    {
+      populate: ['category', 'images'],
+      ...(categoryName && {
+        filters: {
+          category: {
+            name: { $eq: categoryName },
+          },
+        },
+      }),
+    },
+    { encodeValuesOnly: true }
+  );
+
   try {
-    const params: any = { populate: 'category' };
-    if (categoryName) {
-      params['filters[category][name][$eq]'] = categoryName;
+    const response = await apiClient.listings({ method: 'get', url: `/listings?${query}` });
+    console.log('Raw listings response:', response.data.data);
+    const mapped = response.data.data.map(mapListing);
+    console.log('Mapped listings:', JSON.stringify(mapped, null, 2));
+    return mapped;
+  } catch (error: any) {
+    if (error.response) {
+      console.error('Listings API error:', error.response.status, error.response.data);
+    } else if (error.request) {
+      console.error('Listings API network error:', error.message);
+    } else {
+      console.error('Listings API unknown error:', error);
     }
-    const response = await apiClient.listings({ params });
-    // Map the response data to a cleaner format for the app
-    return response.data.data.map((listing: Listing) => ({
-      id: listing.id,
-      documentId: listing.documentId,
-      title: listing.title,
-      subtitle: listing.subtitle,
-      description: listing.description,
-      price: listing.price,
-      location: listing.location,
-      featured: listing.featured,
-      imageUrl: listing.image?.url ? `http://localhost:1337${listing.image.url}` : undefined,
-      categoryId: listing.category?.id,
-      categoryName: listing.category?.name,
-    }));
-  } catch (error) {
-    console.error('Error fetching listings:', error);
     throw error;
   }
 }
-
-

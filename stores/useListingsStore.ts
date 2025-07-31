@@ -1,64 +1,57 @@
+// listingsStore.ts
 import { create } from 'zustand';
-import { MappedListing, getListings } from '../services/listingsService';
+import { MappedListing, fetchListings } from '../services/listingsService';
 
 interface ListingsState {
-  // Current listings data
   listings: MappedListing[];
   currentCategoryListings: MappedListing[];
-  // Selected property for detail page
   selectedProperty: MappedListing | null;
-  setSelectedProperty: (property: MappedListing | null) => void;
-  // Loading states
   loading: boolean;
   categoryLoading: boolean;
-  // Error states
   error: string | null;
   categoryError: string | null;
-  // Actions
+  setSelectedProperty: (property: MappedListing | null) => void;
   fetchListings: () => Promise<void>;
   fetchListingsByCategory: (categoryName: string) => Promise<void>;
   clearError: () => void;
 }
 
-export const useListingsStore = create<ListingsState>((set, get) => ({
-  // Initial state
+export const useListingsStore = create<ListingsState>((set) => ({
   listings: [],
   currentCategoryListings: [],
   selectedProperty: null,
-  setSelectedProperty: (property) => set({ selectedProperty: property }),
   loading: false,
   categoryLoading: false,
   error: null,
   categoryError: null,
-  
-  // Fetch all listings
+
+  setSelectedProperty: (property) => set({ selectedProperty: property }),
+
   fetchListings: async () => {
     set({ loading: true, error: null });
     try {
-      const listings = await getListings();
+      const listings = await fetchListings();
       set({ listings, loading: false });
-    } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to fetch listings',
-        loading: false 
+    } catch (err) {
+      set({
+        error: err instanceof Error ? err.message : 'Failed to fetch listings',
+        loading: false,
       });
     }
   },
-  
-  // Fetch listings by category
+
   fetchListingsByCategory: async (categoryName: string) => {
     set({ categoryLoading: true, categoryError: null });
     try {
-      const currentCategoryListings = await getListings(categoryName);
+      const currentCategoryListings = await fetchListings(categoryName);
       set({ currentCategoryListings, categoryLoading: false });
-    } catch (error) {
-      set({ 
-        categoryError: error instanceof Error ? error.message : 'Failed to fetch category listings',
-        categoryLoading: false 
+    } catch (err) {
+      set({
+        categoryError: err instanceof Error ? err.message : 'Failed to fetch category listings',
+        categoryLoading: false,
       });
     }
   },
-  
-  // Clear errors
+
   clearError: () => set({ error: null, categoryError: null }),
 }));
