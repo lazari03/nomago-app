@@ -1,4 +1,5 @@
 import { useBookingStore } from '@/stores/useBookingStore';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from './ThemedText';
@@ -7,11 +8,18 @@ interface BookingFormProps {
   visible: boolean;
   onClose: () => void;
   propertyTitle: string;
+  propertyId: number | string;
+  propertyDocumentId: string;
+  startDate?: Date | null;
+  endDate?: Date | null;
 }
 
 
-const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTitle }) => {
+
+const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTitle, propertyId, propertyDocumentId, startDate, endDate }) => {
   const [form, setForm] = useState({ name: '', surname: '', email: '', phoneNumber: '' });
+  const [localStartDate, setLocalStartDate] = useState<Date | null>(startDate || null);
+  const [localEndDate, setLocalEndDate] = useState<Date | null>(endDate || null);
   const { loading, error, success, book, reset } = useBookingStore();
 
   useEffect(() => {
@@ -27,12 +35,32 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
     }
   }, [success, error]);
 
+  // If dates from filter change, update local state
+  useEffect(() => {
+    if (startDate) setLocalStartDate(startDate);
+    if (endDate) setLocalEndDate(endDate);
+  }, [startDate, endDate]);
+
   const handleSubmit = () => {
     if (!form.name || !form.surname || !form.email || !form.phoneNumber) {
       Alert.alert('Please fill all fields');
       return;
     }
-    book({ ...form });
+    if (!localStartDate || !localEndDate) {
+      Alert.alert('Please select both start and end dates');
+      return;
+    }
+    if (!propertyDocumentId) {
+      Alert.alert('Property Document ID is missing.');
+      return;
+    }
+    console.log('Booking listing documentId:', propertyDocumentId);
+    book({
+      ...form,
+      startDate: localStartDate,
+      endDate: localEndDate,
+      listing: propertyDocumentId, // Use correct key for backend
+    });
   };
 
   return (
@@ -80,6 +108,64 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
                 keyboardType="phone-pad"
                 returnKeyType="done"
               />
+              {/* Show or select dates */}
+              <View style={{ marginBottom: 16 }}>
+                <ThemedText style={styles.formLabel}>Dates:</ThemedText>
+                {(startDate && endDate) ? (
+                  <ThemedText style={styles.formValue}>
+                    {startDate ? startDate.toLocaleDateString() : ''} - {endDate ? endDate.toLocaleDateString() : ''}
+                  </ThemedText>
+                ) : (
+                  <View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                      <ThemedText style={styles.formLabel}>From:</ThemedText>
+                      {Platform.OS === 'web' ? (
+                        <input
+                          type="date"
+                          style={{ marginLeft: 8, fontSize: 16, padding: 4, borderRadius: 6, border: '1px solid #eee' }}
+                          value={localStartDate ? localStartDate.toISOString().split('T')[0] : ''}
+                          onChange={e => {
+                            const val = e.target.value;
+                            setLocalStartDate(val ? new Date(val) : null);
+                          }}
+                        />
+                      ) : (
+                        <DateTimePicker
+                          value={localStartDate || new Date()}
+                          mode="date"
+                          display="default"
+                          onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                            if (selectedDate) setLocalStartDate(selectedDate);
+                          }}
+                        />
+                      )}
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <ThemedText style={styles.formLabel}>To:</ThemedText>
+                      {Platform.OS === 'web' ? (
+                        <input
+                          type="date"
+                          style={{ marginLeft: 8, fontSize: 16, padding: 4, borderRadius: 6, border: '1px solid #eee' }}
+                          value={localEndDate ? localEndDate.toISOString().split('T')[0] : ''}
+                          onChange={e => {
+                            const val = e.target.value;
+                            setLocalEndDate(val ? new Date(val) : null);
+                          }}
+                        />
+                      ) : (
+                        <DateTimePicker
+                          value={localEndDate || new Date()}
+                          mode="date"
+                          display="default"
+                          onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                            if (selectedDate) setLocalEndDate(selectedDate);
+                          }}
+                        />
+                      )}
+                    </View>
+                  </View>
+                )}
+              </View>
               <View style={{ flexDirection: 'row', marginTop: 24, justifyContent: 'space-between' }}>
                 <TouchableOpacity style={styles.cancelButton} onPress={onClose} disabled={loading}>
                   <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
@@ -101,6 +187,17 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
 }
 
 const styles = StyleSheet.create({
+  formLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#6C4DF6',
+    marginBottom: 2,
+  },
+  formValue: {
+    fontSize: 16,
+    color: '#222',
+    marginBottom: 2,
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.2)',

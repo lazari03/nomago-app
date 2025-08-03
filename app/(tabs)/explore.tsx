@@ -35,6 +35,13 @@ export default function ExplorePage() {
     }
   });
 
+  // Debug: log all listing ids and titles
+  React.useEffect(() => {
+    if (currentCategoryListings && currentCategoryListings.length > 0) {
+      console.log('ExplorePage listings:', currentCategoryListings.map(l => ({ id: l.id, title: l.title })));
+    }
+  }, [currentCategoryListings]);
+
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <SafeAreaView style={{ flex: 1 }}>

@@ -40,10 +40,12 @@ export const useListingsStore = create<ListingsState>((set) => ({
     }
   },
 
+
   fetchListingsByCategory: async (categoryName: string) => {
     set({ categoryLoading: true, categoryError: null });
     try {
       const currentCategoryListings = await fetchListings(categoryName);
+      console.log('useListingsStore fetched listings:', currentCategoryListings.map(l => ({ id: l.id, title: l.title })));
       set({ currentCategoryListings, categoryLoading: false });
     } catch (err) {
       set({
