@@ -8,6 +8,7 @@ function getImageUrl(obj: any): string {
 }
 
 
+
 import BookingForm from '@/components/BookingForm';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
@@ -18,20 +19,17 @@ import React, { useState } from 'react';
 import { Image, SafeAreaView, TouchableOpacity, View } from 'react-native';
 import styles from './PropertyDetailScreen.styles';
 
-
 export const screenOptions = {
   headerShown: false,
 };
 
 export default function PropertyDetailScreen() {
-  // Modal state for booking form (must be inside component)
   const [modalVisible, setModalVisible] = useState(false);
   const { fromDate, toDate } = useDateFilterStore();
   const { id } = useLocalSearchParams();
   const { selectedProperty } = useListingsStore();
   const router = useRouter();
 
-  // Use Zustand property only
   const property = selectedProperty && String(selectedProperty.id) === String(id)
     ? selectedProperty
     : null;
@@ -43,6 +41,11 @@ export default function PropertyDetailScreen() {
       </View>
     );
   }
+
+  // Use the first image from imageUrls, fallback to a default if missing
+  const mainImageUrl = property.imageUrls && property.imageUrls.length > 0
+    ? property.imageUrls[0]
+    : 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2';
 
   return (
     <SafeAreaView style={styles.container}>
@@ -60,7 +63,7 @@ export default function PropertyDetailScreen() {
       <ParallaxScrollView
         headerImage={
           <Image
-            source={{ uri: getImageUrl(property) }}
+            source={{ uri: mainImageUrl }}
             style={styles.heroImage}
           />
         }
@@ -73,16 +76,7 @@ export default function PropertyDetailScreen() {
           <ThemedText style={styles.location}>📍 {property.location}</ThemedText>
         </View>
 
-        {/* Host Info */}
-        {hasHost(property) && (
-          <View style={styles.hostSection}>
-            <Image source={{ uri: property.host.avatar }} style={styles.hostAvatar} />
-            <View style={styles.hostInfo}>
-              <ThemedText style={styles.hostName}>Hosted by {property.host.name}</ThemedText>
-              <ThemedText style={styles.hostJoined}>Host since {property.host.joined}</ThemedText>
-            </View>
-          </View>
-        )}
+        {/* Host Info removed: property.host does not exist on MappedListing */}
 
         {/* Description */}
         <View style={styles.descriptionSection}>
