@@ -1,3 +1,4 @@
+import { useCategoryStore } from '@/stores/useCategoryStore';
 import { useDateFilterStore } from '@/stores/useDateFilterStore';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -9,13 +10,14 @@ export function HeaderFilter() {
   const navigation = useNavigation();
   const [showModal, setShowModal] = useState(false);
   const { fromDate, toDate, setDates } = useDateFilterStore();
+  const { category } = useCategoryStore();
 
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <Ionicons name="arrow-back" size={24} color="#6C4DF6" />
       </TouchableOpacity>
-      <View style={{ flex: 1 }} />
+      <Text style={styles.categoryTitle}>Explore {category}</Text>
       <View style={styles.rightHeader}>
         <TouchableOpacity onPress={() => setShowModal(true)} style={styles.filterButton}>
           <Ionicons name="filter" size={22} color="#6C4DF6" />
@@ -257,6 +259,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 8,
     color: '#6C4DF6',
+  },
+  categoryTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#000',
+    flex: 1,
+    textAlign: 'center',
   },
   // ...existing code...
 });

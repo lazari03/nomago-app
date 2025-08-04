@@ -56,7 +56,6 @@ export default function ExplorePage() {
           scrollEventThrottle={16}
           refreshControl={<RefreshControl {...refreshControlProps} />}
         >
-          <Text style={styles.categoryTitle}>Explore {category}</Text>
           <ThemedView style={styles.stepContainer}>
             {categoryLoading ? (
               <Text>Loading...</Text>
@@ -120,13 +119,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   stepContainer: {
-    gap: 8,
+    gap: 4,  // Reduced from 8 to 4
     marginBottom: 8,
-  },
-  categoryTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    margin: 16,
   },
    tabBar: {
     position: 'absolute',

@@ -6,7 +6,7 @@ export const propertyCardStyles = StyleSheet.create({
     backgroundColor: ColorTokens.darkPurple, // Dark purple background
     borderRadius: 20,
     padding: 16,
-    marginBottom: 16,
+    marginBottom: 8,  // Reduced from 16 to 8
     marginHorizontal: 4,
     elevation: 3,
     shadowColor: '#000',
