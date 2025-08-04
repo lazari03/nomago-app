@@ -7,35 +7,12 @@ import { ListingCardProps, ListingSlide } from './ListingCard.types';
 
 const { width } = Dimensions.get('window');
 
-// Mock data - you can replace this with real data later
-const mockSlides: ListingSlide[] = [
-  {
-    id: '1',
-    image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2',
-    title: 'Modern Apartment',
-    subtitle: 'Downtown, City Center',
-  },
-  {
-    id: '2',
-    image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688',
-    title: 'Cozy Studio',
-    subtitle: 'Art District',
-  },
-  {
-    id: '3',
-    image: 'https://images.unsplash.com/photo-1554995207-c18c203602cb',
-    title: 'Luxury Suite',
-    subtitle: 'Business District',
-  },
-  {
-    id: '4',
-    image: 'https://images.unsplash.com/photo-1520637836862-4d197d17c5a0',
-    title: 'Beach House',
-    subtitle: 'Coastal Area',
-  },
-];
 
-export function ListingCard({ slides = mockSlides, onBookNow }: ListingCardProps) {
+
+
+// slides is now required and must be an array of ListingSlide with imageUrls
+export function ListingCard({ slides, onBookNow }: ListingCardProps) {
+  // slides is now required
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const router = useRouter();
@@ -45,7 +22,6 @@ export function ListingCard({ slides = mockSlides, onBookNow }: ListingCardProps
     if (onBookNow) {
       onBookNow(currentSlide);
     } else {
-      // Navigate to property detail page
       router.push(`/property/${currentSlide.id}`);
     }
   };
@@ -53,7 +29,7 @@ export function ListingCard({ slides = mockSlides, onBookNow }: ListingCardProps
   const renderSlide = ({ item }: { item: ListingSlide }) => (
     <View style={styles.slideContainer}>
       <View style={styles.card}>
-        <Image source={{ uri: item.image }} style={styles.image} />
+        <Image source={{ uri: item.imageUrls?.[0] ?? '' }} style={styles.image} />
         <View style={styles.overlay} />
         <TouchableOpacity style={styles.bookNow} onPress={handleBookNow}>
           <ThemedText style={styles.bookNowText}>BOOK NOW</ThemedText>
@@ -72,6 +48,13 @@ export function ListingCard({ slides = mockSlides, onBookNow }: ListingCardProps
     setCurrentIndex(index);
   };
 
+  if (!slides || slides.length === 0) {
+    return (
+      <View style={styles.container}>
+        <ThemedText>No listings available.</ThemedText>
+      </View>
+    );
+  }
   return (
     <View style={styles.container}>
       <FlatList
@@ -86,9 +69,8 @@ export function ListingCard({ slides = mockSlides, onBookNow }: ListingCardProps
         snapToInterval={width}
         decelerationRate="fast"
         style={styles.carousel}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => String(item.id)}
       />
-      
       {/* Pagination Dots */}
       <View style={styles.paginationContainer}>
         {slides.map((_, index) => (

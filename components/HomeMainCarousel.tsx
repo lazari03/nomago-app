@@ -1,46 +1,18 @@
-
 import { useCategoryStore } from '@/stores/useCategoryStore';
 import { useListingsStore } from '@/stores/useListingsStore';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export function HomeMainCarousel() {
+  const { currentCategoryListings, listings, categoryLoading, fetchListingsByCategory } = useListingsStore();
   const { category } = useCategoryStore();
-  const { currentCategoryListings, categoryLoading } = useListingsStore();
 
-  // Fallback data for when no listings are available
-  const fallbackData: Record<string, { image: string; title: string; subtitle: string }> = {
-    Residences: {
-      image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2',
-      title: 'Cozy Studio',
-      subtitle: 'Art District',
-    },
-    Apartments: {
-      image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
-      title: 'Modern Apartment',
-      subtitle: 'City Center',
-    },
-    Transport: {
-      image: 'https://images.unsplash.com/photo-1519985176271-ad4e1c2d8c27',
-      title: 'Get a Ride',
-      subtitle: 'Taxi Lux',
-    },
-    Restaurant: {
-      image: 'https://images.unsplash.com/photo-1555992336-03a23c1f1c38',
-      title: 'Fine Dining',
-      subtitle: 'Gourmet Experience',
-    },
-    Restaurants: {
-      image: 'https://images.unsplash.com/photo-1555992336-03a23c1f1c38',
-      title: 'Fine Dining',
-      subtitle: 'Gourmet Experience',
-    },
-  };
-
-  // Use category-specific listings if available, otherwise fallback
-  const displayListing = currentCategoryListings.length > 0 
-    ? currentCategoryListings[0] 
-    : null;
+  // Fetch listings for the selected category when it changes
+  useEffect(() => {
+    if (category) {
+      fetchListingsByCategory(category);
+    }
+  }, [category, fetchListingsByCategory]);
 
   if (categoryLoading) {
     return (
@@ -51,43 +23,34 @@ export function HomeMainCarousel() {
     );
   }
 
-  // If we have a listing from API, use it
-  if (displayListing) {
+  // Prefer category listings, fallback to all listings
+  const displayList = (currentCategoryListings && currentCategoryListings.length > 0)
+    ? currentCategoryListings
+    : listings;
+
+  if (!displayList || displayList.length === 0) {
     return (
       <View style={styles.container}>
-        <Image 
-          source={{ uri: displayListing.imageUrl || fallbackData[category]?.image || fallbackData.Residences.image }} 
-          style={styles.image} 
-        />
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>{displayListing.title}</Text>
-          <Text style={styles.subtitle}>{displayListing.subtitle}</Text>
-          {displayListing.price && (
-            <Text style={styles.price}>${displayListing.price}</Text>
-          )}
-        </View>
-        <TouchableOpacity style={styles.reserveBtnNearText}>
-          <Text style={styles.reserveText}>Book Now</Text>
-        </TouchableOpacity>
+        <Text style={styles.title}>No listings available.</Text>
       </View>
     );
   }
 
-  // Fallback to static data
-  const categoryData = fallbackData[category] || {
-    image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2',
-    title: 'Discover',
-    subtitle: 'Explore Options',
-  };
-
-  const { image, title, subtitle } = categoryData;
+  // Show the first listing (can be replaced with a FlatList/Carousel for multiple)
+  const displayListing = displayList[0];
 
   return (
     <View style={styles.container}>
-      <Image source={{ uri: image }} style={styles.image} />
+      <Image 
+        source={{ uri: displayListing.imageUrls?.[0] ?? '' }} 
+        style={styles.image} 
+      />
       <View style={styles.textContainer}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>{subtitle}</Text>
+        <Text style={styles.title}>{displayListing.title}</Text>
+        <Text style={styles.subtitle}>{displayListing.subtitle}</Text>
+        {displayListing.price && (
+          <Text style={styles.price}>${displayListing.price}</Text>
+        )}
       </View>
       <TouchableOpacity style={styles.reserveBtnNearText}>
         <Text style={styles.reserveText}>BOOK NOW</Text>

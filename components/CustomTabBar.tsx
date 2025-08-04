@@ -2,54 +2,57 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { ColorTokens } from '@/constants/Colors';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import React from 'react';
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-// Tab config: icon, label, route
+// Tab config: icon, label, route (only Home and Explore for now)
 const TABS = [
   {
-    name: 'Home',
+    name: 'index',
     icon: 'house.fill',
+    label: 'Home',
     route: '/'
   },
   {
     name: 'explore',
-    icon: 'paperplane.fill',
+    icon: 'magnifyingglass',
+    label: 'Explore',
     route: '/explore'
-  },
-  {
-    name: 'contact',
-    icon: 'chevron.left.forwardslash.chevron.right',
-    route: '/contact'
-  },
-  {
-    name: 'signin',
-    icon: 'person.fill', // You may need to add this mapping in IconSymbol
-    route: '/signin'
   },
 ];
 
 export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
+  
   return (
-    <View style={[styles.tabBar, { paddingBottom: insets.bottom }]}> 
-      {TABS.map((tab, idx) => {
+    <View style={[styles.tabBar, { 
+      marginBottom: Math.max(insets.bottom + 16, 24),
+      position: 'absolute',
+      bottom: 0,
+      left: 16,
+      right: 16,
+    }]}> 
+      {state.routes.map((route, idx) => {
         const isFocused = state.index === idx;
+        const tabData = TABS.find(tab => tab.name === route.name) || TABS[idx];
+        
         return (
           <TouchableOpacity
-            key={tab.name}
+            key={route.key}
             accessibilityRole="button"
             accessibilityState={isFocused ? { selected: true } : {}}
-            onPress={() => navigation.navigate(tab.route)}
+            onPress={() => navigation.navigate(route.name)}
             style={[styles.tab, isFocused && styles.activeTab]}
             activeOpacity={0.8}
           >
-            <IconSymbol
-              name={tab.icon as any}
-              size={28}
-              color={isFocused ? ColorTokens.white : ColorTokens.darkPurple}
-            />
-            <Text style={[styles.label, isFocused && styles.activeLabel]}>{tab.name}</Text>
+            <View style={styles.iconLabelWrapper}>
+              <IconSymbol
+                name={tabData?.icon as any}
+                size={24}
+                color={isFocused ? ColorTokens.purple : ColorTokens.darkPurple}
+              />
+              <Text style={[styles.label, isFocused && styles.activeLabel]}>{tabData?.label}</Text>
+            </View>
           </TouchableOpacity>
         );
       })}
@@ -62,37 +65,42 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: ColorTokens.lightPurple, // changed to light purple
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    marginHorizontal: 8,
-    marginBottom: Platform.OS === 'ios' ? 16 : 8,
-    paddingTop: 8,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    height: 64,
     // shadow for floating effect
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowRadius: 12,
     elevation: 8,
   },
   tab: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 10,
+    justifyContent: 'center',
+    paddingVertical: 8,
+    borderRadius: 12,
+    marginHorizontal: 8,
+    backgroundColor: 'transparent',
+  },
+  iconLabelWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
   },
   activeTab: {
-    // Optionally add a highlight or scale effect
+    backgroundColor: '#F3F0FF',
   },
   label: {
     color: ColorTokens.darkPurple,
     fontSize: 12,
-    marginTop: 2,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   activeLabel: {
-    color: ColorTokens.darkPurple,
+    color: ColorTokens.purple,
     fontWeight: 'bold',
   },
 });
-
-export default CustomTabBar;

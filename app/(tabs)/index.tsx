@@ -2,16 +2,18 @@ import { HomeBottomCards } from '@/components/HomeBottomCards';
 import { HomeDateBar } from '@/components/HomeDateBar';
 import { HomeMainCarousel } from '@/components/HomeMainCarousel';
 import { HomeTabBar } from '@/components/HomeTabBar';
-import { HomeTopBar } from '@/components/HomeTopBar';
+import { ThemedView } from '@/components/ThemedView';
 import { useListingsStore } from '@/stores/useListingsStore';
 import { usePullToRefresh } from '@/utils/usePullToRefresh';
 import { useRef } from 'react';
-import { Animated, RefreshControl, StyleSheet, View } from 'react-native';
+import { Animated, RefreshControl, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const { fetchListings } = useListingsStore();
   const { refreshControlProps } = usePullToRefresh(fetchListings);
+  const insets = useSafeAreaInsets();
 
   // Fade out header between 0 and 80px of scroll
   const headerOpacity = scrollY.interpolate({
@@ -21,28 +23,36 @@ export default function HomeScreen() {
   });
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      <HomeTopBar />
+    <ThemedView style={styles.container}>
       <HomeDateBar />
       <HomeTabBar />
       <Animated.ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ 
+          flexGrow: 1,
+          paddingBottom: Math.max(insets.bottom + 100, 140),  // Account for safe area + tab bar height
+          paddingHorizontal: 8  // Add horizontal padding for better spacing
+        }}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: true }
         )}
         scrollEventThrottle={16}
         refreshControl={<RefreshControl {...refreshControlProps} />}
+        showsVerticalScrollIndicator={false}  // Hide scroll indicator for cleaner look
       >
         <HomeMainCarousel />
         <HomeBottomCards />
       </Animated.ScrollView>
-    </View>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   logoContainer: {
     position: 'absolute',
     left: 0,

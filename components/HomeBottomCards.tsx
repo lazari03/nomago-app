@@ -5,7 +5,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 const HomeBottomCards = React.memo(() => {
   // Hardcoded mock card for bottom section
   return (
-    <View>
+    <View style={styles.container}>
       <View style={styles.row}>
         <TouchableOpacity
           style={styles.leftCard}
@@ -27,6 +27,9 @@ const HomeBottomCards = React.memo(() => {
 export { HomeBottomCards };
 
 const styles = StyleSheet.create({
+  container: {
+    marginBottom: 20, // Extra spacing at the bottom
+  },
   row: {
     flexDirection: 'row',
     gap: 12,

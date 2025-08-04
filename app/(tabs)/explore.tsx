@@ -83,7 +83,6 @@ export default function ExplorePage() {
           </ThemedView>
         </Animated.ScrollView>
       </SafeAreaView>
-      <HomeTabBar />
     </View>
   );
 }
