@@ -56,16 +56,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    marginTop: 0,
+    paddingTop: 0,
   },
   imageContainer: {
     overflow: 'hidden',
     width: '100%',
     backgroundColor: '#fff',
+    marginTop: 0,
+    paddingTop: 0,
   },
   heroImage: {
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
+    marginTop: 0,
+    paddingTop: 0,
   },
   content: {
     padding: 16,

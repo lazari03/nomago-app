@@ -16,7 +16,7 @@ interface CategoryState {
 }
 
 export const useCategoryStore = create<CategoryState>((set, get) => ({
-  category: 'Residences',
+  category: '', // Start with empty string instead of 'Residences'
   categories: [],
   loading: false,
   error: null,
@@ -29,10 +29,10 @@ export const useCategoryStore = create<CategoryState>((set, get) => ({
       const categories = await getCategories();
       const currentState = get();
       
-      // If no category is selected or if the current category doesn't exist in the fetched categories,
-      // select the first category from the API
+      // Always select the first category from the API if no category is selected
+      // or if the current category doesn't exist in the fetched categories
       if (!currentState.category || !categories.some(cat => cat.name === currentState.category)) {
-        const firstCategory = categories.length > 0 ? categories[0].name : 'Residences';
+        const firstCategory = categories.length > 0 ? categories[0].name : '';
         set({ categories, loading: false, category: firstCategory });
       } else {
         set({ categories, loading: false });

@@ -62,10 +62,12 @@ export default function PropertyDetailScreen() {
       </View>
       <ParallaxScrollView
         headerImage={
-          <Image
-            source={{ uri: mainImageUrl }}
-            style={styles.heroImage}
-          />
+          <View style={styles.imageContainer}>
+            <Image
+              source={{ uri: mainImageUrl }}
+              style={styles.heroImage}
+            />
+          </View>
         }
         headerBackgroundColor={{ light: '#fff', dark: '#222' }}
         withTabBarPadding={false}
