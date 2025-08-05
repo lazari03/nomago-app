@@ -1,186 +1,182 @@
+import Colors from '@/constants/Colors';
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 8, // Lower than before
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 2,
-    zIndex: 10,
-  },
-  inlineTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#222',
-    marginLeft: 12,
-    flexShrink: 1,
-  },
-  circleBackButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F3F0FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 4,
-  },
-  iconCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconArrow: {
-    fontSize: 22,
-    color: '#6C4DF6',
-    fontWeight: 'bold',
-    marginLeft: 2,
-    marginTop: -2,
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#222',
-    marginHorizontal: 8,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    marginTop: 0,
-    paddingTop: 0,
-  },
-  imageContainer: {
-    overflow: 'hidden',
-    width: '100%',
-    backgroundColor: '#fff',
-    marginTop: 0,
-    paddingTop: 0,
-  },
-  heroImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-    marginTop: 0,
-    paddingTop: 0,
-  },
-  content: {
-    padding: 16,
-  },
-  titleSection: {
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  location: {
-    fontSize: 16,
-    color: '#666',
-  },
-  hostSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-    paddingBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  hostAvatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 12,
-  },
-  hostInfo: {
-    flex: 1,
-  },
-  hostName: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  hostJoined: {
-    fontSize: 14,
-    color: '#666',
-  },
-  descriptionSection: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  description: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: '#333',
-  },
-  amenitiesSection: {
-    marginBottom: 100,
-  },
-  amenitiesList: {
-    gap: 12,
-  },
-  amenityItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  amenityIcon: {
-    fontSize: 18,
-    marginRight: 12,
-    width: 24,
-  },
-  amenityText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  bottomBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-  },
-  priceInfo: {
-    flex: 1,
-  },
-  priceText: {
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-  priceLabel: {
-    fontSize: 14,
-    color: '#666',
-  },
-  bookButton: {
-    backgroundColor: '#5A4FCF',
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    borderRadius: 12,
-  },
-  bookButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+    // Header Styles
+    headerOverlay: {
+        position: 'absolute',
+        top: 20,
+        left: 0,
+        right: 0,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingTop: 44, // Safe area top padding
+        paddingHorizontal: 16,
+        paddingBottom: 12,
+        height: 100, // Adjust based on safe area
+        backgroundColor: 'transparent',
+        zIndex: 10,
+    },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+        height: 56,
+        backgroundColor: '#fff',
+
+    },
+    headerBackButton: {
+        padding: 8,
+        borderRadius: 20,
+        backgroundColor: Colors.card,
+    },
+    headerBackIcon: {
+        fontSize: 24,
+        color: Colors.buttonColor,
+        fontWeight: 'bold',
+    },
+    headerTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: Colors.text,
+        flex: 1,
+        textAlign: 'center',
+        marginLeft: 8,
+        marginRight: 8,
+    },
+    headerRightSpacer: {
+        width: 40,
+    },
+
+    // Hero Image
+    heroImage: {
+        width: '100%',
+        height: 260,
+        resizeMode: 'cover',
+    },
+
+    // Layout
+    container: {
+        flex: 1,
+        backgroundColor: Colors.background,
+    },
+    contentWrapper: {
+        flex: 1,
+        paddingHorizontal: 16,
+        paddingTop: 16,
+    },
+
+    // Title Section
+    titleSection: {
+        marginBottom: 20,
+        paddingBottom: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: Colors.border,
+    },
+    title: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        marginBottom: 8,
+        color: Colors.text,
+    },
+    locationRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    location: {
+        fontSize: 16,
+        color: Colors.secondary,
+        flex: 1,
+    },
+
+    // Price Preview Section
+    pricePreviewSection: {
+        backgroundColor: Colors.card,
+        padding: 16,
+        borderRadius: 12,
+        marginBottom: 24,
+    },
+    priceRow: {
+        flexDirection: 'row',
+        alignItems: 'baseline',
+    },
+    pricePreviewText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: Colors.text,
+        marginRight: 8,
+    },
+    pricePreviewLabel: {
+        fontSize: 16,
+        color: Colors.secondary,
+    },
+
+    // Description
+    descriptionSection: {
+        marginBottom: 24,
+    },
+    sectionTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 12,
+        color: Colors.text,
+    },
+    description: {
+        fontSize: 16,
+        lineHeight: 24,
+        color: Colors.secondary,
+    },
+
+    // Bottom Spacer
+    bottomSpacer: {
+        height: 120,
+    },
+
+    // Bottom Bar
+    bottomBar: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 16,
+        paddingBottom: 34,
+        backgroundColor: Colors.background,
+        borderTopWidth: 1,
+        borderTopColor: Colors.border,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 5,
+    },
+    priceInfo: {
+        flex: 1,
+    },
+    priceText: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: Colors.text,
+    },
+    priceLabel: {
+        fontSize: 14,
+        color: Colors.secondary,
+    },
+    bookButton: {
+        backgroundColor: Colors.buttonColor,
+        paddingHorizontal: 32,
+        paddingVertical: 16,
+        borderRadius: 12,
+    },
+    bookButtonText: {
+        color: Colors.white,
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
 });
 
 export default styles;

@@ -1,22 +1,12 @@
-// Type guard helpers
-function hasHost(obj: any): obj is { host: { name: string; avatar: string; joined: string } } {
-  return obj && typeof obj.host === 'object' && typeof obj.host.name === 'string';
-}
-// Amenities removed
-function getImageUrl(obj: any): string {
-  return obj.imageUrl || obj.image || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2';
-}
-
-
-
 import BookingForm from '@/components/BookingForm';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import { useDateFilterStore } from '@/stores/useDateFilterStore';
 import { useListingsStore } from '@/stores/useListingsStore';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Image, SafeAreaView, TouchableOpacity, View } from 'react-native';
+import { Image, TouchableOpacity, View } from 'react-native';
 import styles from './PropertyDetailScreen.styles';
 
 export const screenOptions = {
@@ -42,68 +32,72 @@ export default function PropertyDetailScreen() {
     );
   }
 
-  // Use the first image from imageUrls, fallback to a default if missing
   const mainImageUrl = property.imageUrls && property.imageUrls.length > 0
     ? property.imageUrls[0]
     : 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2';
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Custom Header - Explore style */}
-      <View style={styles.headerContainer}>
-        <TouchableOpacity style={styles.circleBackButton} onPress={() => router.back()}>
-          <View style={styles.iconCircle}>
-            <ThemedText style={styles.iconArrow}>←</ThemedText>
-          </View>
+    <ThemedView style={styles.container}>
+      {/* Fixed Header Overlay */}
+      <View style={styles.headerOverlay}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.headerBackButton}>
+          <ThemedText style={styles.headerBackIcon}>←</ThemedText>
         </TouchableOpacity>
-        <ThemedText style={styles.inlineTitle} numberOfLines={1} ellipsizeMode="tail">
+        <ThemedText
+          style={styles.headerTitle}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
           {property.title}
         </ThemedText>
       </View>
+
       <ParallaxScrollView
-        headerImage={
-          <View style={styles.imageContainer}>
-            <Image
-              source={{ uri: mainImageUrl }}
-              style={styles.heroImage}
-            />
-          </View>
-        }
+        headerImage={<Image source={{ uri: mainImageUrl }} style={styles.heroImage} />}
         headerBackgroundColor={{ light: '#fff', dark: '#222' }}
         withTabBarPadding={false}
       >
-        {/* Title and Location */}
-        <View style={styles.titleSection}>
-          <ThemedText style={styles.title}>{property.title}</ThemedText>
-          <ThemedText style={styles.location}>📍 {property.location}</ThemedText>
+        <View style={styles.contentWrapper}>
+          {/* Title & Location */}
+          <View style={styles.titleSection}>
+            <ThemedText style={styles.title}>{property.title}</ThemedText>
+            <View style={styles.locationRow}>
+              <ThemedText style={styles.location}>{property.location}</ThemedText>
+            </View>
+          </View>
+
+          {/* Price */}
+          <View style={styles.pricePreviewSection}>
+            <View style={styles.priceRow}>
+              <ThemedText style={styles.pricePreviewText}>{property.price}</ThemedText>
+              <ThemedText style={styles.pricePreviewLabel}>per night</ThemedText>
+            </View>
+          </View>
+
+          {/* Description */}
+          <View style={styles.descriptionSection}>
+            <ThemedText style={styles.sectionTitle}>About this place</ThemedText>
+            <ThemedText style={styles.description}>
+              {property.description || 'No description available.'}
+            </ThemedText>
+          </View>
+
+          <View style={styles.bottomSpacer} />
         </View>
-
-        {/* Host Info removed: property.host does not exist on MappedListing */}
-
-        {/* Description */}
-        <View style={styles.descriptionSection}>
-          <ThemedText style={styles.sectionTitle}>About this place</ThemedText>
-          <ThemedText style={styles.description}>{property.description}</ThemedText>
-        </View>
-
-        {/* Amenities removed */}
       </ParallaxScrollView>
 
-      {/* Bottom Action Bar */}
+      {/* Bottom Booking Bar */}
       <View style={styles.bottomBar}>
         <View style={styles.priceInfo}>
           <ThemedText style={styles.priceText}>{property.price}</ThemedText>
           <ThemedText style={styles.priceLabel}>per night</ThemedText>
         </View>
-        <TouchableOpacity 
-          style={styles.bookButton}
-          onPress={() => setModalVisible(true)}
-        >
+        <TouchableOpacity style={styles.bookButton} onPress={() => setModalVisible(true)}>
           <ThemedText style={styles.bookButtonText}>Book Now</ThemedText>
         </TouchableOpacity>
       </View>
 
-      {/* Booking Modal (must be at root, not inside bottomBar) */}
+      {/* Booking Modal */}
       <BookingForm
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -113,7 +107,6 @@ export default function PropertyDetailScreen() {
         startDate={fromDate}
         endDate={toDate}
       />
-    </SafeAreaView>
+    </ThemedView>
   );
 }
-

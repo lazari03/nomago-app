@@ -66,7 +66,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
   return (
     <Modal
       visible={visible}
-      animationType="slide"
+      animationType="none"
       transparent
       onRequestClose={onClose}
     >

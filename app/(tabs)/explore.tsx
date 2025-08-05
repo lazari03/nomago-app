@@ -6,7 +6,7 @@ import { useCategoryStore } from '@/stores/useCategoryStore';
 import { useListingsStore } from '@/stores/useListingsStore';
 import { usePullToRefresh } from '@/utils/usePullToRefresh';
 import React, { useRef } from 'react';
-import { Animated, RefreshControl, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Animated, RefreshControl, StyleSheet, Text } from 'react-native';
 
 
 
@@ -43,8 +43,7 @@ export default function ExplorePage() {
   }, [currentCategoryListings]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      <SafeAreaView style={{ flex: 1 }}>
+    <ThemedView style={{ flex: 1, backgroundColor: '#fff' }}>
         <HeaderFilter />
         <HomeTabBar />
         <Animated.ScrollView
@@ -81,8 +80,7 @@ export default function ExplorePage() {
             )}
           </ThemedView>
         </Animated.ScrollView>
-      </SafeAreaView>
-    </View>
+    </ThemedView>
   );
 }
 

@@ -20,7 +20,7 @@ export const ColorTokens = {
   darkBlue: '#1939DC',
   
   // Purples & Pinks
-  purple: '#9C27B0',
+  purple: '#6C4DF6',
   lightPurple: '#E1BEE7',
   darkPurple: '#4A148C',
   
@@ -54,6 +54,8 @@ export const Colors = {
   success: ColorTokens.green,
   error: '#FF5252',
   info: ColorTokens.lightBlue,
+  buttonColor: ColorTokens.purple,
+  white: ColorTokens.white,
 };
 
 export default Colors;
