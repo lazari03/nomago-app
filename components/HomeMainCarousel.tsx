@@ -1,5 +1,6 @@
 import { useCategoryStore } from '@/stores/useCategoryStore';
 import { useListingsStore } from '@/stores/useListingsStore';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
 import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -45,16 +46,25 @@ export function HomeMainCarousel() {
         source={{ uri: displayListing.imageUrls?.[0] ?? '' }} 
         style={styles.image} 
       />
+      
+      {/* Gradient overlay covering bottom 40% */}
+      <LinearGradient
+        colors={['transparent', 'rgba(108,77,246,0.8)']}
+        style={styles.gradientOverlay}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+      />
+      
       <View style={styles.textContainer}>
         <Text style={styles.title}>{displayListing.title}</Text>
         <Text style={styles.subtitle}>{displayListing.subtitle}</Text>
         {displayListing.price && (
           <Text style={styles.price}>${displayListing.price}</Text>
         )}
+        <TouchableOpacity style={styles.reserveBtnNearText}>
+          <Text style={styles.reserveText}>BOOK NOW</Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.reserveBtnNearText}>
-        <Text style={styles.reserveText}>BOOK NOW</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -83,6 +93,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     borderRadius: 28,
   },
+  gradientOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '40%',
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
+  },
   leftArrow: {
     position: 'absolute',
     left: 12,
@@ -108,7 +127,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 8,
     paddingHorizontal: 32,
-    alignSelf: 'flex-start',
+    alignSelf: 'flex-end',
     marginTop: 8,
   },
   reserveText: {
@@ -118,24 +137,28 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     position: 'absolute',
-    left: 20,
+    right: 20,
     bottom: 24,
+    alignItems: 'flex-end',
   },
   title: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 22,
+    textAlign: 'right',
   },
   subtitle: {
     color: '#fff',
     opacity: 0.8,
     fontSize: 15,
     marginTop: 2,
+    textAlign: 'right',
   },
   price: {
     color: '#00FFB0',
     fontWeight: 'bold',
     fontSize: 18,
     marginTop: 4,
+    textAlign: 'right',
   },
 });
