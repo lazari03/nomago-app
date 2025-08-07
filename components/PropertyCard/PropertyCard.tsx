@@ -1,7 +1,8 @@
 import { ThemedText } from '@/components/ThemedText';
+import { ThemeImage } from '@/components/ui/ThemeImage';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Image, TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { propertyCardStyles as styles } from './PropertyCard.styles';
 // Accepts a MappedListing object directly
 import { MappedListing } from '@/services/listingsService';
@@ -27,7 +28,7 @@ export function PropertyCard({ listing, onPress }: PropertyCardProps) {
       <View style={styles.cardContent}>
         {/* Image */}
         <View style={styles.imageContainer}>
-          <Image source={{ uri: listing.imageUrls?.[0] || '' }} style={styles.image} />
+          <ThemeImage uri={listing.imageUrls?.[0] || ''} width={120} height={140} quality={60} style={styles.image} />
         </View>
 
         {/* Content */}

@@ -30,11 +30,7 @@ export async function createBooking(payload: BookingPayload) {
   } catch (error: any) {
     // Log error details for debugging
     if (error.response) {
-      console.error('Booking API error:', error.response.status, error.response.data);
-    } else if (error.request) {
-      console.error('Booking API network error:', error.message);
-    } else {
-      console.error('Booking API unknown error:', error);
+      // Error logging removed
     }
     throw error;
   }

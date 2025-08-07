@@ -39,7 +39,7 @@ export async function getCategories(): Promise<MappedCategory[]> {
       documentId: category.documentId
     }));
   } catch (error) {
-    console.error('Error fetching categories:', error);
+    // Error logging removed
     throw error;
   }
 }

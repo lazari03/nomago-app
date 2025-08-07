@@ -97,7 +97,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
 
       Alert.alert('Success', 'Booking confirmation saved to your gallery!');
     } catch (error) {
-      console.error('Error saving booking confirmation image:', error);
+      // Error logging removed
       Alert.alert('Error', 'Failed to save image. Please try again.');
     } finally {
       setIsSaving(false);

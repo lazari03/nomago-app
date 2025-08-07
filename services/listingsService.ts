@@ -59,7 +59,7 @@ function mapListing(listing: Listing): MappedListing {
   let imageUrls: string[] = [];
 
   // Debug: log raw images object
-  console.log('Raw images object:', JSON.stringify(listing.images, null, 2));
+  // Removed debug console.log
   if (Array.isArray(listing.images)) {
     imageUrls = listing.images.map(img => img.url).filter(Boolean);
   } else if (listing.images?.data && Array.isArray(listing.images.data)) {
@@ -102,17 +102,11 @@ export async function fetchListings(categoryName?: string): Promise<MappedListin
 
   try {
     const response = await apiClient.listings({ method: 'get', url: `/listings?${query}` });
-    console.log('Raw listings response:', response.data.data);
     const mapped = response.data.data.map(mapListing);
-    console.log('Mapped listings:', JSON.stringify(mapped, null, 2));
     return mapped;
   } catch (error: any) {
     if (error.response) {
-      console.error('Listings API error:', error.response.status, error.response.data);
-    } else if (error.request) {
-      console.error('Listings API network error:', error.message);
-    } else {
-      console.error('Listings API unknown error:', error);
+      // Error logging removed
     }
     throw error;
   }

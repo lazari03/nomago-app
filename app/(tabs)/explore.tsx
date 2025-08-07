@@ -6,7 +6,7 @@ import { useCategoryStore } from '@/stores/useCategoryStore';
 import { useListingsStore } from '@/stores/useListingsStore';
 import { usePullToRefresh } from '@/utils/usePullToRefresh';
 import React, { useRef } from 'react';
-import { Animated, RefreshControl, StyleSheet, Text } from 'react-native';
+import { Animated, FlatList, RefreshControl, StyleSheet, Text } from 'react-native';
 
 
 
@@ -37,49 +37,57 @@ export default function ExplorePage() {
 
   // Debug: log all listing ids and titles
   React.useEffect(() => {
-    if (currentCategoryListings && currentCategoryListings.length > 0) {
-      console.log('ExplorePage listings:', currentCategoryListings.map(l => ({ id: l.id, title: l.title })));
-    }
+    // Removed debug console.log
   }, [currentCategoryListings]);
+
+  // Pagination state for lazy loading
+  const [visibleCount, setVisibleCount] = React.useState(10);
+
+  const handleLoadMore = () => {
+    if (currentCategoryListings.length > visibleCount) {
+      setVisibleCount((prev) => prev + 10);
+    }
+  };
 
   return (
     <ThemedView style={{ flex: 1, backgroundColor: '#fff' }}>
-        <HeaderFilter />
-        <HomeTabBar />
-        <Animated.ScrollView
-          contentContainerStyle={{ paddingTop: 0, paddingHorizontal: 16, paddingBottom: 32 }}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: true }
-          )}
-          scrollEventThrottle={16}
-          refreshControl={<RefreshControl {...refreshControlProps} />}
-        >
-          <ThemedView style={styles.stepContainer}>
-            {categoryLoading ? (
-              <Text>Loading...</Text>
-            ) : error ? (
-              <Text>Error: {error}</Text>
-            ) : currentCategoryListings.length > 0 ? (
-              currentCategoryListings.map((item) => (
-                <PropertyCard
-                  key={item.id}
-                  listing={item}
-                  onPress={() => {
-                    setSelectedProperty(item);
-                    // Use useRouter for navigation
-                    import('expo-router').then(({ useRouter }) => {
-                      const router = useRouter();
-                      router.push({ pathname: '/property/[id]', params: { id: item.id } });
-                    });
-                  }}
-                />
-              ))
-            ) : (
-              <Text>No listings found for {category}.</Text>
+      <HeaderFilter />
+      <HomeTabBar />
+      <Animated.View style={{ flex: 1 }}>
+        {categoryLoading ? (
+          <Text>Loading...</Text>
+        ) : error ? (
+          <Text>Error: {error}</Text>
+        ) : currentCategoryListings.length > 0 ? (
+          <FlatList
+            data={currentCategoryListings.slice(0, visibleCount)}
+            keyExtractor={(item: any) => item.id.toString()}
+            renderItem={({ item }: { item: any }) => (
+              <PropertyCard
+                listing={item}
+                onPress={() => {
+                  setSelectedProperty(item);
+                  import('expo-router').then(({ useRouter }) => {
+                    const router = useRouter();
+                    router.push({ pathname: '/property/[id]', params: { id: item.id } });
+                  });
+                }}
+              />
             )}
-          </ThemedView>
-        </Animated.ScrollView>
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={
+              visibleCount < currentCategoryListings.length ? (
+                <Text style={{ textAlign: 'center', marginVertical: 16 }}>Loading more...</Text>
+              ) : null
+            }
+            refreshControl={<RefreshControl {...refreshControlProps} />}
+            contentContainerStyle={{ paddingTop: 0, paddingHorizontal: 16, paddingBottom: 32 }}
+          />
+        ) : (
+          <Text>No listings found for {category}.</Text>
+        )}
+      </Animated.View>
     </ThemedView>
   );
 }
