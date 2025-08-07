@@ -1,8 +1,7 @@
 import { ThemedText } from '@/components/ThemedText';
-import { ThemeImage } from '@/components/ui/ThemeImage';
 import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
-import { Dimensions, FlatList, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, TouchableOpacity, View } from 'react-native';
 import { listingCardStyles as styles } from './ListingCard.styles';
 import { ListingCardProps, ListingSlide } from './ListingCard.types';
 
@@ -30,13 +29,7 @@ export function ListingCard({ slides, onBookNow }: ListingCardProps) {
   const renderSlide = ({ item }: { item: ListingSlide }) => (
     <View style={styles.slideContainer}>
       <View style={styles.card}>
-        <ThemeImage
-          uri={item.imageUrls?.[0] ?? ''}
-          width={400}
-          height={250}
-          quality={60}
-          style={styles.image}
-        />
+        <Image source={{ uri: item.imageUrls?.[0] ?? '' }} style={styles.image} />
         <View style={styles.overlay} />
         <TouchableOpacity style={styles.bookNow} onPress={handleBookNow}>
           <ThemedText style={styles.bookNowText}>BOOK NOW</ThemedText>

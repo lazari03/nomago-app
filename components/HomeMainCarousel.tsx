@@ -1,9 +1,8 @@
-import { ThemeImage } from '@/components/ui/ThemeImage';
 import { useCategoryStore } from '@/stores/useCategoryStore';
 import { useListingsStore } from '@/stores/useListingsStore';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export function HomeMainCarousel() {
   const { currentCategoryListings, listings, categoryLoading, fetchListingsByCategory } = useListingsStore();
@@ -43,13 +42,10 @@ export function HomeMainCarousel() {
 
   return (
     <View style={styles.container}>
-          <ThemeImage
-            uri={displayListing.imageUrls?.[0] ?? ''}
-            width={500}
-            height={500}
-            quality={60}
-            style={styles.image}
-          />
+      <Image 
+        source={{ uri: displayListing.imageUrls?.[0] ?? '' }} 
+        style={styles.image} 
+      />
       
       {/* Gradient overlay covering bottom 40% */}
       <LinearGradient

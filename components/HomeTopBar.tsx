@@ -1,10 +1,9 @@
-import { ThemeImage } from '@/components/ui/ThemeImage';
-import { StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 
 export function HomeTopBar() {
   return (
     <View style={styles.container}>
-      <ThemeImage uri={require('@/assets/images/header-logo.png')} width={80} height={32} quality={80} style={styles.logo} />
+      <Image source={require('@/assets/images/logo.png')} style={styles.logo} />
       <View style={styles.statusIcons}>
         {/* You can add status icons here, e.g. wifi, battery, etc. */}
       </View>

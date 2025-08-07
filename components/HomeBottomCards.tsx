@@ -1,7 +1,6 @@
-import { ThemeImage } from '@/components/ui/ThemeImage';
 import { goToExplore } from '@/services/navigationService';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const HomeBottomCards = React.memo(() => {
   // Hardcoded mock card for bottom section
@@ -17,7 +16,7 @@ const HomeBottomCards = React.memo(() => {
         </TouchableOpacity>
         <View style={styles.rightCard}>
           <Text style={styles.sponsor}>sponsor</Text>
-          <ThemeImage uri={'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2'} width={60} height={100} quality={60} style={styles.scooterImg} />
+          <Image source={{ uri: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2' }} style={styles.scooterImg} />
           <Text style={styles.rightText}>there is more to EXPLORE</Text>
         </View>
       </View>

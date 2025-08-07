@@ -16,7 +16,7 @@ const useCatalogStore = create<CatalogStore>((set) => ({
       const data = await getCategories(); 
       set({ items: data }); 
     } catch (error) {
-      // Error logging removed
+      console.error('Failed to fetch catalog:', error);
     }
   },
 
