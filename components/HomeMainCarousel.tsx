@@ -58,7 +58,7 @@ export function HomeMainCarousel() {
       />
       {/* Gradient overlay covering bottom 40% */}
       <LinearGradient
-        colors={['transparent', 'rgba(108,77,246,0.8)']}
+        colors={['transparent', 'rgba(0,0,0,0.8)']}
         style={styles.gradientOverlay}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
