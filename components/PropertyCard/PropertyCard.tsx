@@ -1,9 +1,10 @@
 import { ThemedText } from '@/components/ThemedText';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Image, TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { propertyCardStyles as styles } from './PropertyCard.styles';
 // Accepts a MappedListing object directly
+import { ThemeImage } from '@/components/ThemeImage';
 import { MappedListing } from '@/services/listingsService';
 
 
@@ -22,12 +23,14 @@ export function PropertyCard({ listing, onPress }: PropertyCardProps) {
     }
   };
 
+  // Use featuredImageUrl if present, else fallback to first imageUrl
+  const imageUrl = listing.featuredImageUrl || listing.imageUrls?.[0] || '';
   return (
     <TouchableOpacity style={styles.card} onPress={handlePress} activeOpacity={0.9}>
       <View style={styles.cardContent}>
         {/* Image */}
         <View style={styles.imageContainer}>
-          <Image source={{ uri: listing.imageUrls?.[0] || '' }} style={styles.image} />
+          <ThemeImage uri={imageUrl} width={180} height={120} style={styles.image} quality={60} />
         </View>
 
         {/* Content */}

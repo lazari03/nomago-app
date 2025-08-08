@@ -5,16 +5,16 @@ const styles = StyleSheet.create({
     // Header Styles
     headerOverlay: {
         position: 'absolute',
-        top: 20,
+        top: 40, // Move header lower to avoid cut-off
         left: 0,
         right: 0,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingTop: 44, // Safe area top padding
+        paddingTop: 16, // Reduce top padding
         paddingHorizontal: 16,
-        paddingBottom: 12,
-        height: 100, // Adjust based on safe area
+        paddingBottom: 8, // Reduce bottom padding
+        height: 72, // Reduce height for tighter layout
         backgroundColor: 'transparent',
         zIndex: 10,
     },
@@ -53,8 +53,14 @@ const styles = StyleSheet.create({
     // Hero Image
     heroImage: {
         width: '100%',
-        height: 260,
+        height: 220, // Reduce height for less space
         resizeMode: 'cover',
+    },
+    heroImageCarousel: {
+        width: '100%',
+        height: 220,
+        flexDirection: 'row',
+        backgroundColor: Colors.background,
     },
 
     // Layout

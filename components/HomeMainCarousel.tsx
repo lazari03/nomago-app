@@ -1,8 +1,9 @@
+import { ThemeImage } from '@/components/ThemeImage';
 import { useCategoryStore } from '@/stores/useCategoryStore';
 import { useListingsStore } from '@/stores/useListingsStore';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
-import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export function HomeMainCarousel() {
   const { currentCategoryListings, listings, categoryLoading, fetchListingsByCategory } = useListingsStore();
@@ -25,9 +26,12 @@ export function HomeMainCarousel() {
   }
 
   // Prefer category listings, fallback to all listings
-  const displayList = (currentCategoryListings && currentCategoryListings.length > 0)
+  let displayList = (currentCategoryListings && currentCategoryListings.length > 0)
     ? currentCategoryListings
     : listings;
+
+  // Filter to only listings with featured === true
+  displayList = displayList.filter(l => l.featured === true);
 
   if (!displayList || displayList.length === 0) {
     return (
@@ -39,14 +43,19 @@ export function HomeMainCarousel() {
 
   // Show the first listing (can be replaced with a FlatList/Carousel for multiple)
   const displayListing = displayList[0];
+  // Use featuredImage if present, else fallback to first imageUrl
+  const featuredImageUrl = displayListing.featuredImageUrl || displayListing.imageUrls?.[0] || '';
 
   return (
     <View style={styles.container}>
-      <Image 
-        source={{ uri: displayListing.imageUrls?.[0] ?? '' }} 
-        style={styles.image} 
+      {/* Use ThemeImage for optimized loading */}
+      <ThemeImage
+        uri={featuredImageUrl}
+        width={400}
+        height={500}
+        style={styles.image}
+        quality={60}
       />
-      
       {/* Gradient overlay covering bottom 40% */}
       <LinearGradient
         colors={['transparent', 'rgba(108,77,246,0.8)']}
@@ -54,7 +63,6 @@ export function HomeMainCarousel() {
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
       />
-      
       <View style={styles.textContainer}>
         <Text style={styles.title}>{displayListing.title}</Text>
         <Text style={styles.subtitle}>{displayListing.subtitle}</Text>

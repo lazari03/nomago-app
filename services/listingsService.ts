@@ -15,6 +15,7 @@ export interface Listing {
   price?: number;
   location?: string;
   featured: boolean;
+  isFeatured?: boolean;
   status: 'active' | 'inactive' | 'pending';
   images?: {
     data: Array<{
@@ -51,22 +52,36 @@ export interface MappedListing {
   location?: string;
   featured: boolean;
   imageUrls: string[];
+  featuredImageUrl?: string;
   categoryId?: number;
   categoryName?: string;
 }
 
 function mapListing(listing: Listing): MappedListing {
   let imageUrls: string[] = [];
+  let featuredImageUrl: string | undefined;
 
-  // Debug: log raw images object
-  console.log('Raw images object:', JSON.stringify(listing.images, null, 2));
+  // Helper to extract best image URL from formats
+  const getBestUrl = (formats: any, fallback?: string) =>
+    formats?.small?.url || formats?.medium?.url || formats?.large?.url || formats?.thumbnail?.url || fallback;
+
+  // Images array (Strapi v3 or v4)
   if (Array.isArray(listing.images)) {
-    imageUrls = listing.images.map(img => img.url).filter(Boolean);
+    imageUrls = listing.images.map(img => getBestUrl(img.formats, img.url)).filter(Boolean);
   } else if (listing.images?.data && Array.isArray(listing.images.data)) {
-    imageUrls = listing.images.data.map(img => img.attributes?.url).filter(Boolean);
+    imageUrls = listing.images.data.map(img => {
+      const attr = img.attributes;
+      return getBestUrl(attr?.formats, attr?.url);
+    }).filter(Boolean);
   }
 
-  if (imageUrls.length === 0) {
+  // Featured image (Strapi field: featuredImage)
+  const featured = (listing as any).featuredImage?.data?.attributes || (listing as any).featuredImage;
+  if (featured) {
+    featuredImageUrl = getBestUrl(featured.formats, featured.url);
+  }
+
+  if (!imageUrls.length) {
     imageUrls = ['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2'];
   }
 
@@ -78,8 +93,9 @@ function mapListing(listing: Listing): MappedListing {
     description: listing.description,
     price: listing.price,
     location: listing.location,
-    featured: listing.featured,
+    featured: listing.isFeatured === true,
     imageUrls,
+    featuredImageUrl,
     categoryId: listing.category?.id ?? listing.category?.data?.id,
     categoryName: listing.category?.name ?? listing.category?.data?.attributes?.name,
   };
@@ -88,7 +104,7 @@ function mapListing(listing: Listing): MappedListing {
 export async function fetchListings(categoryName?: string): Promise<MappedListing[]> {
   const query = qs.stringify(
     {
-      populate: ['category', 'images'],
+      populate: ['category', 'images', 'featuredImage'],
       ...(categoryName && {
         filters: {
           category: {
@@ -100,20 +116,6 @@ export async function fetchListings(categoryName?: string): Promise<MappedListin
     { encodeValuesOnly: true }
   );
 
-  try {
-    const response = await apiClient.listings({ method: 'get', url: `/listings?${query}` });
-    console.log('Raw listings response:', response.data.data);
-    const mapped = response.data.data.map(mapListing);
-    console.log('Mapped listings:', JSON.stringify(mapped, null, 2));
-    return mapped;
-  } catch (error: any) {
-    if (error.response) {
-      console.error('Listings API error:', error.response.status, error.response.data);
-    } else if (error.request) {
-      console.error('Listings API network error:', error.message);
-    } else {
-      console.error('Listings API unknown error:', error);
-    }
-    throw error;
-  }
+  const response = await apiClient.listings({ method: 'get', url: `/listings?${query}` });
+  return response.data.data.map(mapListing);
 }
