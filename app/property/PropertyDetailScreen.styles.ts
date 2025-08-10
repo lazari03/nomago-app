@@ -67,12 +67,18 @@ const styles = StyleSheet.create({
     headerBackButton: {
         padding: 8,
         borderRadius: 20,
-        backgroundColor: Colors.card,
+        backgroundColor: '#eee',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
     },
     headerBackIcon: {
-        fontSize: 24,
-        color: Colors.buttonColor,
+        fontSize: 20,
+        color: '#6C4DF6',
         fontWeight: 'bold',
+        textAlign: 'center',
     },
     headerTitle: {
         fontSize: 18,
@@ -110,7 +116,8 @@ const styles = StyleSheet.create({
     titleSection: {
         alignItems: 'center',
         marginTop: 16,
-        marginBottom: 4,
+        marginBottom: 16,
+        paddingHorizontal: 16,
         paddingTop: 0,
         paddingBottom: 0,
         borderBottomWidth: 0,
@@ -120,21 +127,23 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: Colors.text,
         textAlign: 'center',
-        marginBottom: 4,
-        width: '100%',
-        flexWrap: 'wrap',
+        marginBottom: 8,
+        lineHeight: 34,
+        flexShrink: 1,
+        minHeight: 34,
     },
     locationRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        width: '100%',
+        marginTop: 4,
+        paddingHorizontal: 16,
     },
     location: {
         fontSize: 16,
         color: '#888',
         textAlign: 'center',
-        flex: 1,
+        lineHeight: 22,
     },
 
     // Price Preview Section
@@ -226,8 +235,8 @@ const styles = StyleSheet.create({
     // Back Button Overlay
     headerBackOverlay: {
         position: 'absolute',
-        top: 56,
-        left: 24,
+        top: 44,
+        left: 16,
         zIndex: 10,
     },
 

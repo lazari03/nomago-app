@@ -5,6 +5,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { ThemeImage } from '@/components/ThemeImage';
 import { useDateFilterStore } from '@/stores/useDateFilterStore';
 import { useListingsStore } from '@/stores/useListingsStore';
+import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Dimensions, ScrollView, TouchableOpacity, View } from 'react-native';
@@ -43,7 +44,7 @@ export default function PropertyDetailScreen() {
       {/* Back Button Overlay (left-aligned, visually above image) */}
       <View style={styles.headerBackOverlay}>
         <TouchableOpacity onPress={() => router.back()} style={styles.headerBackButton}>
-          <ThemedText style={styles.headerBackIcon}>←</ThemedText>
+          <Ionicons name="arrow-back" size={24} color="#6C4DF6" />
         </TouchableOpacity>
       </View>
 
@@ -71,7 +72,7 @@ export default function PropertyDetailScreen() {
         <View style={styles.contentWrapper}>
           {/* Title & Location */}
           <View style={styles.titleSection}>
-            <ThemedText style={styles.title} numberOfLines={3} ellipsizeMode="tail">
+            <ThemedText style={styles.title}>
               {property.title}
             </ThemedText>
             <View style={styles.locationRow}>
