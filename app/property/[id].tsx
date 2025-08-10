@@ -16,6 +16,8 @@ export const screenOptions = {
 
 export default function PropertyDetailScreen() {
   const [modalVisible, setModalVisible] = useState(false);
+  const [lightboxVisible, setLightboxVisible] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const { fromDate, toDate } = useDateFilterStore();
   const { id } = useLocalSearchParams();
   const { selectedProperty } = useListingsStore();
@@ -85,39 +87,83 @@ export default function PropertyDetailScreen() {
             </ThemedText>
           </View>
 
-          {/* Gallery Carousel */}
-          <View style={styles.gallerySection}>
-            <ThemedText style={styles.sectionTitle}>Gallery</ThemedText>
-            {galleryImages.length > 0 ? (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.galleryScroll}
-                contentContainerStyle={styles.galleryScrollContent}
+      {/* Gallery Carousel */}
+      <View style={styles.gallerySection}>
+        <ThemedText style={styles.sectionTitle}>Gallery</ThemedText>
+        {galleryImages.length > 0 ? (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.galleryScroll}
+            contentContainerStyle={styles.galleryScrollContent}
+          >
+            {galleryImages.map((imgUrl, idx) => (
+              <TouchableOpacity
+                key={idx}
+                onPress={() => {
+                  setSelectedIndex(idx);
+                  setLightboxVisible(true);
+                }}
               >
-                {galleryImages.map((imgUrl, idx) => (
-                  <ThemeImage
-                    key={idx}
-                    uri={imgUrl}
-                    width={180}
-                    height={180}
-                    style={styles.galleryImage}
-                    quality={60}
-                  />
-                ))}
-              </ScrollView>
-            ) : (
-              <View style={styles.noGalleryImage}>
-                <ThemedText style={styles.noGalleryImageText}>
-                  No images available
-                </ThemedText>
-              </View>
-            )}
+                <ThemeImage
+                  uri={imgUrl}
+                  width={180}
+                  height={180}
+                  style={styles.galleryImage}
+                  quality={60}
+                />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        ) : (
+          <View style={styles.noGalleryImage}>
+            <ThemedText style={styles.noGalleryImageText}>
+              No images available
+            </ThemedText>
           </View>
+        )}
+      </View>
 
           <View style={styles.bottomSpacer} />
         </View>
       </ParallaxScrollView>
+
+      {/* Lightbox Modal for Gallery Image */}
+      {lightboxVisible && galleryImages.length > 0 && (
+        <View style={styles.lightboxOverlay}>
+          <TouchableOpacity
+            style={styles.lightboxCloseButton}
+            onPress={() => {
+              setLightboxVisible(false);
+            }}
+          >
+            <ThemedText style={styles.lightboxCloseIcon}>✕</ThemedText>
+          </TouchableOpacity>
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            contentOffset={{ x: selectedIndex * Dimensions.get('window').width, y: 0 }}
+            onMomentumScrollEnd={e => {
+              const newIndex = Math.round(e.nativeEvent.contentOffset.x / Dimensions.get('window').width);
+              setSelectedIndex(newIndex);
+            }}
+            style={{ width: Dimensions.get('window').width }}
+          >
+            {galleryImages.map((imgUrl, idx) => (
+              <View key={idx} style={{ width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center' }}>
+                <ThemeImage
+                  uri={imgUrl}
+                  width={Dimensions.get('window').width * 0.9}
+                  height={Dimensions.get('window').height * 0.7}
+                  style={styles.lightboxImage}
+                  quality={80}
+                />
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+      )}
 
       {/* Bottom Booking Bar */}
       <View style={styles.bottomBar}>
