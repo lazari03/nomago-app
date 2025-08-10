@@ -7,7 +7,7 @@ import { useDateFilterStore } from '@/stores/useDateFilterStore';
 import { useListingsStore } from '@/stores/useListingsStore';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { Dimensions, ScrollView, TouchableOpacity, View } from 'react-native';
 import styles from './PropertyDetailScreen.styles';
 
 export const screenOptions = {
@@ -33,10 +33,8 @@ export default function PropertyDetailScreen() {
     );
   }
 
-  // Exclude featuredImage from detail carousel
-  const detailImages = property.imageUrls?.filter(url => url !== property.featuredImageUrl) ?? [];
-  // Fallback if no images
-  const fallbackImage = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2';
+  // Show all images from listing
+  const galleryImages = property.imageUrls?.filter(url => !!url) ?? [];
 
   return (
     <ThemedView style={styles.container}>
@@ -45,29 +43,30 @@ export default function PropertyDetailScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.headerBackButton}>
           <ThemedText style={styles.headerBackIcon}>←</ThemedText>
         </TouchableOpacity>
-        <ThemedText
-          style={styles.headerTitle}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {property.title}
-        </ThemedText>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <ThemedText style={[styles.headerTitle, { flexWrap: 'wrap', textAlign: 'center', maxWidth: '90%' }]} numberOfLines={2} ellipsizeMode="tail">
+            {property.title}
+          </ThemedText>
+        </View>
       </View>
 
       <ParallaxScrollView
         headerImage={
-          <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} style={styles.heroImageCarousel}>
-            {(detailImages.length > 0 ? detailImages : [fallbackImage]).map((imgUrl, idx) => (
-              <ThemeImage
-                key={idx}
-                uri={imgUrl}
-                width={typeof styles.heroImage.width === 'number' ? styles.heroImage.width : 400}
-                height={typeof styles.heroImage.height === 'number' ? styles.heroImage.height : 220}
-                style={styles.heroImage}
-                quality={60}
-              />
-            ))}
-          </ScrollView>
+          property.featuredImageUrl ? (
+            <ThemeImage
+              uri={property.featuredImageUrl}
+              width={Dimensions.get('window').width}
+              height={320}
+              style={{ borderRadius: 0, marginBottom: 8, backgroundColor: '#eee', alignSelf: 'stretch' }}
+              quality={60}
+            />
+          ) : (
+            <View style={{ height: 220, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f3f3f3', borderRadius: 16, marginBottom: 8 }}>
+              <ThemedText style={{ color: '#999', fontSize: 16 }}>
+                No featured image
+              </ThemedText>
+            </View>
+          )
         }
         headerBackgroundColor={{ light: '#fff', dark: '#222' }}
         withTabBarPadding={false}
@@ -87,6 +86,36 @@ export default function PropertyDetailScreen() {
             <ThemedText style={styles.description}>
               {property.description || 'No description available.'}
             </ThemedText>
+          </View>
+
+          {/* Gallery Carousel */}
+          <View style={{ marginBottom: 24 }}>
+            <ThemedText style={[styles.sectionTitle, { marginBottom: 8 }]}>Gallery</ThemedText>
+            {galleryImages.length > 0 ? (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={{ height: 180, borderRadius: 16, overflow: 'hidden', paddingLeft: 8 }}
+                contentContainerStyle={{ alignItems: 'center' }}
+              >
+                {galleryImages.map((imgUrl, idx) => (
+                  <ThemeImage
+                    key={idx}
+                    uri={imgUrl}
+                    width={180}
+                    height={180}
+                    style={{ borderRadius: 16, marginRight: 12, backgroundColor: '#eee' }}
+                    quality={60}
+                  />
+                ))}
+              </ScrollView>
+            ) : (
+              <View style={{ height: 180, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f3f3f3', borderRadius: 16 }}>
+                <ThemedText style={{ color: '#999', fontSize: 16 }}>
+                  No images available
+                </ThemedText>
+              </View>
+            )}
           </View>
 
           <View style={styles.bottomSpacer} />

@@ -23,8 +23,12 @@ export const ThemeImage: React.FC<ThemeImageProps> = ({
 }) => {
   let source: any;
   if (typeof uri === 'string') {
-    // Remote image: optimize
-    source = { uri: uri ? `${uri}?w=${width}&q=${quality}` : '' };
+    // Only append params for non-external images
+    if (uri.includes('unsplash.com') || uri.startsWith('http')) {
+      source = { uri };
+    } else {
+      source = { uri: uri ? `${uri}?w=${width}&q=${quality}` : '' };
+    }
   } else {
     // Local image: require/import
     source = uri;

@@ -56,12 +56,6 @@ const styles = StyleSheet.create({
         height: 220, // Reduce height for less space
         resizeMode: 'cover',
     },
-    heroImageCarousel: {
-        width: '100%',
-        height: 220,
-        flexDirection: 'row',
-        backgroundColor: Colors.background,
-    },
 
     // Layout
     container: {
