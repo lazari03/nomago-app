@@ -64,11 +64,9 @@ export function HomeMainCarousel() {
         end={{ x: 0, y: 1 }}
       />
       <View style={styles.textContainer}>
-        <Text style={styles.title}>{displayListing.title}</Text>
-        <Text style={styles.subtitle}>{displayListing.subtitle}</Text>
-        {displayListing.price && (
-          <Text style={styles.price}>${displayListing.price}</Text>
-        )}
+        <Text style={styles.title}>{String(displayListing.title ?? '')}</Text>
+        <Text style={styles.subtitle}>{String(displayListing.subtitle ?? '')}</Text>
+        <Text style={styles.price}>{displayListing.price != null ? `$${displayListing.price}` : ''}</Text>
         <TouchableOpacity style={styles.reserveBtnNearText}>
           <Text style={styles.reserveText}>BOOK NOW</Text>
         </TouchableOpacity>
