@@ -38,16 +38,11 @@ export default function PropertyDetailScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      {/* Fixed Header Overlay */}
-      <View style={styles.headerOverlay}>
+      {/* Back Button Overlay (left-aligned, visually above image) */}
+      <View style={styles.headerBackOverlay}>
         <TouchableOpacity onPress={() => router.back()} style={styles.headerBackButton}>
           <ThemedText style={styles.headerBackIcon}>←</ThemedText>
         </TouchableOpacity>
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <ThemedText style={[styles.headerTitle, { flexWrap: 'wrap', textAlign: 'center', maxWidth: '90%' }]} numberOfLines={2} ellipsizeMode="tail">
-            {property.title}
-          </ThemedText>
-        </View>
       </View>
 
       <ParallaxScrollView
@@ -57,12 +52,12 @@ export default function PropertyDetailScreen() {
               uri={property.featuredImageUrl}
               width={Dimensions.get('window').width}
               height={320}
-              style={{ borderRadius: 0, marginBottom: 8, backgroundColor: '#eee', alignSelf: 'stretch' }}
+              style={styles.featuredImage}
               quality={60}
             />
           ) : (
-            <View style={{ height: 220, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f3f3f3', borderRadius: 16, marginBottom: 8 }}>
-              <ThemedText style={{ color: '#999', fontSize: 16 }}>
+            <View style={styles.noFeaturedImage}>
+              <ThemedText style={styles.noFeaturedImageText}>
                 No featured image
               </ThemedText>
             </View>
@@ -74,7 +69,9 @@ export default function PropertyDetailScreen() {
         <View style={styles.contentWrapper}>
           {/* Title & Location */}
           <View style={styles.titleSection}>
-            <ThemedText style={styles.title}>{property.title}</ThemedText>
+            <ThemedText style={styles.title} numberOfLines={3} ellipsizeMode="tail">
+              {property.title}
+            </ThemedText>
             <View style={styles.locationRow}>
               <ThemedText style={styles.location}>{property.location}</ThemedText>
             </View>
@@ -89,14 +86,14 @@ export default function PropertyDetailScreen() {
           </View>
 
           {/* Gallery Carousel */}
-          <View style={{ marginBottom: 24 }}>
-            <ThemedText style={[styles.sectionTitle, { marginBottom: 8 }]}>Gallery</ThemedText>
+          <View style={styles.gallerySection}>
+            <ThemedText style={styles.sectionTitle}>Gallery</ThemedText>
             {galleryImages.length > 0 ? (
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                style={{ height: 180, borderRadius: 16, overflow: 'hidden', paddingLeft: 8 }}
-                contentContainerStyle={{ alignItems: 'center' }}
+                style={styles.galleryScroll}
+                contentContainerStyle={styles.galleryScrollContent}
               >
                 {galleryImages.map((imgUrl, idx) => (
                   <ThemeImage
@@ -104,14 +101,14 @@ export default function PropertyDetailScreen() {
                     uri={imgUrl}
                     width={180}
                     height={180}
-                    style={{ borderRadius: 16, marginRight: 12, backgroundColor: '#eee' }}
+                    style={styles.galleryImage}
                     quality={60}
                   />
                 ))}
               </ScrollView>
             ) : (
-              <View style={{ height: 180, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f3f3f3', borderRadius: 16 }}>
-                <ThemedText style={{ color: '#999', fontSize: 16 }}>
+              <View style={styles.noGalleryImage}>
+                <ThemedText style={styles.noGalleryImageText}>
                   No images available
                 </ThemedText>
               </View>

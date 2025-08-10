@@ -2,6 +2,7 @@ import Colors from '@/constants/Colors';
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
+// ...existing code...
     // Header Styles
     headerOverlay: {
         position: 'absolute',
@@ -61,33 +62,43 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: Colors.background,
+        paddingTop: 0,
     },
     contentWrapper: {
         flex: 1,
-        paddingHorizontal: 16,
-        paddingTop: 16,
+        paddingHorizontal: 0,
+        paddingTop: 12,
+        marginTop: 0,
     },
 
     // Title Section
     titleSection: {
-        marginBottom: 20,
-        paddingBottom: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: Colors.border,
+        alignItems: 'center',
+        marginTop: 16,
+        marginBottom: 4,
+        paddingTop: 0,
+        paddingBottom: 0,
+        borderBottomWidth: 0,
     },
     title: {
         fontSize: 28,
         fontWeight: 'bold',
-        marginBottom: 8,
         color: Colors.text,
+        textAlign: 'center',
+        marginBottom: 4,
+        width: '100%',
+        flexWrap: 'wrap',
     },
     locationRow: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
     },
     location: {
         fontSize: 16,
-        color: Colors.secondary,
+        color: '#888',
+        textAlign: 'center',
         flex: 1,
     },
 
@@ -176,6 +187,59 @@ const styles = StyleSheet.create({
         color: Colors.white,
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    // Back Button Overlay
+    headerBackOverlay: {
+        position: 'absolute',
+        top: 56,
+        left: 24,
+        zIndex: 10,
+    },
+
+    // Featured Image
+    featuredImage: {
+        backgroundColor: '#eee',
+    },
+    noFeaturedImage: {
+        height: 220,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f3f3f3',
+        borderRadius: 16,
+    },
+    noFeaturedImageText: {
+        color: '#999',
+        fontSize: 16,
+    },
+
+    // Gallery Section
+    gallerySection: {
+        marginBottom: 24,
+    },
+    galleryScroll: {
+        height: 180,
+        borderRadius: 16,
+        overflow: 'hidden',
+        paddingLeft: 8,
+    },
+    galleryScrollContent: {
+        alignItems: 'center',
+    },
+    galleryImage: {
+        borderRadius: 16,
+        marginRight: 12,
+        backgroundColor: '#eee',
+    },
+    noGalleryImage: {
+        height: 180,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f3f3f3',
+        borderRadius: 16,
+    },
+    noGalleryImageText: {
+        color: '#999',
+        fontSize: 16,
     },
 });
 
