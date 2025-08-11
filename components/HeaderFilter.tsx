@@ -1,7 +1,8 @@
 import { useCategoryStore } from '@/stores/useCategoryStore';
 import { useDateFilterStore } from '@/stores/useDateFilterStore';
+import { IS_WEB } from '@/constants/Platform';
 import { Ionicons } from '@expo/vector-icons';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -9,6 +10,8 @@ import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 export function HeaderFilter() {
   const navigation = useNavigation();
   const [showModal, setShowModal] = useState(false);
+  const [showFromDatePicker, setShowFromDatePicker] = useState(false);
+  const [showToDatePicker, setShowToDatePicker] = useState(false);
   const { fromDate, toDate, setDates } = useDateFilterStore();
   const { category } = useCategoryStore();
 
@@ -33,32 +36,87 @@ export function HeaderFilter() {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <Text style={styles.availabilityText}>Filter by Date</Text>
+              
+              {/* From Date Field */}
               <View style={styles.dateFieldRowCentered}>
                 <Text style={styles.dateFieldLabel}>From:</Text>
-                  <DateTimePicker
-                    value={fromDate || new Date()}
-                    mode="date"
-                    display="default"
-                    onChange={(event, selectedDate) => {
-                      if (selectedDate) setDates(selectedDate, toDate);
+                {IS_WEB ? (
+                  <input
+                    type="date"
+                    style={{ fontSize: 16, padding: 8, borderRadius: 6, border: '1px solid #eee' }}
+                    value={fromDate ? fromDate.toISOString().split('T')[0] : ''}
+                    onChange={e => {
+                      const val = e.target.value;
+                      setDates(val ? new Date(val) : null, toDate);
                     }}
                   />
+                ) : (
+                  <TouchableOpacity
+                    style={styles.dateFieldButton}
+                    onPress={() => setShowFromDatePicker(true)}
+                  >
+                    <Text style={styles.dateFieldText}>
+                      {fromDate ? fromDate.toLocaleDateString() : 'Select date'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
+
+              {/* To Date Field */}
               <View style={styles.dateFieldRowCentered}>
                 <Text style={styles.dateFieldLabel}>To:</Text>
-                  <DateTimePicker
-                    value={toDate || new Date()}
-                    mode="date"
-                    display="default"
-                    onChange={(event, selectedDate) => {
-                      if (selectedDate) setDates(fromDate, selectedDate);
+                {IS_WEB ? (
+                  <input
+                    type="date"
+                    style={{ fontSize: 16, padding: 8, borderRadius: 6, border: '1px solid #eee' }}
+                    value={toDate ? toDate.toISOString().split('T')[0] : ''}
+                    onChange={e => {
+                      const val = e.target.value;
+                      setDates(fromDate, val ? new Date(val) : null);
                     }}
                   />
+                ) : (
+                  <TouchableOpacity
+                    style={styles.dateFieldButton}
+                    onPress={() => setShowToDatePicker(true)}
+                  >
+                    <Text style={styles.dateFieldText}>
+                      {toDate ? toDate.toLocaleDateString() : 'Select date'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
+
+              {/* Date Pickers (only show when button is pressed) */}
+              {!IS_WEB && showFromDatePicker && (
+                <DateTimePicker
+                  value={fromDate || new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                    setShowFromDatePicker(false);
+                    if (selectedDate) setDates(selectedDate, toDate);
+                  }}
+                />
+              )}
+              
+              {!IS_WEB && showToDatePicker && (
+                <DateTimePicker
+                  value={toDate || new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                    setShowToDatePicker(false);
+                    if (selectedDate) setDates(fromDate, selectedDate);
+                  }}
+                />
+              )}
               <TouchableOpacity
                 style={styles.applyButton}
                 onPress={() => {
                   setShowModal(false);
+                  setShowFromDatePicker(false);
+                  setShowToDatePicker(false);
                 }}
               >
                 <Text style={styles.applyButtonText}>Apply</Text>
