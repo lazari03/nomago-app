@@ -1,8 +1,9 @@
+import { IS_WEB, PLATFORM_STYLES } from '@/constants/Platform';
 import { useBookingStore } from '@/stores/useBookingStore';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import * as MediaLibrary from 'expo-media-library';
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, KeyboardAvoidingView, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
 import { ThemedText } from './ThemedText';
 
@@ -112,7 +113,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.modalContainer}>
+        <KeyboardAvoidingView behavior={PLATFORM_STYLES.keyboardBehavior} style={styles.modalContainer}>
           {showConfirmation ? (
             <View style={styles.confirmationFullScreen}>
               <View style={styles.header}>
@@ -253,7 +254,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
                     <View>
                       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                         <ThemedText style={styles.formLabel}>From:</ThemedText>
-                        {Platform.OS === 'web' ? (
+                        {IS_WEB ? (
                           <input
                             type="date"
                             style={{ marginLeft: 8, fontSize: 16, padding: 4, borderRadius: 6, border: '1px solid #eee' }}
@@ -276,7 +277,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
                       </View>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <ThemedText style={styles.formLabel}>To:</ThemedText>
-                        {Platform.OS === 'web' ? (
+                        {IS_WEB ? (
                           <input
                             type="date"
                             style={{ marginLeft: 8, fontSize: 16, padding: 4, borderRadius: 6, border: '1px solid #eee' }}
@@ -309,7 +310,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
                     onPress={handleSubmit}
                     disabled={loading}
                   >
-                    {loading ? <ActivityIndicator color="#fff" /> : <ThemedText style={styles.submitButtonText}>Send Booking</ThemedText>}
+                    {loading ? <ActivityIndicator color="#fff" /> : <ThemedText style={styles.submitButtonText}>Book Now</ThemedText>}
                   </TouchableOpacity>
                 </View>
               </View>
@@ -339,7 +340,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    paddingTop: Platform.OS === 'ios' ? 44 : 24,
+    paddingTop: PLATFORM_STYLES.headerPadding,
   },
   formBox: {
     flex: 1,

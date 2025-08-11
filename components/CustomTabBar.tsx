@@ -1,5 +1,6 @@
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { ColorTokens } from '@/constants/Colors';
+import { IS_ANDROID } from '@/constants/Platform';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -41,10 +42,18 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
     });
   }, [state.index]);
   
+  // Better Android safe area handling
+  const bottomMargin = IS_ANDROID 
+    ? Math.max(insets.bottom + 20, 20) // Ensure minimum 20px margin on Android
+    : Math.max(insets.bottom + 16, 24);
+  
   return (
-    <View style={[styles.tabBarContainer, { 
-      marginBottom: Math.max(insets.bottom + 16, 24),
-    }]}>
+    <View style={[
+      styles.tabBarContainer, 
+      { 
+        paddingBottom: bottomMargin,
+      }
+    ]}>
       <View style={styles.tabBar}> 
         {state.routes.map((route, idx) => {
           const isFocused = state.index === idx;
@@ -80,8 +89,8 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
                 <View style={styles.iconLabelWrapper}>
                   <IconSymbol
                     name={tabData?.icon as any}
-                    size={24}
-                    color={isFocused ? ColorTokens.purple : ColorTokens.darkPurple}
+                    size={IS_ANDROID ? 28 : 24}
+                    color={isFocused ? ColorTokens.purple : (IS_ANDROID ? '#111' : ColorTokens.darkPurple)}
                   />
                   {isFocused && (
                     <Animated.View style={{
@@ -107,29 +116,32 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-end', // Changed from 'center' to 'flex-end'
+    zIndex: 1000, // Added high z-index for Android
   },
   tabBar: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    borderRadius: 32, // Made more pill-shaped
+    borderRadius: 32,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    minHeight: 56, // Smaller height
-    // Dynamic width based on content
+    minHeight: 56,
     alignSelf: 'center',
-    // shadow for floating effect
+    // Clean shadow for iOS
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 12,
+    shadowRadius: 8,
+    // Clean elevation for Android
     elevation: 8,
   },
   tab: {
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 4,
+    minHeight: 44, // Ensure minimum touch target for Android
+    minWidth: 44, // Ensure minimum touch target for Android
   },
   tabContent: {
     paddingVertical: 6,
@@ -146,7 +158,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   label: {
-    color: ColorTokens.darkPurple,
+    color: IS_ANDROID ? '#555' : ColorTokens.darkPurple,
     fontSize: 12,
     fontWeight: '600',
   },

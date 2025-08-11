@@ -1,16 +1,62 @@
 // apiClient.ts
+import { ANDROID_LOCALHOST_IP, DEFAULT_PORT, IOS_LOCALHOST_IP, IS_ANDROID } from '@/constants/Platform';
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:1337/api';
+// Use the appropriate IP based on platform
+const getBaseUrl = () => {
+  if (IS_ANDROID) {
+    // For Android emulator, use 10.0.2.2 instead of localhost
+    return `http://${ANDROID_LOCALHOST_IP}:${DEFAULT_PORT}/api`;
+  }
+  // For iOS simulator and web, localhost works fine
+  return `http://${IOS_LOCALHOST_IP}:${DEFAULT_PORT}/api`;
+};
+
+const BASE_URL = getBaseUrl();
 const AUTH_HEADER = 'Bearer 3cc4fcdc4e832666d02e71cbb307a6f573e38b61b524945757171b5fca48e991cf133f562a550b5862c0aa516184d393b88f76886a2f31045a244af71c97a67841cc25866438be2bc452732b340f9fd1550595640f668efed4040075ac7a295f72d237b160ee88afc8942e93e19b277bb303593a2bf6ff9ccc8ef1fb51889325';
 
+// Add error handling and logging for debugging
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
     Authorization: AUTH_HEADER,
     'Content-Type': 'application/json',
   },
+  timeout: 10000, // 10 second timeout
 });
+
+// Add request interceptor for debugging
+api.interceptors.request.use(
+  (config) => {
+    console.log(`API Request: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
+    return config;
+  },
+  (error) => {
+    console.error('API Request Error:', error);
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor for debugging
+api.interceptors.response.use(
+  (response) => {
+    console.log(`API Response: ${response.status} ${response.config.url}`);
+    return response;
+  },
+  (error) => {
+    if (IS_ANDROID) {
+      console.error('Android API Error:', {
+        message: error.message,
+        code: error.code,
+        baseURL: BASE_URL,
+        platform: 'android'
+      });
+    } else {
+      console.error('API Error:', error.message);
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const apiClient = new Proxy(
   {},

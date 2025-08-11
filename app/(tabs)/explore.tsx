@@ -7,20 +7,15 @@ import { useListingsStore } from '@/stores/useListingsStore';
 import { usePullToRefresh } from '@/utils/usePullToRefresh';
 import React, { useRef } from 'react';
 import { Animated, RefreshControl, StyleSheet, Text } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
 
 export default function ExplorePage() {
   const scrollY = useRef(new Animated.Value(0)).current;
-  const { category } = useCategoryStore();
-  const {
-    currentCategoryListings,
-    categoryLoading,
-    fetchListingsByCategory,
-    setSelectedProperty,
-    error,
-    clearError,
-  } = useListingsStore();
+  const { category, loading: categoryLoading, error } = useCategoryStore();
+  const { currentCategoryListings, setSelectedProperty, fetchListingsByCategory } = useListingsStore();
+  const insets = useSafeAreaInsets();
 
   React.useEffect(() => {
     if (category) {
@@ -47,7 +42,11 @@ export default function ExplorePage() {
         <HeaderFilter />
         <HomeTabBar />
         <Animated.ScrollView
-          contentContainerStyle={{ paddingTop: 0, paddingHorizontal: 16, paddingBottom: 32 }}
+          contentContainerStyle={{ 
+            paddingTop: 0, 
+            paddingHorizontal: 16, 
+            paddingBottom: Math.max(insets.bottom + 100, 140)  // Account for safe area + tab bar height
+          }}
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
             { useNativeDriver: true }
