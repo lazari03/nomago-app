@@ -8,3 +8,4 @@ export function ThemedView({ style, ...otherProps }: ThemedViewProps) {
   const backgroundColor = useThemeColor('background');
   return <SafeAreaView style={[{ backgroundColor, flex: 1 }, style]} {...otherProps} />;
 }
+

@@ -3,7 +3,7 @@ import { useBookingStore } from '@/stores/useBookingStore';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import * as MediaLibrary from 'expo-media-library';
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, KeyboardAvoidingView, Modal, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
 import { ThemedText } from './ThemedText';
 
@@ -21,10 +21,17 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
   const [form, setForm] = useState({ name: '', surname: '', email: '', phoneNumber: '' });
   const [localStartDate, setLocalStartDate] = useState<Date | null>(startDate || null);
   const [localEndDate, setLocalEndDate] = useState<Date | null>(endDate || null);
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const confirmationRef = useRef<View>(null);
   const { loading, error, success, book, reset } = useBookingStore();
+
+  // Debug log to see if modal opens
+  useEffect(() => {
+    console.log('BookingForm visible state changed:', visible);
+  }, [visible]);
 
   useEffect(() => {
     if (success) {
@@ -111,9 +118,14 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
       animationType="slide"
       presentationStyle="fullScreen"
       onRequestClose={onClose}
+      transparent={false}
+      hardwareAccelerated={true}
     >
-      <View style={styles.modalOverlay}>
-        <KeyboardAvoidingView behavior={PLATFORM_STYLES.keyboardBehavior} style={styles.modalContainer}>
+      <StatusBar hidden={false} barStyle="dark-content" backgroundColor="#fff" />
+      <KeyboardAvoidingView 
+        behavior={PLATFORM_STYLES.keyboardBehavior} 
+        style={styles.modalContainer}
+      >
           {showConfirmation ? (
             <View style={styles.confirmationFullScreen}>
               <View style={styles.header}>
@@ -252,12 +264,17 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
                     </ThemedText>
                   ) : (
                     <View>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                        <ThemedText style={styles.formLabel}>From:</ThemedText>
+                      <ThemedText style={[styles.formValue, { color: '#666', fontStyle: 'italic', marginBottom: 12 }]}>
+                        Please select your check-in and check-out dates
+                      </ThemedText>
+                      
+                      {/* Check-in Date Button */}
+                      <View style={{ marginBottom: 8 }}>
+                        <ThemedText style={[styles.formLabel, { marginBottom: 4 }]}>Check-in:</ThemedText>
                         {IS_WEB ? (
                           <input
                             type="date"
-                            style={{ marginLeft: 8, fontSize: 16, padding: 4, borderRadius: 6, border: '1px solid #eee' }}
+                            style={{ fontSize: 16, padding: 8, borderRadius: 6, border: '1px solid #eee', width: '100%' }}
                             value={localStartDate ? localStartDate.toISOString().split('T')[0] : ''}
                             onChange={e => {
                               const val = e.target.value;
@@ -265,22 +282,24 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
                             }}
                           />
                         ) : (
-                          <DateTimePicker
-                            value={localStartDate || new Date()}
-                            mode="date"
-                            display="default"
-                            onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-                              if (selectedDate) setLocalStartDate(selectedDate);
-                            }}
-                          />
+                          <TouchableOpacity 
+                            style={styles.dateButton}
+                            onPress={() => setShowStartDatePicker(true)}
+                          >
+                            <ThemedText style={styles.dateButtonText}>
+                              {localStartDate ? localStartDate.toLocaleDateString() : 'Select check-in date'}
+                            </ThemedText>
+                          </TouchableOpacity>
                         )}
                       </View>
-                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <ThemedText style={styles.formLabel}>To:</ThemedText>
+
+                      {/* Check-out Date Button */}
+                      <View style={{ marginBottom: 8 }}>
+                        <ThemedText style={[styles.formLabel, { marginBottom: 4 }]}>Check-out:</ThemedText>
                         {IS_WEB ? (
                           <input
                             type="date"
-                            style={{ marginLeft: 8, fontSize: 16, padding: 4, borderRadius: 6, border: '1px solid #eee' }}
+                            style={{ fontSize: 16, padding: 8, borderRadius: 6, border: '1px solid #eee', width: '100%' }}
                             value={localEndDate ? localEndDate.toISOString().split('T')[0] : ''}
                             onChange={e => {
                               const val = e.target.value;
@@ -288,16 +307,41 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
                             }}
                           />
                         ) : (
-                          <DateTimePicker
-                            value={localEndDate || new Date()}
-                            mode="date"
-                            display="default"
-                            onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-                              if (selectedDate) setLocalEndDate(selectedDate);
-                            }}
-                          />
+                          <TouchableOpacity 
+                            style={styles.dateButton}
+                            onPress={() => setShowEndDatePicker(true)}
+                          >
+                            <ThemedText style={styles.dateButtonText}>
+                              {localEndDate ? localEndDate.toLocaleDateString() : 'Select check-out date'}
+                            </ThemedText>
+                          </TouchableOpacity>
                         )}
                       </View>
+
+                      {/* Date Pickers (only show when button is pressed) */}
+                      {!IS_WEB && showStartDatePicker && (
+                        <DateTimePicker
+                          value={localStartDate || new Date()}
+                          mode="date"
+                          display="default"
+                          onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                            setShowStartDatePicker(false);
+                            if (selectedDate) setLocalStartDate(selectedDate);
+                          }}
+                        />
+                      )}
+                      
+                      {!IS_WEB && showEndDatePicker && (
+                        <DateTimePicker
+                          value={localEndDate || new Date()}
+                          mode="date"
+                          display="default"
+                          onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                            setShowEndDatePicker(false);
+                            if (selectedDate) setLocalEndDate(selectedDate);
+                          }}
+                        />
+                      )}
                     </View>
                   )}
                 </View>
@@ -317,7 +361,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
             </ScrollView>
           )}
         </KeyboardAvoidingView>
-      </View>
     </Modal>
   );
 };
@@ -334,12 +377,9 @@ const styles = StyleSheet.create({
     color: '#222',
     marginBottom: 2,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
   modalContainer: {
     flex: 1,
+    backgroundColor: '#fff',
     paddingTop: PLATFORM_STYLES.headerPadding,
   },
   formBox: {
@@ -537,6 +577,17 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
     fontSize: 16,
+  },
+  dateButton: {
+    borderWidth: 1,
+    borderColor: '#eee',
+    borderRadius: 8,
+    padding: 12,
+    backgroundColor: '#faf9ff',
+  },
+  dateButtonText: {
+    fontSize: 16,
+    color: '#333',
   },
 });
 export default BookingForm;

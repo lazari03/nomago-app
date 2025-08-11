@@ -1,4 +1,3 @@
-import BookingForm from '@/components/BookingForm';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -16,7 +15,6 @@ export const screenOptions = {
 };
 
 export default function PropertyDetailScreen() {
-  const [modalVisible, setModalVisible] = useState(false);
   const [lightboxVisible, setLightboxVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const { fromDate, toDate } = useDateFilterStore();
@@ -172,21 +170,20 @@ export default function PropertyDetailScreen() {
           <ThemedText style={styles.priceText}>{property.price}</ThemedText>
           <ThemedText style={styles.priceLabel}>per night</ThemedText>
         </View>
-        <TouchableOpacity style={styles.bookButton} onPress={() => setModalVisible(true)}>
+        <TouchableOpacity style={styles.bookButton} onPress={() => {
+          console.log('Book Now button pressed, navigating to booking page');
+          router.push({
+            pathname: '/booking/[propertyId]',
+            params: {
+              propertyId: property.id,
+              propertyDocumentId: property.documentId,
+              propertyTitle: property.title,
+            }
+          });
+        }}>
           <ThemedText style={styles.bookButtonText}>Book Now</ThemedText>
         </TouchableOpacity>
       </View>
-
-      {/* Booking Modal */}
-      <BookingForm
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        propertyTitle={property.title}
-        propertyId={property.id}
-        propertyDocumentId={property.documentId}
-        startDate={fromDate}
-        endDate={toDate}
-      />
     </ThemedView>
   );
 }
