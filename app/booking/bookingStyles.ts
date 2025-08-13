@@ -64,7 +64,6 @@ export const bookingStyles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 32,
     paddingTop: 24,
-    gap: 12,
   },
   cancelButton: {
     flex: 1,
@@ -183,7 +182,6 @@ export const bookingStyles = StyleSheet.create({
   confirmationButtons: {
     flexDirection: 'row',
     width: '100%',
-    gap: 12,
   },
   saveButton: {
     flex: 1,
@@ -208,5 +206,52 @@ export const bookingStyles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
     fontSize: 16,
+  },
+  // Compact layout additions for booking form
+  inputRow: {
+    flexDirection: 'row',
+    marginBottom: 12,
+    gap: 8,
+  },
+  inputHalf: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#eee',
+    backgroundColor: '#faf9ff',
+    padding: 12,
+    fontSize: 16,
+  },
+  inputLeft: {
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+    marginRight: 0,
+  },
+  inputRight: {
+    borderTopRightRadius: 12,
+    borderBottomRightRadius: 12,
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+    marginLeft: 0,
+  },
+  datesSection: {
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  formValueHint: {
+    color: '#666',
+    fontStyle: 'italic',
+    marginBottom: 8,
+    fontSize: 15,
+  },
+  dateRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 4,
+    marginBottom: 4,
+  },
+  dateCol: {
+    flex: 1,
   },
 });

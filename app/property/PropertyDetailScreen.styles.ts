@@ -2,43 +2,50 @@ import Colors from '@/constants/Colors';
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
-  // Lightbox overlay styles
-  lightboxOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.85)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 100,
-  },
-  lightboxCloseButton: {
-    position: 'absolute',
-    top: 40,
-    right: 20,
-    backgroundColor: 'rgba(255,255,255,0.8)',
-    borderRadius: 20,
-    padding: 8,
-    zIndex: 101,
-  },
-  lightboxCloseIcon: {
-    fontSize: 28,
-    color: '#222',
-    fontWeight: 'bold',
-  },
-  lightboxImage: {
-    borderRadius: 12,
-    maxWidth: '90%',
-    maxHeight: '70%',
-    resizeMode: 'contain',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-  },
-// ...existing code...
+    headerOverlaySafe: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 10,
+
+    },
+    lightboxOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.85)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 100,
+    },
+    lightboxCloseButton: {
+        position: 'absolute',
+        top: 40,
+        right: 20,
+        backgroundColor: 'rgba(255,255,255,0.8)',
+        borderRadius: 20,
+        padding: 8,
+        zIndex: 101,
+    },
+    lightboxCloseIcon: {
+        fontSize: 28,
+        color: '#222',
+        fontWeight: 'bold',
+    },
+    lightboxImage: {
+        borderRadius: 12,
+        maxWidth: '90%',
+        maxHeight: '70%',
+        resizeMode: 'contain',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+    },
+    // ...existing code...
     // Header Styles
     headerOverlay: {
         position: 'absolute',
@@ -108,7 +115,7 @@ const styles = StyleSheet.create({
     },
     contentWrapper: {
         flex: 1,
-        paddingTop: 12,
+        paddingTop: 0,
         marginTop: 0,
     },
 
@@ -186,7 +193,7 @@ const styles = StyleSheet.create({
 
     // Bottom Spacer
     bottomSpacer: {
-        height: 120,
+        height: 40,
     },
 
     // Bottom Bar

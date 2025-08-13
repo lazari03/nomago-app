@@ -1,10 +1,10 @@
+import { HeaderNavigation } from '@/components/HeaderNavigation';
 import { ThemedText } from '@/components/ThemedText';
-import { BACK_BUTTON_STYLES, HEADER_STYLES } from '@/constants/BackButton';
+import { ThemedView } from '@/components/ThemedView';
 import Colors from '@/constants/Colors';
 import { IS_ANDROID, IS_IOS, IS_WEB, PLATFORM_STYLES } from '@/constants/Platform';
 import { useBookingStore } from '@/stores/useBookingStore';
 import { useDateFilterStore } from '@/stores/useDateFilterStore';
-import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import * as MediaLibrary from 'expo-media-library';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -157,113 +157,85 @@ export default function BookingScreen() {
   };
 
   return (
-  <View style={bookingStyles.fullScreenContainer}>
+    <ThemedView style={bookingStyles.fullScreenContainer}>
       <StatusBar 
         barStyle="dark-content" 
         backgroundColor={Colors.background || '#fff'} 
         translucent={IS_ANDROID} 
         hidden={false}
       />
-      {/* Header */}
-  <View style={[HEADER_STYLES.container, { paddingTop: IS_ANDROID ? insets.top : insets.top, flexDirection: 'row', alignItems: 'center' }]}> 
-    <TouchableOpacity onPress={() => router.back()} style={BACK_BUTTON_STYLES.container}>
-      <Ionicons name="arrow-back" size={24} color={BACK_BUTTON_STYLES.icon.color} />
-    </TouchableOpacity>
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <ThemedText style={bookingStyles.headerTitle}>
-        {showConfirmation ? 'Booking Confirmed' : 'Start Booking'}
-      </ThemedText>
-    </View>
-  </View>
-
+      <HeaderNavigation
+        showBack
+        title={showConfirmation ? 'Booking Confirmed' : undefined}
+      />
       <KeyboardAvoidingView 
         behavior={PLATFORM_STYLES.keyboardBehavior} 
         style={bookingStyles.content}
       >
         {showConfirmation ? (
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View style={bookingStyles.confirmationContainer}>
-              <View
-                ref={confirmationRef}
-                collapsable={false}
-                style={bookingStyles.confirmationCard}
-              >
-                <View style={bookingStyles.confirmationHeader}>
-                  <Text style={bookingStyles.brandText}>NOMAGO</Text>
-                  <Text style={bookingStyles.confirmationDate}>
-                    {new Date().toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </Text>
-                </View>
-                <View style={bookingStyles.successIcon}>
-                  <Text style={bookingStyles.successIconText}>✓</Text>
-                </View>
-                <Text style={bookingStyles.confirmationTitle}>
-                  We received your booking!
+          <ScrollView contentContainerStyle={bookingStyles.confirmationContainer}>
+            <View style={bookingStyles.confirmationCard} ref={confirmationRef} collapsable={false}>
+              <View style={bookingStyles.confirmationHeader}>
+                <Text style={bookingStyles.brandText}>NOMAGO</Text>
+                <Text style={bookingStyles.confirmationDate}>
+                  {new Date().toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
                 </Text>
-                <Text style={bookingStyles.confirmationSubtitle}>
-                  Here are your booking details:
-                </Text>
-
-                <View style={bookingStyles.bookingDetails}>
-                  <View style={bookingStyles.detailRow}>
-                    <Text style={bookingStyles.detailLabel}>Property:</Text>
-                    <Text style={bookingStyles.detailValue}>{propertyTitle}</Text>
-                  </View>
-                  <View style={bookingStyles.detailRow}>
-                    <Text style={bookingStyles.detailLabel}>Name:</Text>
-                    <Text style={bookingStyles.detailValue}>{form.name} {form.surname}</Text>
-                  </View>
-                  <View style={bookingStyles.detailRow}>
-                    <Text style={bookingStyles.detailLabel}>Email:</Text>
-                    <Text style={bookingStyles.detailValue}>{form.email}</Text>
-                  </View>
-                  <View style={bookingStyles.detailRow}>
-                    <Text style={bookingStyles.detailLabel}>Phone:</Text>
-                    <Text style={bookingStyles.detailValue}>{form.phoneNumber}</Text>
-                  </View>
-                  <View style={bookingStyles.detailRow}>
-                    <Text style={bookingStyles.detailLabel}>Check-in:</Text>
-                    <Text style={bookingStyles.detailValue}>
-                      {localStartDate?.toLocaleDateString() || 'Not selected'}
-                    </Text>
-                  </View>
-                  <View style={[bookingStyles.detailRow, { borderBottomWidth: 0 }]}> 
-                    <Text style={bookingStyles.detailLabel}>Check-out:</Text>
-                    <Text style={bookingStyles.detailValue}>
-                      {localEndDate?.toLocaleDateString() || 'Not selected'}
-                    </Text>
-                  </View>
+              </View>
+              <View style={bookingStyles.successIcon}>
+                <Text style={bookingStyles.successIconText}>✓</Text>
+              </View>
+              <Text style={bookingStyles.confirmationTitle}>We received your booking!</Text>
+              <Text style={bookingStyles.confirmationSubtitle}>Here are your booking details:</Text>
+              <View style={bookingStyles.bookingDetails}>
+                <View style={bookingStyles.detailRow}>
+                  <Text style={bookingStyles.detailLabel}>Property:</Text>
+                  <Text style={bookingStyles.detailValue}>{propertyTitle}</Text>
+                </View>
+                <View style={bookingStyles.detailRow}>
+                  <Text style={bookingStyles.detailLabel}>Name:</Text>
+                  <Text style={bookingStyles.detailValue}>{form.name} {form.surname}</Text>
+                </View>
+                <View style={bookingStyles.detailRow}>
+                  <Text style={bookingStyles.detailLabel}>Email:</Text>
+                  <Text style={bookingStyles.detailValue}>{form.email}</Text>
+                </View>
+                <View style={bookingStyles.detailRow}>
+                  <Text style={bookingStyles.detailLabel}>Phone:</Text>
+                  <Text style={bookingStyles.detailValue}>{form.phoneNumber}</Text>
+                </View>
+                <View style={bookingStyles.detailRow}>
+                  <Text style={bookingStyles.detailLabel}>Check-in:</Text>
+                  <Text style={bookingStyles.detailValue}>{localStartDate?.toLocaleDateString() || 'Not selected'}</Text>
+                </View>
+                <View style={[bookingStyles.detailRow, { borderBottomWidth: 0 }]}>
+                  <Text style={bookingStyles.detailLabel}>Check-out:</Text>
+                  <Text style={bookingStyles.detailValue}>{localEndDate?.toLocaleDateString() || 'Not selected'}</Text>
                 </View>
               </View>
-
-              <View style={bookingStyles.confirmationButtons}>
-                <TouchableOpacity
-                  style={bookingStyles.saveButton}
-                  onPress={handleSaveBookingData}
-                  disabled={isSaving}
-                >
-                  {isSaving ? (
-                    <ActivityIndicator color="#fff" size="small" />
-                  ) : (
-                    <ThemedText style={bookingStyles.saveButtonText}>Save Confirmation</ThemedText>
-                  )}
-                </TouchableOpacity>
-                <TouchableOpacity style={bookingStyles.doneButton} onPress={handleClose}>
-                  <ThemedText style={bookingStyles.doneButtonText}>Done</ThemedText>
-                </TouchableOpacity>
-              </View>
+            </View>
+            <View style={bookingStyles.confirmationButtons}>
+              <TouchableOpacity style={bookingStyles.saveButton} onPress={handleSaveBookingData} disabled={isSaving}>
+                {isSaving ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <ThemedText style={bookingStyles.saveButtonText}>Save Confirmation</ThemedText>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity style={bookingStyles.doneButton} onPress={handleClose}>
+                <ThemedText style={bookingStyles.doneButtonText}>Done</ThemedText>
+              </TouchableOpacity>
             </View>
           </ScrollView>
         ) : (
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View style={bookingStyles.formBox}>
-              <ThemedText style={bookingStyles.formTitle}>Book {propertyTitle}</ThemedText>
+          <ScrollView contentContainerStyle={bookingStyles.formBox}>
+            <ThemedText style={bookingStyles.formTitle}>Book {propertyTitle}</ThemedText>
+            <View style={bookingStyles.inputRow}>
               <TextInput
-                style={bookingStyles.input}
+                style={[bookingStyles.inputHalf, bookingStyles.inputLeft]}
                 placeholder="Name"
                 value={form.name}
                 onChangeText={text => setForm({ name: text })}
@@ -271,48 +243,47 @@ export default function BookingScreen() {
                 returnKeyType="next"
               />
               <TextInput
-                style={bookingStyles.input}
+                style={[bookingStyles.inputHalf, bookingStyles.inputRight]}
                 placeholder="Surname"
                 value={form.surname}
                 onChangeText={text => setForm({ surname: text })}
                 autoCapitalize="words"
                 returnKeyType="next"
               />
-              <TextInput
-                style={bookingStyles.input}
-                placeholder="Email"
-                value={form.email}
-                onChangeText={text => setForm({ email: text })}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                returnKeyType="next"
-              />
-              <TextInput
-                style={bookingStyles.input}
-                placeholder="Phone Number"
-                value={form.phoneNumber}
-                onChangeText={text => setForm({ phoneNumber: text })}
-                keyboardType="phone-pad"
-                returnKeyType="done"
-              />
-              <View style={{ marginBottom: 16 }}>
-                <ThemedText style={bookingStyles.formLabel}>Dates:</ThemedText>
-                {(fromDate && toDate) ? (
-                  <ThemedText style={bookingStyles.formValue}>
-                    {fromDate ? fromDate.toLocaleDateString() : ''} - {toDate ? toDate.toLocaleDateString() : ''}
-                  </ThemedText>
-                ) : (
-                  <View>
-                    <ThemedText style={[bookingStyles.formValue, { color: '#666', fontStyle: 'italic', marginBottom: 12 }]}> 
-                      Please select your check-in and check-out dates
-                    </ThemedText>
-                    {/* Check-in Date Button */}
-                    <View style={{ marginBottom: 8 }}>
-                      <ThemedText style={[bookingStyles.formLabel, { marginBottom: 4 }]}>Check-in:</ThemedText>
+            </View>
+            <TextInput
+              style={bookingStyles.input}
+              placeholder="Email"
+              value={form.email}
+              onChangeText={text => setForm({ email: text })}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              returnKeyType="next"
+            />
+            <TextInput
+              style={bookingStyles.input}
+              placeholder="Phone Number"
+              value={form.phoneNumber}
+              onChangeText={text => setForm({ phoneNumber: text })}
+              keyboardType="phone-pad"
+              returnKeyType="done"
+            />
+            <View style={bookingStyles.datesSection}>
+              <ThemedText style={bookingStyles.formLabel}>Dates:</ThemedText>
+              {(fromDate && toDate) ? (
+                <ThemedText style={bookingStyles.formValue}>
+                  {fromDate ? fromDate.toLocaleDateString() : ''} - {toDate ? toDate.toLocaleDateString() : ''}
+                </ThemedText>
+              ) : (
+                <>
+                  <ThemedText style={bookingStyles.formValueHint}>Please select your check-in and check-out dates</ThemedText>
+                  <View style={bookingStyles.dateRow}>
+                    <View style={bookingStyles.dateCol}>
+                      <ThemedText style={bookingStyles.formLabel}>Check-in:</ThemedText>
                       {IS_WEB ? (
                         <input
                           type="date"
-                          style={{ fontSize: 16, padding: 8, borderRadius: 6, border: '1px solid #eee', width: '100%' }}
+                          className="dateInputWeb"
                           value={localStartDate ? localStartDate.toISOString().split('T')[0] : ''}
                           onChange={e => {
                             const val = e.target.value;
@@ -333,13 +304,12 @@ export default function BookingScreen() {
                         </TouchableOpacity>
                       )}
                     </View>
-                    {/* Check-out Date Button */}
-                    <View style={{ marginBottom: 8 }}>
-                      <ThemedText style={[bookingStyles.formLabel, { marginBottom: 4 }]}>Check-out:</ThemedText>
+                    <View style={bookingStyles.dateCol}>
+                      <ThemedText style={bookingStyles.formLabel}>Check-out:</ThemedText>
                       {IS_WEB ? (
                         <input
                           type="date"
-                          style={{ fontSize: 16, padding: 8, borderRadius: 6, border: '1px solid #eee', width: '100%' }}
+                          className="dateInputWeb"
                           value={localEndDate ? localEndDate.toISOString().split('T')[0] : ''}
                           onChange={e => {
                             const val = e.target.value;
@@ -360,73 +330,73 @@ export default function BookingScreen() {
                         </TouchableOpacity>
                       )}
                     </View>
-                    {/* Date Pickers: Use react-native-modal-datetime-picker for iOS, DateTimePicker for Android */}
-                    {!IS_WEB && IS_IOS && (
-                      <>
-                        <DateTimePickerModal
-                          isVisible={showStartDatePicker}
-                          mode="date"
-                          date={localStartDate || new Date()}
-                          onConfirm={date => {
-                            setLocalStartDate(date);
-                            setShowStartDatePicker(false);
-                          }}
-                          onCancel={() => setShowStartDatePicker(false)}
-                        />
-                        <DateTimePickerModal
-                          isVisible={showEndDatePicker}
-                          mode="date"
-                          date={localEndDate || new Date()}
-                          onConfirm={date => {
-                            setLocalEndDate(date);
-                            setShowEndDatePicker(false);
-                          }}
-                          onCancel={() => setShowEndDatePicker(false)}
-                        />
-                      </>
-                    )}
-                    {!IS_WEB && IS_ANDROID && showStartDatePicker && (
-                      <DateTimePicker
-                        value={localStartDate || new Date()}
-                        mode="date"
-                        display="calendar"
-                        onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-                          setShowStartDatePicker(false);
-                          if (event.type === 'set' && selectedDate) setLocalStartDate(selectedDate);
-                        }}
-                      />
-                    )}
-                    {!IS_WEB && IS_ANDROID && showEndDatePicker && (
-                      <DateTimePicker
-                        value={localEndDate || new Date()}
-                        mode="date"
-                        display="calendar"
-                        onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-                          setShowEndDatePicker(false);
-                          if (event.type === 'set' && selectedDate) setLocalEndDate(selectedDate);
-                        }}
-                      />
-                    )}
                   </View>
-                )}
-              </View>
-              <View style={bookingStyles.buttonContainer}>
-                <TouchableOpacity style={bookingStyles.cancelButton} onPress={() => router.back()} disabled={loading}>
-                  <ThemedText style={bookingStyles.cancelButtonText}>Cancel</ThemedText>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={bookingStyles.submitButton}
-                  onPress={handleSubmit}
-                  disabled={loading}
-                >
-                  {loading ? <ActivityIndicator color="#fff" /> : <ThemedText style={bookingStyles.submitButtonText}>Book Now</ThemedText>}
-                </TouchableOpacity>
-              </View>
+                  {/* Date Pickers: Use react-native-modal-datetime-picker for iOS, DateTimePicker for Android */}
+                  {!IS_WEB && IS_IOS && (
+                    <>
+                      <DateTimePickerModal
+                        isVisible={showStartDatePicker}
+                        mode="date"
+                        date={localStartDate || new Date()}
+                        onConfirm={date => {
+                          setLocalStartDate(date);
+                          setShowStartDatePicker(false);
+                        }}
+                        onCancel={() => setShowStartDatePicker(false)}
+                      />
+                      <DateTimePickerModal
+                        isVisible={showEndDatePicker}
+                        mode="date"
+                        date={localEndDate || new Date()}
+                        onConfirm={date => {
+                          setLocalEndDate(date);
+                          setShowEndDatePicker(false);
+                        }}
+                        onCancel={() => setShowEndDatePicker(false)}
+                      />
+                    </>
+                  )}
+                  {!IS_WEB && IS_ANDROID && showStartDatePicker && (
+                    <DateTimePicker
+                      value={localStartDate || new Date()}
+                      mode="date"
+                      display="calendar"
+                      onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                        setShowStartDatePicker(false);
+                        if (event.type === 'set' && selectedDate) setLocalStartDate(selectedDate);
+                      }}
+                    />
+                  )}
+                  {!IS_WEB && IS_ANDROID && showEndDatePicker && (
+                    <DateTimePicker
+                      value={localEndDate || new Date()}
+                      mode="date"
+                      display="calendar"
+                      onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                        setShowEndDatePicker(false);
+                        if (event.type === 'set' && selectedDate) setLocalEndDate(selectedDate);
+                      }}
+                    />
+                  )}
+                </>
+              )}
+            </View>
+            <View style={bookingStyles.buttonContainer}>
+              <TouchableOpacity style={bookingStyles.cancelButton} onPress={() => router.back()} disabled={loading}>
+                <ThemedText style={bookingStyles.cancelButtonText}>Cancel</ThemedText>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={bookingStyles.submitButton}
+                onPress={handleSubmit}
+                disabled={loading}
+              >
+                {loading ? <ActivityIndicator color="#fff" /> : <ThemedText style={bookingStyles.submitButtonText}>Book Now</ThemedText>}
+              </TouchableOpacity>
             </View>
           </ScrollView>
         )}
       </KeyboardAvoidingView>
-    </View>
+    </ThemedView>
   );
 }
 

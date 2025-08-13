@@ -8,6 +8,7 @@ import { useListingsStore } from '@/stores/useListingsStore';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Dimensions, ScrollView, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styles from './PropertyDetailScreen.styles';
 
 export const screenOptions = {
@@ -18,6 +19,7 @@ export default function PropertyDetailScreen() {
 
   const [lightboxVisible, setLightboxVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const insets = useSafeAreaInsets();
   const { fromDate, toDate } = useDateFilterStore();
   const { id } = useLocalSearchParams();
   const { selectedProperty, listings } = useListingsStore();
@@ -44,9 +46,9 @@ export default function PropertyDetailScreen() {
 
   return (
     <ThemedView style={styles.container}>
-  {/* HeaderNavigation with only left button (back) */}
-  <HeaderNavigation showBack />
-
+      <View style={[styles.headerOverlaySafe, { paddingTop: insets.top }]}>
+        <HeaderNavigation showBack title={property.title} />
+      </View>
       <ParallaxScrollView
         headerImage={
           property.featuredImageUrl ? (
@@ -69,11 +71,8 @@ export default function PropertyDetailScreen() {
         withTabBarPadding={false}
       >
         <View style={styles.contentWrapper}>
-          {/* Title & Location */}
+          {/* Location only (title moved to header) */}
           <View style={styles.titleSection}>
-            <ThemedText style={styles.title}>
-              {property.title}
-            </ThemedText>
             <View style={styles.locationRow}>
               <ThemedText style={styles.location}>{property.location}</ThemedText>
             </View>
