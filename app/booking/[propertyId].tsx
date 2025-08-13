@@ -68,6 +68,7 @@ const useBookingFormStore = create<BookingFormState>((set) => ({
 }));
 
 export default function BookingScreen() {
+
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { propertyId, propertyDocumentId, propertyTitle } = useLocalSearchParams<{
@@ -89,6 +90,11 @@ export default function BookingScreen() {
 
   const confirmationRef = useRef<View>(null);
   const { loading, error, success, book, reset } = useBookingStore();
+
+  // Always reset form and local dates on mount
+  useEffect(() => {
+    resetForm();
+  }, []);
 
   useEffect(() => {
     if (success) {
