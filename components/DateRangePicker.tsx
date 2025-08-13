@@ -30,6 +30,10 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
     if (!showEnd) setTempEnd(endDate || null);
   }, [endDate, showEnd]);
 
+  // Android-specific state for showing pickers
+  const [showAndroidStart, setShowAndroidStart] = React.useState(false);
+  const [showAndroidEnd, setShowAndroidEnd] = React.useState(false);
+
   return (
     <View>
       {/* Check-in */}
@@ -44,6 +48,25 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
             onStartDateChange(val ? new Date(val) : null);
           }}
         />
+      ) : Platform.OS === 'android' ? (
+        <>
+          <TouchableOpacity style={styles.button} onPress={() => setShowAndroidStart(true)}>
+            <ThemedText style={styles.buttonText}>
+              {startDate ? startDate.toLocaleDateString() : 'Select check-in date'}
+            </ThemedText>
+          </TouchableOpacity>
+          {showAndroidStart && (
+            <DateTimePicker
+              value={startDate || new Date()}
+              mode="date"
+              display="default"
+              onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                setShowAndroidStart(false);
+                if (event.type === 'set' && selectedDate) onStartDateChange(selectedDate);
+              }}
+            />
+          )}
+        </>
       ) : (
         <>
           <TouchableOpacity style={styles.button} onPress={() => {
@@ -95,6 +118,26 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
             onEndDateChange(val ? new Date(val) : null);
           }}
         />
+      ) : Platform.OS === 'android' ? (
+        <>
+          <TouchableOpacity style={styles.button} onPress={() => setShowAndroidEnd(true)}>
+            <ThemedText style={styles.buttonText}>
+              {endDate ? endDate.toLocaleDateString() : 'Select check-out date'}
+            </ThemedText>
+          </TouchableOpacity>
+          {showAndroidEnd && (
+            <DateTimePicker
+              value={endDate || (startDate || new Date())}
+              mode="date"
+              display="default"
+              minimumDate={startDate || undefined}
+              onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                setShowAndroidEnd(false);
+                if (event.type === 'set' && selectedDate) onEndDateChange(selectedDate);
+              }}
+            />
+          )}
+        </>
       ) : (
         <>
           <TouchableOpacity style={styles.button} onPress={() => {
@@ -108,7 +151,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
           </TouchableOpacity>
           <Modal
             visible={showEnd}
-            animationType="slide"
+            animationType="none"
             transparent
             onRequestClose={() => setShowEnd(false)}
           >

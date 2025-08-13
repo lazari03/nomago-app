@@ -1,5 +1,5 @@
 
-import { ColorTokens } from '@/constants/Colors';
+import Colors, { ColorTokens } from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -27,11 +27,23 @@ export function HeaderNavigation({ title, showBack = false, right, left, center,
     title ? (
       typeof title === 'string' ? <Text style={styles.title}>{title}</Text> : title
     ) : null;
+
+  // Dynamic flex for center if right is not present
+  const centerStyle = [
+    styles.center,
+    { alignItems: 'flex-start' as const, justifyContent: 'center' as const },
+    !right ? { flex: 3 } : null,
+  ];
+  const rightStyle = [
+    styles.right,
+    !right ? { minWidth: 0, flex: 0 } : null,
+  ];
+
   return (
     <View style={[styles.container, style]}>
       <View style={styles.left}>{leftElement}</View>
-      <View style={styles.center}>{centerElement}</View>
-      <View style={styles.right}>{right}</View>
+  <View style={centerStyle} pointerEvents="box-none">{centerElement}</View>
+      <View style={rightStyle}>{right}</View>
     </View>
   );
 }
@@ -43,7 +55,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     height: 56,
-    backgroundColor: '#fff',
+  backgroundColor: Colors.white,
+  borderBottomWidth: 1,
+  borderBottomColor: Colors.border,
   },
   left: {
     minWidth: 48,
