@@ -399,5 +399,3 @@ export default function BookingScreen() {
     </ThemedView>
   );
 }
-
-// Styles moved to bookingStyles.ts

@@ -50,11 +50,12 @@ export const bookingStyles = StyleSheet.create({
     backgroundColor: '#faf9ff',
   },
   dateButton: {
-    borderWidth: 1,
-    borderColor: '#eee',
-    borderRadius: 8,
-    padding: 12,
-    backgroundColor: '#faf9ff',
+  borderWidth: 1,
+  borderColor: '#eee',
+  borderRadius: 8,
+  padding: 12,
+  backgroundColor: '#faf9ff',
+  width: '100%',
   },
   dateButtonText: {
     fontSize: 16,
@@ -209,9 +210,8 @@ export const bookingStyles = StyleSheet.create({
   },
   // Compact layout additions for booking form
   inputRow: {
-    flexDirection: 'row',
-    marginBottom: 12,
-    gap: 8,
+  flexDirection: 'row',
+  marginBottom: 12,
   },
   inputHalf: {
     flex: 1,
@@ -222,18 +222,18 @@ export const bookingStyles = StyleSheet.create({
     fontSize: 16,
   },
   inputLeft: {
-    borderTopLeftRadius: 12,
-    borderBottomLeftRadius: 12,
-    borderTopRightRadius: 0,
-    borderBottomRightRadius: 0,
-    marginRight: 0,
+  borderTopLeftRadius: 12,
+  borderBottomLeftRadius: 12,
+  borderTopRightRadius: 0,
+  borderBottomRightRadius: 0,
+  marginRight: 8,
   },
   inputRight: {
-    borderTopRightRadius: 12,
-    borderBottomRightRadius: 12,
-    borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0,
-    marginLeft: 0,
+  borderTopRightRadius: 12,
+  borderBottomRightRadius: 12,
+  borderTopLeftRadius: 0,
+  borderBottomLeftRadius: 0,
+  marginLeft: 0,
   },
   datesSection: {
     marginTop: 8,
@@ -246,12 +246,13 @@ export const bookingStyles = StyleSheet.create({
     fontSize: 15,
   },
   dateRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 4,
-    marginBottom: 4,
+  flexDirection: 'row',
+  alignItems: 'stretch',
+  marginTop: 4,
+  marginBottom: 4,
   },
   dateCol: {
-    flex: 1,
+  flex: 1,
+  alignItems: 'stretch',
   },
 });
