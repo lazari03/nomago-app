@@ -60,6 +60,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
               value={startDate || new Date()}
               mode="date"
               display="default"
+              textColor="#000"
               onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
                 setShowAndroidStart(false);
                 if (event.type === 'set' && selectedDate) onStartDateChange(selectedDate);
@@ -90,6 +91,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
                 value={tempStart || new Date()}
                 mode="date"
                 display={Platform.OS === 'ios' ? 'spinner' : 'calendar'}
+                textColor="#000"
                 onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
                   if (selectedDate) setTempStart(selectedDate);
                 }}
@@ -131,6 +133,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
               mode="date"
               display="default"
               minimumDate={startDate || undefined}
+              textColor="#000"
               onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
                 setShowAndroidEnd(false);
                 if (event.type === 'set' && selectedDate) onEndDateChange(selectedDate);
@@ -162,6 +165,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
                 mode="date"
                 display={Platform.OS === 'ios' ? 'spinner' : 'calendar'}
                 minimumDate={startDate || undefined}
+                textColor="#000"
                 onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
                   if (selectedDate) setTempEnd(selectedDate);
                 }}

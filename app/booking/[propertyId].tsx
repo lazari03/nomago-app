@@ -280,21 +280,13 @@ export default function BookingScreen() {
               />
             <View style={bookingStyles.datesSection}>
               <ThemedText style={bookingStyles.formLabel}>Dates:</ThemedText>
-              {(fromDate && toDate) ? (
-                <ThemedText style={bookingStyles.formValue}>
-                  {fromDate ? fromDate.toLocaleDateString() : ''} - {toDate ? toDate.toLocaleDateString() : ''}
-                </ThemedText>
-              ) : (
-                <>
-                  <ThemedText style={bookingStyles.formValueHint}>{BOOKING_DATES_HINT}</ThemedText>
-                  <DateRangePicker
-                    startDate={localStartDate}
-                    endDate={localEndDate}
-                    onStartDateChange={setLocalStartDate}
-                    onEndDateChange={setLocalEndDate}
-                  />
-                </>
-              )}
+              <ThemedText style={bookingStyles.formValueHint}>{BOOKING_DATES_HINT}</ThemedText>
+              <DateRangePicker
+                startDate={localStartDate}
+                endDate={localEndDate}
+                onStartDateChange={setLocalStartDate}
+                onEndDateChange={setLocalEndDate}
+              />
             </View>
             <View style={bookingStyles.buttonContainer}>
               <TouchableOpacity style={bookingStyles.cancelButton} onPress={() => router.back()} disabled={loading}>
