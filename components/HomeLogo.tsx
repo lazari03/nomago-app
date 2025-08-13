@@ -10,7 +10,7 @@ function Logo() {
   );
 }
 
-export function HomeDateBar() {
+export function HomeLogo() {
   return (
     <View style={styles.container}>
       <Logo />

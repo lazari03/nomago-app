@@ -1,11 +1,10 @@
+import { HeaderNavigation } from '@/components/HeaderNavigation';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemeImage } from '@/components/ThemeImage';
-import { BACK_BUTTON_STYLES, HEADER_STYLES } from '@/constants/BackButton';
 import { useDateFilterStore } from '@/stores/useDateFilterStore';
 import { useListingsStore } from '@/stores/useListingsStore';
-import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Dimensions, ScrollView, TouchableOpacity, View } from 'react-native';
@@ -45,12 +44,8 @@ export default function PropertyDetailScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      {/* Back Button Overlay (left-aligned, visually above image) */}
-      <View style={HEADER_STYLES.overlay}>
-        <TouchableOpacity onPress={() => router.back()} style={BACK_BUTTON_STYLES.container}>
-          <Ionicons name="arrow-back" size={24} color={BACK_BUTTON_STYLES.icon.color} />
-        </TouchableOpacity>
-      </View>
+  {/* HeaderNavigation with only left button (back) */}
+  <HeaderNavigation showBack />
 
       <ParallaxScrollView
         headerImage={

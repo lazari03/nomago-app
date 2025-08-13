@@ -1,16 +1,38 @@
 import { ThemedText } from '@/components/ThemedText';
 import { BACK_BUTTON_STYLES, HEADER_STYLES } from '@/constants/BackButton';
-import { IS_ANDROID, IS_WEB, PLATFORM_STYLES } from '@/constants/Platform';
+import Colors from '@/constants/Colors';
+import { IS_ANDROID, IS_IOS, IS_WEB, PLATFORM_STYLES } from '@/constants/Platform';
 import { useBookingStore } from '@/stores/useBookingStore';
 import { useDateFilterStore } from '@/stores/useDateFilterStore';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import * as MediaLibrary from 'expo-media-library';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, KeyboardAvoidingView, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { ActivityIndicator, Alert, KeyboardAvoidingView, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { captureRef } from 'react-native-view-shot';
+import { create } from 'zustand';
+import { bookingStyles } from './bookingStyles';
+
+type BookingFormState = {
+  form: { name: string; surname: string; email: string; phoneNumber: string };
+  setForm: (payload: Partial<{ name: string; surname: string; email: string; phoneNumber: string }>) => void;
+  localStartDate: Date | null;
+  setLocalStartDate: (date: Date | null) => void;
+  localEndDate: Date | null;
+  setLocalEndDate: (date: Date | null) => void;
+  showStartDatePicker: boolean;
+  setShowStartDatePicker: (val: boolean) => void;
+  showEndDatePicker: boolean;
+  setShowEndDatePicker: (val: boolean) => void;
+  showConfirmation: boolean;
+  setShowConfirmation: (val: boolean) => void;
+  isSaving: boolean;
+  setIsSaving: (val: boolean) => void;
+  resetForm: () => void;
+};
 
 export const screenOptions = {
   headerShown: false,
@@ -25,14 +47,46 @@ export default function BookingScreen() {
     propertyTitle: string;
   }>();
   
+
+  // Zustand store for form state
+  const useBookingFormStore = create<BookingFormState>((set) => ({
+    form: { name: '', surname: '', email: '', phoneNumber: '' },
+    setForm: (payload: Partial<{ name: string; surname: string; email: string; phoneNumber: string }>) =>
+      set((state: any) => ({ form: { ...state.form, ...payload } })),
+    localStartDate: null as Date | null,
+    setLocalStartDate: (date: Date | null) => set({ localStartDate: date }),
+    localEndDate: null as Date | null,
+    setLocalEndDate: (date: Date | null) => set({ localEndDate: date }),
+    showStartDatePicker: false,
+    setShowStartDatePicker: (val: boolean) => set({ showStartDatePicker: val }),
+    showEndDatePicker: false,
+    setShowEndDatePicker: (val: boolean) => set({ showEndDatePicker: val }),
+    showConfirmation: false,
+    setShowConfirmation: (val: boolean) => set({ showConfirmation: val }),
+    isSaving: false,
+    setIsSaving: (val: boolean) => set({ isSaving: val }),
+    resetForm: () => set({
+      form: { name: '', surname: '', email: '', phoneNumber: '' },
+      localStartDate: null,
+      localEndDate: null,
+      showStartDatePicker: false,
+      showEndDatePicker: false,
+      showConfirmation: false,
+      isSaving: false,
+    }),
+  }));
+
   const { fromDate, toDate } = useDateFilterStore();
-  const [form, setForm] = useState({ name: '', surname: '', email: '', phoneNumber: '' });
-  const [localStartDate, setLocalStartDate] = useState<Date | null>(fromDate || null);
-  const [localEndDate, setLocalEndDate] = useState<Date | null>(toDate || null);
-  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
-  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const {
+    form, setForm,
+    localStartDate, setLocalStartDate,
+    localEndDate, setLocalEndDate,
+    showStartDatePicker, setShowStartDatePicker,
+    showEndDatePicker, setShowEndDatePicker,
+    showConfirmation, setShowConfirmation,
+    isSaving, setIsSaving, resetForm
+  } = useBookingFormStore();
+
   const confirmationRef = useRef<View>(null);
   const { loading, error, success, book, reset } = useBookingStore();
 
@@ -45,7 +99,7 @@ export default function BookingScreen() {
       Alert.alert('Booking failed', error);
       reset();
     }
-  }, [success, error]);
+  }, [success, error, setShowConfirmation, reset]);
 
   const handleSubmit = () => {
     if (!form.name || !form.surname || !form.email || !form.phoneNumber) {
@@ -70,7 +124,7 @@ export default function BookingScreen() {
 
   const handleClose = () => {
     setShowConfirmation(false);
-    setForm({ name: '', surname: '', email: '', phoneNumber: '' });
+    resetForm();
     router.back();
   };
 
@@ -79,9 +133,7 @@ export default function BookingScreen() {
       Alert.alert('Error', 'No confirmation to save.');
       return;
     }
-
     setIsSaving(true);
-
     try {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== 'granted') {
@@ -89,17 +141,12 @@ export default function BookingScreen() {
         setIsSaving(false);
         return;
       }
-
-      // Small delay to ensure the view is fully rendered
       await new Promise(res => setTimeout(res, 100));
-
       const uri = await captureRef(confirmationRef, {
         format: 'png',
         quality: 1,
       });
-
       await MediaLibrary.createAssetAsync(uri);
-
       Alert.alert('Success', 'Booking confirmation saved to your gallery!');
     } catch (error) {
       console.error('Error saving booking confirmation image:', error);
@@ -110,39 +157,40 @@ export default function BookingScreen() {
   };
 
   return (
-    <View style={styles.fullScreenContainer}>
+  <View style={bookingStyles.fullScreenContainer}>
       <StatusBar 
         barStyle="dark-content" 
-        backgroundColor="#fff" 
+        backgroundColor={Colors.background || '#fff'} 
         translucent={IS_ANDROID} 
         hidden={false}
       />
       {/* Header */}
-      <View style={[HEADER_STYLES.container, { paddingTop: IS_ANDROID ? insets.top : insets.top }]}>
-        <TouchableOpacity onPress={() => router.back()} style={BACK_BUTTON_STYLES.container}>
-          <Ionicons name="arrow-back" size={24} color={BACK_BUTTON_STYLES.icon.color} />
-        </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>
-          {showConfirmation ? 'Booking Confirmed' : 'Book Property'}
-        </ThemedText>
-        <View style={BACK_BUTTON_STYLES.container} />
-      </View>
+  <View style={[HEADER_STYLES.container, { paddingTop: IS_ANDROID ? insets.top : insets.top, flexDirection: 'row', alignItems: 'center' }]}> 
+    <TouchableOpacity onPress={() => router.back()} style={BACK_BUTTON_STYLES.container}>
+      <Ionicons name="arrow-back" size={24} color={BACK_BUTTON_STYLES.icon.color} />
+    </TouchableOpacity>
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <ThemedText style={bookingStyles.headerTitle}>
+        {showConfirmation ? 'Booking Confirmed' : 'Start Booking'}
+      </ThemedText>
+    </View>
+  </View>
 
       <KeyboardAvoidingView 
         behavior={PLATFORM_STYLES.keyboardBehavior} 
-        style={styles.content}
+        style={bookingStyles.content}
       >
         {showConfirmation ? (
           <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View style={styles.confirmationContainer}>
+            <View style={bookingStyles.confirmationContainer}>
               <View
                 ref={confirmationRef}
                 collapsable={false}
-                style={styles.confirmationCard}
+                style={bookingStyles.confirmationCard}
               >
-                <View style={styles.confirmationHeader}>
-                  <Text style={styles.brandText}>NOMAGO</Text>
-                  <Text style={styles.confirmationDate}>
+                <View style={bookingStyles.confirmationHeader}>
+                  <Text style={bookingStyles.brandText}>NOMAGO</Text>
+                  <Text style={bookingStyles.confirmationDate}>
                     {new Date().toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
@@ -150,118 +198,117 @@ export default function BookingScreen() {
                     })}
                   </Text>
                 </View>
-                <View style={styles.successIcon}>
-                  <Text style={styles.successIconText}>✓</Text>
+                <View style={bookingStyles.successIcon}>
+                  <Text style={bookingStyles.successIconText}>✓</Text>
                 </View>
-                <Text style={styles.confirmationTitle}>
+                <Text style={bookingStyles.confirmationTitle}>
                   We received your booking!
                 </Text>
-                <Text style={styles.confirmationSubtitle}>
+                <Text style={bookingStyles.confirmationSubtitle}>
                   Here are your booking details:
                 </Text>
 
-                <View style={styles.bookingDetails}>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Property:</Text>
-                    <Text style={styles.detailValue}>{propertyTitle}</Text>
+                <View style={bookingStyles.bookingDetails}>
+                  <View style={bookingStyles.detailRow}>
+                    <Text style={bookingStyles.detailLabel}>Property:</Text>
+                    <Text style={bookingStyles.detailValue}>{propertyTitle}</Text>
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Name:</Text>
-                    <Text style={styles.detailValue}>{form.name} {form.surname}</Text>
+                  <View style={bookingStyles.detailRow}>
+                    <Text style={bookingStyles.detailLabel}>Name:</Text>
+                    <Text style={bookingStyles.detailValue}>{form.name} {form.surname}</Text>
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Email:</Text>
-                    <Text style={styles.detailValue}>{form.email}</Text>
+                  <View style={bookingStyles.detailRow}>
+                    <Text style={bookingStyles.detailLabel}>Email:</Text>
+                    <Text style={bookingStyles.detailValue}>{form.email}</Text>
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Phone:</Text>
-                    <Text style={styles.detailValue}>{form.phoneNumber}</Text>
+                  <View style={bookingStyles.detailRow}>
+                    <Text style={bookingStyles.detailLabel}>Phone:</Text>
+                    <Text style={bookingStyles.detailValue}>{form.phoneNumber}</Text>
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Check-in:</Text>
-                    <Text style={styles.detailValue}>
+                  <View style={bookingStyles.detailRow}>
+                    <Text style={bookingStyles.detailLabel}>Check-in:</Text>
+                    <Text style={bookingStyles.detailValue}>
                       {localStartDate?.toLocaleDateString() || 'Not selected'}
                     </Text>
                   </View>
-                  <View style={[styles.detailRow, { borderBottomWidth: 0 }]}>
-                    <Text style={styles.detailLabel}>Check-out:</Text>
-                    <Text style={styles.detailValue}>
+                  <View style={[bookingStyles.detailRow, { borderBottomWidth: 0 }]}> 
+                    <Text style={bookingStyles.detailLabel}>Check-out:</Text>
+                    <Text style={bookingStyles.detailValue}>
                       {localEndDate?.toLocaleDateString() || 'Not selected'}
                     </Text>
                   </View>
                 </View>
               </View>
 
-              <View style={styles.confirmationButtons}>
+              <View style={bookingStyles.confirmationButtons}>
                 <TouchableOpacity
-                  style={styles.saveButton}
+                  style={bookingStyles.saveButton}
                   onPress={handleSaveBookingData}
                   disabled={isSaving}
                 >
                   {isSaving ? (
                     <ActivityIndicator color="#fff" size="small" />
                   ) : (
-                    <ThemedText style={styles.saveButtonText}>Save Confirmation</ThemedText>
+                    <ThemedText style={bookingStyles.saveButtonText}>Save Confirmation</ThemedText>
                   )}
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.doneButton} onPress={handleClose}>
-                  <ThemedText style={styles.doneButtonText}>Done</ThemedText>
+                <TouchableOpacity style={bookingStyles.doneButton} onPress={handleClose}>
+                  <ThemedText style={bookingStyles.doneButtonText}>Done</ThemedText>
                 </TouchableOpacity>
               </View>
             </View>
           </ScrollView>
         ) : (
           <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View style={styles.formBox}>
-              <ThemedText style={styles.formTitle}>Book {propertyTitle}</ThemedText>
+            <View style={bookingStyles.formBox}>
+              <ThemedText style={bookingStyles.formTitle}>Book {propertyTitle}</ThemedText>
               <TextInput
-                style={styles.input}
+                style={bookingStyles.input}
                 placeholder="Name"
                 value={form.name}
-                onChangeText={text => setForm(f => ({ ...f, name: text }))}
+                onChangeText={text => setForm({ name: text })}
                 autoCapitalize="words"
                 returnKeyType="next"
               />
               <TextInput
-                style={styles.input}
+                style={bookingStyles.input}
                 placeholder="Surname"
                 value={form.surname}
-                onChangeText={text => setForm(f => ({ ...f, surname: text }))}
+                onChangeText={text => setForm({ surname: text })}
                 autoCapitalize="words"
                 returnKeyType="next"
               />
               <TextInput
-                style={styles.input}
+                style={bookingStyles.input}
                 placeholder="Email"
                 value={form.email}
-                onChangeText={text => setForm(f => ({ ...f, email: text }))}
+                onChangeText={text => setForm({ email: text })}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 returnKeyType="next"
               />
               <TextInput
-                style={styles.input}
+                style={bookingStyles.input}
                 placeholder="Phone Number"
                 value={form.phoneNumber}
-                onChangeText={text => setForm(f => ({ ...f, phoneNumber: text }))}
+                onChangeText={text => setForm({ phoneNumber: text })}
                 keyboardType="phone-pad"
                 returnKeyType="done"
               />
               <View style={{ marginBottom: 16 }}>
-                <ThemedText style={styles.formLabel}>Dates:</ThemedText>
+                <ThemedText style={bookingStyles.formLabel}>Dates:</ThemedText>
                 {(fromDate && toDate) ? (
-                  <ThemedText style={styles.formValue}>
+                  <ThemedText style={bookingStyles.formValue}>
                     {fromDate ? fromDate.toLocaleDateString() : ''} - {toDate ? toDate.toLocaleDateString() : ''}
                   </ThemedText>
                 ) : (
                   <View>
-                    <ThemedText style={[styles.formValue, { color: '#666', fontStyle: 'italic', marginBottom: 12 }]}>
+                    <ThemedText style={[bookingStyles.formValue, { color: '#666', fontStyle: 'italic', marginBottom: 12 }]}> 
                       Please select your check-in and check-out dates
                     </ThemedText>
-                    
                     {/* Check-in Date Button */}
                     <View style={{ marginBottom: 8 }}>
-                      <ThemedText style={[styles.formLabel, { marginBottom: 4 }]}>Check-in:</ThemedText>
+                      <ThemedText style={[bookingStyles.formLabel, { marginBottom: 4 }]}>Check-in:</ThemedText>
                       {IS_WEB ? (
                         <input
                           type="date"
@@ -274,19 +321,21 @@ export default function BookingScreen() {
                         />
                       ) : (
                         <TouchableOpacity 
-                          style={styles.dateButton}
-                          onPress={() => setShowStartDatePicker(true)}
+                          style={bookingStyles.dateButton}
+                          onPress={() => {
+                            setShowStartDatePicker(true);
+                            setShowEndDatePicker(false);
+                          }}
                         >
-                          <ThemedText style={styles.dateButtonText}>
+                          <ThemedText style={bookingStyles.dateButtonText}>
                             {localStartDate ? localStartDate.toLocaleDateString() : 'Select check-in date'}
                           </ThemedText>
                         </TouchableOpacity>
                       )}
                     </View>
-
                     {/* Check-out Date Button */}
                     <View style={{ marginBottom: 8 }}>
-                      <ThemedText style={[styles.formLabel, { marginBottom: 4 }]}>Check-out:</ThemedText>
+                      <ThemedText style={[bookingStyles.formLabel, { marginBottom: 4 }]}>Check-out:</ThemedText>
                       {IS_WEB ? (
                         <input
                           type="date"
@@ -299,53 +348,78 @@ export default function BookingScreen() {
                         />
                       ) : (
                         <TouchableOpacity 
-                          style={styles.dateButton}
-                          onPress={() => setShowEndDatePicker(true)}
+                          style={bookingStyles.dateButton}
+                          onPress={() => {
+                            setShowEndDatePicker(true);
+                            setShowStartDatePicker(false);
+                          }}
                         >
-                          <ThemedText style={styles.dateButtonText}>
+                          <ThemedText style={bookingStyles.dateButtonText}>
                             {localEndDate ? localEndDate.toLocaleDateString() : 'Select check-out date'}
                           </ThemedText>
                         </TouchableOpacity>
                       )}
                     </View>
-
-                    {/* Date Pickers (only show when button is pressed) */}
-                    {!IS_WEB && showStartDatePicker && (
+                    {/* Date Pickers: Use react-native-modal-datetime-picker for iOS, DateTimePicker for Android */}
+                    {!IS_WEB && IS_IOS && (
+                      <>
+                        <DateTimePickerModal
+                          isVisible={showStartDatePicker}
+                          mode="date"
+                          date={localStartDate || new Date()}
+                          onConfirm={date => {
+                            setLocalStartDate(date);
+                            setShowStartDatePicker(false);
+                          }}
+                          onCancel={() => setShowStartDatePicker(false)}
+                        />
+                        <DateTimePickerModal
+                          isVisible={showEndDatePicker}
+                          mode="date"
+                          date={localEndDate || new Date()}
+                          onConfirm={date => {
+                            setLocalEndDate(date);
+                            setShowEndDatePicker(false);
+                          }}
+                          onCancel={() => setShowEndDatePicker(false)}
+                        />
+                      </>
+                    )}
+                    {!IS_WEB && IS_ANDROID && showStartDatePicker && (
                       <DateTimePicker
                         value={localStartDate || new Date()}
                         mode="date"
-                        display="default"
+                        display="calendar"
                         onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
                           setShowStartDatePicker(false);
-                          if (selectedDate) setLocalStartDate(selectedDate);
+                          if (event.type === 'set' && selectedDate) setLocalStartDate(selectedDate);
                         }}
                       />
                     )}
-                    
-                    {!IS_WEB && showEndDatePicker && (
+                    {!IS_WEB && IS_ANDROID && showEndDatePicker && (
                       <DateTimePicker
                         value={localEndDate || new Date()}
                         mode="date"
-                        display="default"
+                        display="calendar"
                         onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
                           setShowEndDatePicker(false);
-                          if (selectedDate) setLocalEndDate(selectedDate);
+                          if (event.type === 'set' && selectedDate) setLocalEndDate(selectedDate);
                         }}
                       />
                     )}
                   </View>
                 )}
               </View>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()} disabled={loading}>
-                  <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
+              <View style={bookingStyles.buttonContainer}>
+                <TouchableOpacity style={bookingStyles.cancelButton} onPress={() => router.back()} disabled={loading}>
+                  <ThemedText style={bookingStyles.cancelButtonText}>Cancel</ThemedText>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={styles.submitButton}
+                  style={bookingStyles.submitButton}
                   onPress={handleSubmit}
                   disabled={loading}
                 >
-                  {loading ? <ActivityIndicator color="#fff" /> : <ThemedText style={styles.submitButtonText}>Book Now</ThemedText>}
+                  {loading ? <ActivityIndicator color="#fff" /> : <ThemedText style={bookingStyles.submitButtonText}>Book Now</ThemedText>}
                 </TouchableOpacity>
               </View>
             </View>
@@ -356,213 +430,4 @@ export default function BookingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  fullScreenContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-  },
-  content: {
-    flex: 1,
-  },
-  formBox: {
-    flex: 1,
-    backgroundColor: '#fff',
-    padding: 24,
-  },
-  formTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    marginBottom: 24,
-    color: '#333',
-    textAlign: 'center',
-  },
-  formLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#6C4DF6',
-    marginBottom: 2,
-  },
-  formValue: {
-    fontSize: 16,
-    color: '#222',
-    marginBottom: 2,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#eee',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
-    fontSize: 16,
-    backgroundColor: '#faf9ff',
-  },
-  dateButton: {
-    borderWidth: 1,
-    borderColor: '#eee',
-    borderRadius: 8,
-    padding: 12,
-    backgroundColor: '#faf9ff',
-  },
-  dateButtonText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    marginTop: 32,
-    paddingTop: 24,
-    gap: 12,
-  },
-  cancelButton: {
-    flex: 1,
-    backgroundColor: '#f8f8f8',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    color: '#666',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  submitButton: {
-    flex: 2,
-    backgroundColor: '#5A4FCF',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  submitButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  confirmationContainer: {
-    flex: 1,
-    padding: 24,
-  },
-  confirmationCard: {
-    alignItems: 'center',
-    paddingTop: 40,
-    paddingBottom: 40,
-    backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    borderRadius: 16,
-    marginBottom: 24,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  confirmationHeader: {
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 20,
-    paddingBottom: 16,
-    borderBottomWidth: 2,
-    borderBottomColor: '#5A4FCF',
-  },
-  brandText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#5A4FCF',
-    letterSpacing: 2,
-  },
-  confirmationDate: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 4,
-  },
-  successIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#4CAF50',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  successIconText: {
-    fontSize: 40,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  confirmationTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  confirmationSubtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 32,
-  },
-  bookingDetails: {
-    width: '100%',
-    backgroundColor: '#f8f9fa',
-    borderRadius: 12,
-    padding: 20,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
-  },
-  detailLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#495057',
-    flex: 1,
-  },
-  detailValue: {
-    fontSize: 16,
-    color: '#212529',
-    flex: 2,
-    textAlign: 'right',
-  },
-  confirmationButtons: {
-    flexDirection: 'row',
-    width: '100%',
-    gap: 12,
-  },
-  saveButton: {
-    flex: 1,
-    backgroundColor: '#6c757d',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  doneButton: {
-    flex: 1,
-    backgroundColor: '#5A4FCF',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  doneButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-});
+// Styles moved to bookingStyles.ts

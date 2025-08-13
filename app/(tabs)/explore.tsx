@@ -1,4 +1,4 @@
-import { HeaderFilter } from '@/components/HeaderFilter';
+import { HeaderNavigation } from '@/components/HeaderNavigation';
 import { HomeTabBar } from '@/components/HomeTabBar';
 import { PropertyCard } from '@/components/PropertyCard/PropertyCard';
 import { ThemedView } from '@/components/ThemedView';
@@ -39,7 +39,11 @@ export default function ExplorePage() {
 
   return (
     <ThemedView style={{ flex: 1, backgroundColor: '#fff' }}>
-        <HeaderFilter />
+        <HeaderNavigation
+          title="Explore"
+          showBack={true}
+          right={null}
+        />
         <HomeTabBar />
         <Animated.ScrollView
           contentContainerStyle={{ 

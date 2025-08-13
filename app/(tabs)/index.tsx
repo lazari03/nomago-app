@@ -1,5 +1,5 @@
 import { HomeBottomCards } from '@/components/HomeBottomCards';
-import { HomeDateBar } from '@/components/HomeDateBar';
+import { HomeLogo } from '@/components/HomeLogo';
 import { HomeMainCarousel } from '@/components/HomeMainCarousel';
 import { HomeTabBar } from '@/components/HomeTabBar';
 import { ThemedView } from '@/components/ThemedView';
@@ -24,7 +24,7 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <HomeDateBar />
+      <HomeLogo />
       <HomeTabBar />
       <Animated.ScrollView
         style={{ flex: 1 }}
