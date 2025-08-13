@@ -1,6 +1,7 @@
+import { BACK_BUTTON_STYLES } from '@/constants/BackButton';
+import { IS_WEB } from '@/constants/Platform';
 import { useCategoryStore } from '@/stores/useCategoryStore';
 import { useDateFilterStore } from '@/stores/useDateFilterStore';
-import { IS_WEB } from '@/constants/Platform';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
@@ -17,8 +18,8 @@ export function HeaderFilter() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Ionicons name="arrow-back" size={24} color="#6C4DF6" />
+      <TouchableOpacity onPress={() => navigation.goBack()} style={BACK_BUTTON_STYLES.container}>
+        <Ionicons name="arrow-back" size={24} color={BACK_BUTTON_STYLES.icon.color} />
       </TouchableOpacity>
       <Text style={styles.categoryTitle}>Explore {category}</Text>
       <View style={styles.rightHeader}>
@@ -204,11 +205,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     height: 56,
     backgroundColor: '#fff',
-  },
-  backButton: {
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: '#eee',
   },
   headerAvailabilityText: {
     color: '#6C4DF6',

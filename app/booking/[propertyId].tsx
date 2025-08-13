@@ -1,4 +1,5 @@
 import { ThemedText } from '@/components/ThemedText';
+import { BACK_BUTTON_STYLES, HEADER_STYLES } from '@/constants/BackButton';
 import { IS_ANDROID, IS_WEB, PLATFORM_STYLES } from '@/constants/Platform';
 import { useBookingStore } from '@/stores/useBookingStore';
 import { useDateFilterStore } from '@/stores/useDateFilterStore';
@@ -117,14 +118,14 @@ export default function BookingScreen() {
         hidden={false}
       />
       {/* Header */}
-      <View style={[styles.header, { paddingTop: IS_ANDROID ? insets.top : insets.top }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#6C4DF6" />
+      <View style={[HEADER_STYLES.container, { paddingTop: IS_ANDROID ? insets.top : insets.top }]}>
+        <TouchableOpacity onPress={() => router.back()} style={BACK_BUTTON_STYLES.container}>
+          <Ionicons name="arrow-back" size={24} color={BACK_BUTTON_STYLES.icon.color} />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle}>
           {showConfirmation ? 'Booking Confirmed' : 'Book Property'}
         </ThemedText>
-        <View style={styles.backButton} />
+        <View style={BACK_BUTTON_STYLES.container} />
       </View>
 
       <KeyboardAvoidingView 
@@ -363,25 +364,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-    minHeight: 80,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f8f8f8',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 18,
