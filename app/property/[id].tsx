@@ -16,16 +16,21 @@ export const screenOptions = {
 };
 
 export default function PropertyDetailScreen() {
+
   const [lightboxVisible, setLightboxVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const { fromDate, toDate } = useDateFilterStore();
   const { id } = useLocalSearchParams();
-  const { selectedProperty } = useListingsStore();
+  const { selectedProperty, listings } = useListingsStore();
   const router = useRouter();
 
-  const property = selectedProperty && String(selectedProperty.id) === String(id)
+  // Try to find the property by ID from listings if not set as selectedProperty
+  let property = selectedProperty && String(selectedProperty.id) === String(id)
     ? selectedProperty
     : null;
+  if (!property && listings && listings.length > 0) {
+    property = listings.find((l) => String(l.id) === String(id)) || null;
+  }
 
   if (!property) {
     return (

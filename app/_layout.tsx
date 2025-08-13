@@ -3,7 +3,7 @@ import { useFonts } from 'expo-font';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useCategoryStore } from '@/stores/useCategoryStore';
 import { useListingsStore } from '@/stores/useListingsStore';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -31,14 +31,15 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <ThemeProvider value={DefaultTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="property/[id]" options={{ headerShown: false }} />
           <Stack.Screen name="booking/[propertyId]" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
-        <StatusBar style="auto" />
+        {/* Force white background and dark status bar icons globally */}
+        <StatusBar style="dark" backgroundColor="#fff" translucent={true} />
       </ThemeProvider>
     </SafeAreaProvider>
   );

@@ -45,6 +45,8 @@ export function HomeMainCarousel() {
   const displayListing = displayList[0];
   // Use featuredImage if present, else fallback to first imageUrl
   const featuredImageUrl = displayListing.featuredImageUrl || displayListing.imageUrls?.[0] || '';
+  const { useRouter } = require('expo-router');
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
@@ -67,7 +69,15 @@ export function HomeMainCarousel() {
         <Text style={styles.title}>{String(displayListing.title ?? '')}</Text>
         <Text style={styles.subtitle}>{String(displayListing.subtitle ?? '')}</Text>
         <Text style={styles.price}>{displayListing.price != null ? `$${displayListing.price}` : ''}</Text>
-        <TouchableOpacity style={styles.reserveBtnNearText}>
+        <TouchableOpacity
+          style={styles.reserveBtnNearText}
+          onPress={() => {
+            router.push({
+              pathname: '/property/[id]',
+              params: { id: displayListing.id },
+            });
+          }}
+        >
           <Text style={styles.reserveText}>BOOK NOW</Text>
         </TouchableOpacity>
       </View>
