@@ -241,39 +241,43 @@ export default function BookingScreen() {
             <ThemedText style={bookingStyles.formTitle}>Book {propertyTitle}</ThemedText>
             <View style={bookingStyles.inputRow}>
               <TextInput
-                style={[bookingStyles.inputHalf, bookingStyles.inputLeft]}
-                placeholder="Name"
-                value={form.name}
-                onChangeText={text => setForm({ name: text })}
-                autoCapitalize="words"
+                  style={[bookingStyles.inputHalf, bookingStyles.inputLeft]}
+                  placeholder="Name"
+                   placeholderTextColor="#888"
+                  value={form.name}
+                  onChangeText={text => setForm({ name: text })}
+                  autoCapitalize="words"
+                  returnKeyType="next"
+              />
+              <TextInput
+                  style={[bookingStyles.inputHalf, bookingStyles.inputRight]}
+                  placeholder="Surname"
+                   placeholderTextColor="#888"
+                  value={form.surname}
+                  onChangeText={text => setForm({ surname: text })}
+                  autoCapitalize="words"
+                  returnKeyType="next"
+              />
+            </View>
+              <TextInput
+                style={bookingStyles.input}
+                placeholder="Email"
+                 placeholderTextColor="#888"
+                value={form.email}
+                onChangeText={text => setForm({ email: text })}
+                keyboardType="email-address"
+                autoCapitalize="none"
                 returnKeyType="next"
               />
               <TextInput
-                style={[bookingStyles.inputHalf, bookingStyles.inputRight]}
-                placeholder="Surname"
-                value={form.surname}
-                onChangeText={text => setForm({ surname: text })}
-                autoCapitalize="words"
-                returnKeyType="next"
+                style={bookingStyles.input}
+                placeholder="Phone Number"
+                 placeholderTextColor="#888"
+                value={form.phoneNumber}
+                onChangeText={text => setForm({ phoneNumber: text })}
+                keyboardType="phone-pad"
+                returnKeyType="done"
               />
-            </View>
-            <TextInput
-              style={bookingStyles.input}
-              placeholder="Email"
-              value={form.email}
-              onChangeText={text => setForm({ email: text })}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              returnKeyType="next"
-            />
-            <TextInput
-              style={bookingStyles.input}
-              placeholder="Phone Number"
-              value={form.phoneNumber}
-              onChangeText={text => setForm({ phoneNumber: text })}
-              keyboardType="phone-pad"
-              returnKeyType="done"
-            />
             <View style={bookingStyles.datesSection}>
               <ThemedText style={bookingStyles.formLabel}>Dates:</ThemedText>
               {(fromDate && toDate) ? (
