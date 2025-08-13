@@ -1,6 +1,7 @@
 import { HeaderNavigation } from '@/components/HeaderNavigation';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { BOOKING_DATES_HINT } from '@/constants/bookingFormStrings';
 import { IS_ANDROID, IS_IOS, IS_WEB, PLATFORM_STYLES } from '@/constants/Platform';
 import { useBookingStore } from '@/stores/useBookingStore';
 import { useDateFilterStore } from '@/stores/useDateFilterStore';
@@ -106,7 +107,7 @@ export default function BookingFormScreen() {
               </ThemedText>
             ) : (
               <>
-                <ThemedText style={bookingStyles.formValueHint}>Please select your check-in and check-out dates</ThemedText>
+                <ThemedText style={bookingStyles.formValueHint}>{BOOKING_DATES_HINT}</ThemedText>
                 <View style={bookingStyles.dateRow}>
                   <View style={bookingStyles.dateCol}>
                     <ThemedText style={bookingStyles.formLabel}>Check-in:</ThemedText>

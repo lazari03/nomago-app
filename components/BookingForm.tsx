@@ -1,10 +1,11 @@
-import { IS_WEB, PLATFORM_STYLES } from '@/constants/Platform';
+import { PLATFORM_STYLES } from '@/constants/Platform';
+
 import { useBookingStore } from '@/stores/useBookingStore';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import * as MediaLibrary from 'expo-media-library';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, KeyboardAvoidingView, Modal, Platform, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
+import { DateRangePicker } from './DateRangePicker';
 import { ThemedText } from './ThemedText';
 
 interface BookingFormProps {
@@ -259,109 +260,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
                 />
                 <View style={{ marginBottom: 16 }}>
                   <ThemedText style={styles.formLabel}>Dates:</ThemedText>
-                  {(startDate && endDate) ? (
-                    <ThemedText style={styles.formValue}>
-                      {startDate ? startDate.toLocaleDateString() : ''} - {endDate ? endDate.toLocaleDateString() : ''}
-                    </ThemedText>
-                  ) : (
-                    <View>
-                      <ThemedText style={[styles.formValue, { color: '#666', fontStyle: 'italic', marginBottom: 12 }]}>
-                        Please select your check-in and check-out dates
-                      </ThemedText>
-                      
-                      {/* Check-in Date Button */}
-                      <View style={{ marginBottom: 8 }}>
-                        <ThemedText style={[styles.formLabel, { marginBottom: 4 }]}>Check-in:</ThemedText>
-                        {IS_WEB ? (
-                          <input
-                            type="date"
-                            style={{ fontSize: 16, padding: 8, borderRadius: 6, border: '1px solid #eee', width: '100%' }}
-                            value={localStartDate ? localStartDate.toISOString().split('T')[0] : ''}
-                            onChange={e => {
-                              const val = e.target.value;
-                              setLocalStartDate(val ? new Date(val) : null);
-                            }}
-                          />
-                        ) : (
-                          <>
-                            <TouchableOpacity 
-                              style={styles.dateButton}
-                              onPress={() => {
-                                setShowStartDatePicker(show => !show);
-                                setShowEndDatePicker(false);
-                              }}
-                            >
-                              <ThemedText style={styles.dateButtonText}>
-                                {localStartDate ? localStartDate.toLocaleDateString() : 'Select check-in date'}
-                              </ThemedText>
-                            </TouchableOpacity>
-                            {showStartDatePicker && (
-                              <DateTimePicker
-                                value={localStartDate || new Date()}
-                                mode="date"
-                                display={Platform.OS === 'ios' ? 'spinner' : 'calendar'}
-                                onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-                                  if (Platform.OS === 'android') setShowStartDatePicker(false);
-                                  if (selectedDate) {
-                                    setLocalStartDate(selectedDate);
-                                    if (Platform.OS === 'ios') setShowStartDatePicker(false);
-                                  }
-                                }}
-                                style={Platform.OS === 'ios' ? { width: '100%' } : {}}
-                              />
-                            )}
-                          </>
-                        )}
-                      </View>
-
-                      {/* Check-out Date Button */}
-                      <View style={{ marginBottom: 8 }}>
-                        <ThemedText style={[styles.formLabel, { marginBottom: 4 }]}>Check-out:</ThemedText>
-                        {IS_WEB ? (
-                          <input
-                            type="date"
-                            style={{ fontSize: 16, padding: 8, borderRadius: 6, border: '1px solid #eee', width: '100%' }}
-                            value={localEndDate ? localEndDate.toISOString().split('T')[0] : ''}
-                            onChange={e => {
-                              const val = e.target.value;
-                              setLocalEndDate(val ? new Date(val) : null);
-                            }}
-                          />
-                        ) : (
-                          <>
-                            <TouchableOpacity 
-                              style={styles.dateButton}
-                              onPress={() => {
-                                setShowEndDatePicker(show => !show);
-                                setShowStartDatePicker(false);
-                              }}
-                            >
-                              <ThemedText style={styles.dateButtonText}>
-                                {localEndDate ? localEndDate.toLocaleDateString() : 'Select check-out date'}
-                              </ThemedText>
-                            </TouchableOpacity>
-                            {showEndDatePicker && (
-                              <DateTimePicker
-                                value={localEndDate || new Date()}
-                                mode="date"
-                                display={Platform.OS === 'ios' ? 'spinner' : 'calendar'}
-                                onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-                                  if (Platform.OS === 'android') setShowEndDatePicker(false);
-                                  if (selectedDate) {
-                                    setLocalEndDate(selectedDate);
-                                    if (Platform.OS === 'ios') setShowEndDatePicker(false);
-                                  }
-                                }}
-                                style={Platform.OS === 'ios' ? { width: '100%' } : {}}
-                              />
-                            )}
-                          </>
-                        )}
-                      </View>
-
-                      // ...existing code...
-                    </View>
-                  )}
+                  <DateRangePicker
+                    startDate={localStartDate}
+                    endDate={localEndDate}
+                    onStartDateChange={setLocalStartDate}
+                    onEndDateChange={setLocalEndDate}
+                  />
                 </View>
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity style={styles.cancelButton} onPress={onClose} disabled={loading}>
