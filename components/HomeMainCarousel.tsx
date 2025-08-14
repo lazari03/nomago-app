@@ -27,13 +27,15 @@ export function HomeMainCarousel() {
   }, [displayList.length]);
 
   const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 20 && Math.abs(g.dy) < 20,
-      onPanResponderRelease: (_, g) => {
-        if (g.dx < -40) setActiveIndex(i => (i === displayList.length - 1 ? 0 : i + 1));
-        else if (g.dx > 40) setActiveIndex(i => (i === 0 ? displayList.length - 1 : i - 1));
-      },
-    })
+    displayList.length > 1
+      ? PanResponder.create({
+          onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 20 && Math.abs(g.dy) < 20,
+          onPanResponderRelease: (_, g) => {
+            if (g.dx < -40) setActiveIndex(i => (i === displayList.length - 1 ? 0 : i + 1));
+            else if (g.dx > 40) setActiveIndex(i => (i === 0 ? displayList.length - 1 : i - 1));
+          },
+        })
+      : { panHandlers: {} }
   ).current;
 
   const showLoading = categoryLoading;
@@ -50,7 +52,7 @@ export function HomeMainCarousel() {
           ))}
         </View>
 
-        {!showEmpty && (
+        {!showEmpty && displayList.length > 1 && (
           <>
             <TouchableOpacity style={styles.leftArrow} onPress={() => setActiveIndex(i => (i === 0 ? displayList.length - 1 : i - 1))}>
               <Text style={styles.arrowText}>‹</Text>
