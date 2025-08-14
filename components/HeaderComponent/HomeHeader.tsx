@@ -1,3 +1,5 @@
+import { useTranslations } from '@/hooks/useTranslation';
+import { L10n } from '@/utils/translationHelper';
 import { Image, StyleSheet, Text, View, ViewStyle } from 'react-native';
 
 type HomeHeaderProps = {
@@ -6,6 +8,7 @@ type HomeHeaderProps = {
 };
 
 export function HomeHeader({ style, showText = true }: HomeHeaderProps) {
+  const { t } = useTranslations();
   return (
     <View style={[styles.container, style]}>
       {showText && (
@@ -13,10 +16,10 @@ export function HomeHeader({ style, showText = true }: HomeHeaderProps) {
           <Image
             source={require('@/assets/images/logo.png')}
             style={{ width: 80, height: 80, resizeMode: 'contain', alignSelf: 'center', marginBottom: 8 }}
-            accessibilityLabel="Nomago Logo"
+            accessibilityLabel={t(L10n.common.nomagoLogo)}
           />
-          <Text style={styles.title}>HEY THERE{''}GLOBAL EXPLORER!</Text>
-          <Text style={styles.subtitle}>Join the nomad life-style, made easy</Text>
+          <Text style={styles.title}>{t(L10n.homeHeader.title)}</Text>
+          <Text style={styles.subtitle}>{t(L10n.homeHeader.subtitle)}</Text>
         </View>
       )}
     </View>

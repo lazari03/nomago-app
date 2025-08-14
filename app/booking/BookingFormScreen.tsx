@@ -3,8 +3,10 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { BOOKING_DATES_HINT } from '@/constants/bookingFormStrings';
 import { IS_ANDROID, IS_IOS, IS_WEB, PLATFORM_STYLES } from '@/constants/Platform';
+import { useTranslations } from '@/hooks/useTranslation';
 import { useBookingStore } from '@/stores/useBookingStore';
 import { useDateFilterStore } from '@/stores/useDateFilterStore';
+import { L10n } from '@/utils/translationHelper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
@@ -14,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { bookingStyles } from './bookingStyles';
 
 export default function BookingFormScreen() {
+  const { t } = useTranslations();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { propertyId, propertyDocumentId, propertyTitle } = useLocalSearchParams();
@@ -29,15 +32,15 @@ export default function BookingFormScreen() {
 
   const handleSubmit = () => {
     if (!form.name || !form.surname || !form.email || !form.phoneNumber) {
-      Alert.alert('Please fill all fields');
+      Alert.alert(t(L10n.booking.pleaseFillAllFields));
       return;
     }
     if (!localStartDate || !localEndDate) {
-      Alert.alert('Please select both start and end dates');
+      Alert.alert(t(L10n.booking.pleaseSelectDates));
       return;
     }
     if (!propertyDocumentId) {
-      Alert.alert('Property Document ID is missing.');
+      Alert.alert(t(L10n.booking.propertyDocumentMissing));
       return;
     }
     book({
@@ -63,11 +66,11 @@ export default function BookingFormScreen() {
         style={bookingStyles.content}
       >
         <ScrollView contentContainerStyle={bookingStyles.formBox}>
-          <ThemedText style={bookingStyles.formTitle}>Book {propertyTitle}</ThemedText>
+          <ThemedText style={bookingStyles.formTitle}>{t(L10n.booking.bookProperty, { propertyTitle })}</ThemedText>
           <View style={bookingStyles.inputRow}>
             <TextInput
               style={[bookingStyles.inputHalf, bookingStyles.inputLeft]}
-              placeholder="Name"
+              placeholder={t(L10n.booking.name)}
               value={form.name}
               onChangeText={text => setForm({ name: text })}
               autoCapitalize="words"
@@ -75,7 +78,7 @@ export default function BookingFormScreen() {
             />
             <TextInput
               style={[bookingStyles.inputHalf, bookingStyles.inputRight]}
-              placeholder="Surname"
+              placeholder={t(L10n.booking.surname)}
               value={form.surname}
               onChangeText={text => setForm({ surname: text })}
               autoCapitalize="words"
@@ -84,7 +87,7 @@ export default function BookingFormScreen() {
           </View>
           <TextInput
             style={bookingStyles.input}
-            placeholder="Email"
+            placeholder={t(L10n.booking.email)}
             value={form.email}
             onChangeText={text => setForm({ email: text })}
             keyboardType="email-address"
@@ -93,7 +96,7 @@ export default function BookingFormScreen() {
           />
           <TextInput
             style={bookingStyles.input}
-            placeholder="Phone Number"
+            placeholder={t(L10n.booking.phoneNumber)}
             value={form.phoneNumber}
             onChangeText={text => setForm({ phoneNumber: text })}
             keyboardType="phone-pad"

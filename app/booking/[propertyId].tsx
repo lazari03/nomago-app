@@ -5,8 +5,10 @@ import { ThemedView } from '@/components/ThemedView';
 import { BOOKING_DATES_HINT } from '@/constants/bookingFormStrings';
 import Colors from '@/constants/Colors';
 import { IS_ANDROID, PLATFORM_STYLES } from '@/constants/Platform';
+import { useTranslations } from '@/hooks/useTranslation';
 import { useBookingStore } from '@/stores/useBookingStore';
 import { useDateFilterStore } from '@/stores/useDateFilterStore';
+import { L10n } from '@/utils/translationHelper';
 import * as MediaLibrary from 'expo-media-library';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useRef } from 'react';
@@ -68,6 +70,7 @@ const useBookingFormStore = create<BookingFormState>((set) => ({
 }));
 
 export default function BookingScreen() {
+  const { t } = useTranslations();
 
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -102,22 +105,22 @@ export default function BookingScreen() {
       reset();
     }
     if (error) {
-      Alert.alert('Booking failed', error);
+      Alert.alert(t(L10n.booking.bookingFailed), error);
       reset();
     }
   }, [success, error, setShowConfirmation, reset]);
 
   const handleSubmit = () => {
     if (!form.name || !form.surname || !form.email || !form.phoneNumber) {
-      Alert.alert('Please fill all fields');
+      Alert.alert(t(L10n.booking.pleaseFillAllFields));
       return;
     }
     if (!localStartDate || !localEndDate) {
-      Alert.alert('Please select both start and end dates');
+      Alert.alert(t(L10n.booking.pleaseSelectDates));
       return;
     }
     if (!propertyDocumentId) {
-      Alert.alert('Property Document ID is missing.');
+      Alert.alert(t(L10n.booking.propertyDocumentMissing));
       return;
     }
     book({
@@ -136,14 +139,14 @@ export default function BookingScreen() {
 
   const handleSaveBookingData = async () => {
     if (!confirmationRef.current) {
-      Alert.alert('Error', 'No confirmation to save.');
+      Alert.alert(t(L10n.booking.errorSaving), t(L10n.booking.failedToSave));
       return;
     }
     setIsSaving(true);
     try {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'Permission to access media library is required!');
+        Alert.alert(t(L10n.booking.permissionDenied), t(L10n.booking.permissionRequired));
         setIsSaving(false);
         return;
       }
@@ -153,10 +156,10 @@ export default function BookingScreen() {
         quality: 1,
       });
       await MediaLibrary.createAssetAsync(uri);
-      Alert.alert('Success', 'Booking confirmation saved to your gallery!');
+  Alert.alert(t(L10n.booking.success), t(L10n.booking.confirmationSaved));
     } catch (error) {
       console.error('Error saving booking confirmation image:', error);
-      Alert.alert('Error', 'Failed to save image. Please try again.');
+  Alert.alert(t(L10n.booking.errorSaving), t(L10n.booking.failedToSave));
     } finally {
       setIsSaving(false);
     }
@@ -172,7 +175,7 @@ export default function BookingScreen() {
       />
       <HeaderNavigation
         showBack
-        title={showConfirmation ? 'Booking Confirmed' : undefined}
+  title={showConfirmation ? t(L10n.booking.bookingConfirmed) : undefined}
       />
       <KeyboardAvoidingView 
         behavior={PLATFORM_STYLES.keyboardBehavior} 
@@ -194,32 +197,32 @@ export default function BookingScreen() {
               <View style={bookingStyles.successIcon}>
                 <Text style={bookingStyles.successIconText}>✓</Text>
               </View>
-              <Text style={bookingStyles.confirmationTitle}>We received your booking!</Text>
-              <Text style={bookingStyles.confirmationSubtitle}>Here are your booking details:</Text>
+              <Text style={bookingStyles.confirmationTitle}>{t(L10n.booking.weReceived)}</Text>
+              <Text style={bookingStyles.confirmationSubtitle}>{t(L10n.booking.hereAreDetails)}</Text>
               <View style={bookingStyles.bookingDetails}>
                 <View style={bookingStyles.detailRow}>
-                  <Text style={bookingStyles.detailLabel}>Property:</Text>
+                  <Text style={bookingStyles.detailLabel}>{t(L10n.booking.property)}</Text>
                   <Text style={bookingStyles.detailValue}>{propertyTitle}</Text>
                 </View>
                 <View style={bookingStyles.detailRow}>
-                  <Text style={bookingStyles.detailLabel}>Name:</Text>
+                  <Text style={bookingStyles.detailLabel}>{t(L10n.booking.name)}</Text>
                   <Text style={bookingStyles.detailValue}>{form.name} {form.surname}</Text>
                 </View>
                 <View style={bookingStyles.detailRow}>
-                  <Text style={bookingStyles.detailLabel}>Email:</Text>
+                  <Text style={bookingStyles.detailLabel}>{t(L10n.booking.email)}</Text>
                   <Text style={bookingStyles.detailValue}>{form.email}</Text>
                 </View>
                 <View style={bookingStyles.detailRow}>
-                  <Text style={bookingStyles.detailLabel}>Phone:</Text>
+                  <Text style={bookingStyles.detailLabel}>{t(L10n.booking.phoneNumber)}</Text>
                   <Text style={bookingStyles.detailValue}>{form.phoneNumber}</Text>
                 </View>
                 <View style={bookingStyles.detailRow}>
-                  <Text style={bookingStyles.detailLabel}>Check-in:</Text>
-                  <Text style={bookingStyles.detailValue}>{localStartDate?.toLocaleDateString() || 'Not selected'}</Text>
+                  <Text style={bookingStyles.detailLabel}>{t(L10n.booking.checkIn)}</Text>
+                  <Text style={bookingStyles.detailValue}>{localStartDate?.toLocaleDateString() || t(L10n.booking.notSelected)}</Text>
                 </View>
-                <View style={[bookingStyles.detailRow, { borderBottomWidth: 0 }]}>
-                  <Text style={bookingStyles.detailLabel}>Check-out:</Text>
-                  <Text style={bookingStyles.detailValue}>{localEndDate?.toLocaleDateString() || 'Not selected'}</Text>
+                <View style={[bookingStyles.detailRow, { borderBottomWidth: 0 }]}> 
+                  <Text style={bookingStyles.detailLabel}>{t(L10n.booking.checkOut)}</Text>
+                  <Text style={bookingStyles.detailValue}>{localEndDate?.toLocaleDateString() || t(L10n.booking.notSelected)}</Text>
                 </View>
               </View>
             </View>
@@ -228,40 +231,40 @@ export default function BookingScreen() {
                 {isSaving ? (
                   <ActivityIndicator color="#fff" size="small" />
                 ) : (
-                  <ThemedText style={bookingStyles.saveButtonText}>Save Confirmation</ThemedText>
+                  <ThemedText style={bookingStyles.saveButtonText}>{t(L10n.booking.saveConfirmation)}</ThemedText>
                 )}
               </TouchableOpacity>
               <TouchableOpacity style={bookingStyles.doneButton} onPress={handleClose}>
-                <ThemedText style={bookingStyles.doneButtonText}>Done</ThemedText>
+                <ThemedText style={bookingStyles.doneButtonText}>{t(L10n.booking.done)}</ThemedText>
               </TouchableOpacity>
             </View>
           </ScrollView>
         ) : (
           <ScrollView contentContainerStyle={bookingStyles.formBox}>
-            <ThemedText style={bookingStyles.formTitle}>Book {propertyTitle}</ThemedText>
+            <ThemedText style={bookingStyles.formTitle}>{t(L10n.booking.bookProperty, { propertyTitle })}</ThemedText>
             <View style={bookingStyles.inputRow}>
-              <TextInput
-                  style={[bookingStyles.inputHalf, bookingStyles.inputLeft]}
-                  placeholder="Name"
-                   placeholderTextColor="#888"
-                  value={form.name}
-                  onChangeText={text => setForm({ name: text })}
-                  autoCapitalize="words"
-                  returnKeyType="next"
-              />
-              <TextInput
-                  style={[bookingStyles.inputHalf, bookingStyles.inputRight]}
-                  placeholder="Surname"
-                   placeholderTextColor="#888"
-                  value={form.surname}
-                  onChangeText={text => setForm({ surname: text })}
-                  autoCapitalize="words"
-                  returnKeyType="next"
-              />
+        <TextInput
+          style={[bookingStyles.inputHalf, bookingStyles.inputLeft]}
+          placeholder={t(L10n.booking.name)}
+           placeholderTextColor="#888"
+          value={form.name}
+          onChangeText={text => setForm({ name: text })}
+          autoCapitalize="words"
+          returnKeyType="next"
+        />
+        <TextInput
+          style={[bookingStyles.inputHalf, bookingStyles.inputRight]}
+          placeholder={t(L10n.booking.surname)}
+           placeholderTextColor="#888"
+          value={form.surname}
+          onChangeText={text => setForm({ surname: text })}
+          autoCapitalize="words"
+          returnKeyType="next"
+        />
             </View>
               <TextInput
                 style={bookingStyles.input}
-                placeholder="Email"
+                placeholder={t(L10n.booking.email)}
                  placeholderTextColor="#888"
                 value={form.email}
                 onChangeText={text => setForm({ email: text })}
@@ -271,7 +274,7 @@ export default function BookingScreen() {
               />
               <TextInput
                 style={bookingStyles.input}
-                placeholder="Phone Number"
+                placeholder={t(L10n.booking.phoneNumber)}
                  placeholderTextColor="#888"
                 value={form.phoneNumber}
                 onChangeText={text => setForm({ phoneNumber: text })}
@@ -279,7 +282,7 @@ export default function BookingScreen() {
                 returnKeyType="done"
               />
             <View style={bookingStyles.datesSection}>
-              <ThemedText style={bookingStyles.formLabel}>Dates:</ThemedText>
+              <ThemedText style={bookingStyles.formLabel}>{t(L10n.booking.dates)}</ThemedText>
               <ThemedText style={bookingStyles.formValueHint}>{BOOKING_DATES_HINT}</ThemedText>
               <DateRangePicker
                 startDate={localStartDate}
@@ -290,14 +293,14 @@ export default function BookingScreen() {
             </View>
             <View style={bookingStyles.buttonContainer}>
               <TouchableOpacity style={bookingStyles.cancelButton} onPress={() => router.back()} disabled={loading}>
-                <ThemedText style={bookingStyles.cancelButtonText}>Cancel</ThemedText>
+                <ThemedText style={bookingStyles.cancelButtonText}>{t(L10n.booking.cancel)}</ThemedText>
               </TouchableOpacity>
               <TouchableOpacity
                 style={bookingStyles.submitButton}
                 onPress={handleSubmit}
                 disabled={loading}
               >
-                {loading ? <ActivityIndicator color="#fff" /> : <ThemedText style={bookingStyles.submitButtonText}>Book Now</ThemedText>}
+                {loading ? <ActivityIndicator color="#fff" /> : <ThemedText style={bookingStyles.submitButtonText}>{t(L10n.booking.bookNow)}</ThemedText>}
               </TouchableOpacity>
             </View>
           </ScrollView>

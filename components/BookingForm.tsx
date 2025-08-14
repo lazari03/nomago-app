@@ -1,6 +1,8 @@
 import { PLATFORM_STYLES } from '@/constants/Platform';
 
+import { useTranslations } from '@/hooks/useTranslation';
 import { useBookingStore } from '@/stores/useBookingStore';
+import { L10n } from '@/utils/translationHelper';
 import * as MediaLibrary from 'expo-media-library';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, KeyboardAvoidingView, Modal, Platform, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -20,6 +22,7 @@ interface BookingFormProps {
 
 const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTitle, propertyId, propertyDocumentId, startDate, endDate }) => {
   const [form, setForm] = useState({ name: '', surname: '', email: '', phoneNumber: '' });
+  const { t } = useTranslations();
   const [localStartDate, setLocalStartDate] = useState<Date | null>(startDate || null);
   const [localEndDate, setLocalEndDate] = useState<Date | null>(endDate || null);
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
@@ -42,7 +45,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
       reset();
     }
     if (error) {
-      Alert.alert('Booking failed', error);
+      Alert.alert(t(L10n.booking.bookingFailed), error);
       reset();
     }
   }, [success, error]);
@@ -55,15 +58,15 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
 
   const handleSubmit = () => {
     if (!form.name || !form.surname || !form.email || !form.phoneNumber) {
-      Alert.alert('Please fill all fields');
+      Alert.alert(t(L10n.booking.pleaseFillAllFields));
       return;
     }
     if (!localStartDate || !localEndDate) {
-      Alert.alert('Please select both start and end dates');
+      Alert.alert(t(L10n.booking.pleaseSelectDates));
       return;
     }
     if (!propertyDocumentId) {
-      Alert.alert('Property Document ID is missing.');
+      Alert.alert(t(L10n.booking.propertyDocumentMissing));
       return;
     }
     book({
@@ -82,7 +85,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
 
   const handleSaveBookingData = async () => {
     if (!confirmationRef.current) {
-      Alert.alert('Error', 'No confirmation to save.');
+  Alert.alert(t(L10n.booking.errorSaving), t(L10n.booking.failedToSave));
       return;
     }
 
@@ -91,7 +94,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
     try {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'Permission to access media library is required!');
+        Alert.alert(t(L10n.booking.permissionDenied), t(L10n.booking.permissionRequired));
         setIsSaving(false);
         return;
       }
@@ -106,10 +109,10 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
 
       await MediaLibrary.createAssetAsync(uri);
 
-      Alert.alert('Success', 'Booking confirmation saved to your gallery!');
+  Alert.alert(t(L10n.booking.success), t(L10n.booking.confirmationSaved));
     } catch (error) {
       console.error('Error saving booking confirmation image:', error);
-      Alert.alert('Error', 'Failed to save image. Please try again.');
+  Alert.alert(t(L10n.booking.errorSaving), t(L10n.booking.failedToSave));
     } finally {
       setIsSaving(false);
     }
@@ -133,7 +136,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
             <View style={styles.confirmationFullScreen}>
               <View style={styles.header}>
                 <View style={styles.closeButton} />
-                <ThemedText style={styles.headerTitle}>Booking Confirmed</ThemedText>
+                <ThemedText style={styles.headerTitle}>{t(L10n.booking.bookingConfirmed)}</ThemedText>
                 <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
                   <ThemedText style={styles.closeButtonText}>✕</ThemedText>
                 </TouchableOpacity>
@@ -158,39 +161,39 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
                   {/* Removed the green circle success icon as requested */}
                   <Text style={[styles.successIconText, {alignSelf: 'center', fontSize: 40, color: '#4CAF50', marginBottom: 24}]}>✓</Text>
                   <Text style={styles.confirmationTitle}>
-                    We received your booking!
+                    {t(L10n.booking.weReceived)}
                   </Text>
                   <Text style={styles.confirmationSubtitle}>
-                    Here are your booking details:
+                    {t(L10n.booking.hereAreDetails)}
                   </Text>
 
                   <View style={styles.bookingDetails}>
                     <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Property:</Text>
+                      <Text style={styles.detailLabel}>{t(L10n.booking.property)}</Text>
                       <Text style={styles.detailValue}>{propertyTitle}</Text>
                     </View>
                     <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Name:</Text>
+                      <Text style={styles.detailLabel}>{t(L10n.booking.name)}</Text>
                       <Text style={styles.detailValue}>{form.name} {form.surname}</Text>
                     </View>
                     <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Email:</Text>
+                      <Text style={styles.detailLabel}>{t(L10n.booking.email)}</Text>
                       <Text style={styles.detailValue}>{form.email}</Text>
                     </View>
                     <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Phone:</Text>
+                      <Text style={styles.detailLabel}>{t(L10n.booking.phoneNumber)}</Text>
                       <Text style={styles.detailValue}>{form.phoneNumber}</Text>
                     </View>
                     <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Check-in:</Text>
+                      <Text style={styles.detailLabel}>{t(L10n.booking.checkIn)}</Text>
                       <Text style={styles.detailValue}>
-                        {localStartDate?.toLocaleDateString() || 'Not selected'}
+                        {localStartDate?.toLocaleDateString() || t(L10n.booking.notSelected)}
                       </Text>
                     </View>
                     <View style={[styles.detailRow, { borderBottomWidth: 0 }]}>
-                      <Text style={styles.detailLabel}>Check-out:</Text>
+                      <Text style={styles.detailLabel}>{t(L10n.booking.checkOut)}</Text>
                       <Text style={styles.detailValue}>
-                        {localEndDate?.toLocaleDateString() || 'Not selected'}
+                        {localEndDate?.toLocaleDateString() || t(L10n.booking.notSelected)}
                       </Text>
                     </View>
                   </View>
@@ -206,11 +209,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
                   {isSaving ? (
                     <ActivityIndicator color="#fff" size="small" />
                   ) : (
-                    <ThemedText style={styles.saveButtonText}>Save Confirmation</ThemedText>
+                    <ThemedText style={styles.saveButtonText}>{t(L10n.booking.saveConfirmation)}</ThemedText>
                   )}
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.doneButton} onPress={handleClose}>
-                  <ThemedText style={styles.doneButtonText}>Done</ThemedText>
+                  <ThemedText style={styles.doneButtonText}>{t(L10n.booking.done)}</ThemedText>
                 </TouchableOpacity>
               </View>
             </View>
@@ -219,15 +222,15 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
               <View style={styles.formBox}>
                 <View style={styles.header}>
                   <View style={styles.closeButton} />
-                  <ThemedText style={styles.headerTitle}>Start Booking</ThemedText>
+                  <ThemedText style={styles.headerTitle}>{t(L10n.booking.startBooking)}</ThemedText>
                   <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
                     <ThemedText style={styles.closeButtonText}>✕</ThemedText>
                   </TouchableOpacity>
                 </View>
-                <ThemedText style={styles.formTitle}>Book {propertyTitle}</ThemedText>
+                <ThemedText style={styles.formTitle}>{t(L10n.booking.bookProperty, { propertyTitle })}</ThemedText>
                 <TextInput
                   style={styles.input}
-                  placeholder="Name"
+                  placeholder={t(L10n.booking.name)}
                   value={form.name}
                   onChangeText={text => setForm(f => ({ ...f, name: text }))}
                   autoCapitalize="words"
@@ -235,7 +238,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
                 />
                 <TextInput
                   style={styles.input}
-                  placeholder="Surname"
+                  placeholder={t(L10n.booking.surname)}
                   value={form.surname}
                   onChangeText={text => setForm(f => ({ ...f, surname: text }))}
                   autoCapitalize="words"
@@ -243,7 +246,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
                 />
                 <TextInput
                   style={styles.input}
-                  placeholder="Email"
+                  placeholder={t(L10n.booking.email)}
                   value={form.email}
                   onChangeText={text => setForm(f => ({ ...f, email: text }))}
                   keyboardType="email-address"
@@ -252,14 +255,14 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
                 />
                 <TextInput
                   style={styles.input}
-                  placeholder="Phone Number"
+                  placeholder={t(L10n.booking.phoneNumber)}
                   value={form.phoneNumber}
                   onChangeText={text => setForm(f => ({ ...f, phoneNumber: text }))}
                   keyboardType="phone-pad"
                   returnKeyType="done"
                 />
                 <View style={{ marginBottom: 16 }}>
-                  <ThemedText style={styles.formLabel}>Dates:</ThemedText>
+                  <ThemedText style={styles.formLabel}>{t(L10n.booking.dates)}</ThemedText>
                   <DateRangePicker
                     startDate={localStartDate}
                     endDate={localEndDate}
@@ -269,14 +272,14 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
                 </View>
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity style={styles.cancelButton} onPress={onClose} disabled={loading}>
-                    <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
+                    <ThemedText style={styles.cancelButtonText}>{t(L10n.booking.cancel)}</ThemedText>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.submitButton}
                     onPress={handleSubmit}
                     disabled={loading}
                   >
-                    {loading ? <ActivityIndicator color="#fff" /> : <ThemedText style={styles.submitButtonText}>Book Now</ThemedText>}
+                    {loading ? <ActivityIndicator color="#fff" /> : <ThemedText style={styles.submitButtonText}>{t(L10n.booking.bookNow)}</ThemedText>}
                   </TouchableOpacity>
                 </View>
               </View>

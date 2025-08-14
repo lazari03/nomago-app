@@ -2,8 +2,10 @@ import { HeaderNavigation } from '@/components/HeaderNavigation';
 import { HomeTabBar } from '@/components/HomeTabBar';
 import { PropertyCard } from '@/components/PropertyCard/PropertyCard';
 import { ThemedView } from '@/components/ThemedView';
+import { useTranslations } from '@/hooks/useTranslation';
 import { useCategoryStore } from '@/stores/useCategoryStore';
 import { useListingsStore } from '@/stores/useListingsStore';
+import { L10n } from '@/utils/translationHelper';
 import { usePullToRefresh } from '@/utils/usePullToRefresh';
 import React, { useRef } from 'react';
 import { Animated, RefreshControl, StyleSheet, Text } from 'react-native';
@@ -12,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
 export default function ExplorePage() {
+  const { t } = useTranslations();
   const scrollY = useRef(new Animated.Value(0)).current;
   const { category, loading: categoryLoading, error } = useCategoryStore();
   const { currentCategoryListings, setSelectedProperty, fetchListingsByCategory } = useListingsStore();
@@ -40,7 +43,7 @@ export default function ExplorePage() {
   return (
     <ThemedView style={{ flex: 1, backgroundColor: '#fff' }}>
         <HeaderNavigation
-          title="Explore"
+          title={t(L10n.explore.title)}
           showBack={true}
           right={null}
         />
@@ -60,9 +63,9 @@ export default function ExplorePage() {
         >
           <ThemedView style={styles.stepContainer}>
             {categoryLoading ? (
-              <Text>Loading...</Text>
+              <Text>{t(L10n.explore.loading)}</Text>
             ) : error ? (
-              <Text>Error: {error}</Text>
+              <Text>{t(L10n.explore.error)}: {error}</Text>
             ) : currentCategoryListings.length > 0 ? (
               currentCategoryListings.map((item) => (
                 <PropertyCard
@@ -79,7 +82,7 @@ export default function ExplorePage() {
                 />
               ))
             ) : (
-              <Text>No listings found for {category}.</Text>
+              <Text>{t(L10n.explore.noListings, { category })}</Text>
             )}
           </ThemedView>
         </Animated.ScrollView>

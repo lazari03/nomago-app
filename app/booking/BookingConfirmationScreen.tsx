@@ -1,7 +1,9 @@
 import { HeaderNavigation } from '@/components/HeaderNavigation';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useTranslations } from '@/hooks/useTranslation';
 import { useBookingStore } from '@/stores/useBookingStore';
+import { L10n } from '@/utils/translationHelper';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useRef } from 'react';
 import { ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
@@ -19,6 +21,7 @@ export default function BookingConfirmationScreen() {
     localEndDate,
     resetForm
   } = useBookingStore();
+  const { t } = useTranslations();
 
   return (
     <ThemedView style={bookingStyles.fullScreenContainer}>
@@ -28,7 +31,7 @@ export default function BookingConfirmationScreen() {
         translucent={false} 
         hidden={false}
       />
-      <HeaderNavigation showBack title="Booking Confirmed" />
+  <HeaderNavigation showBack title={t(L10n.booking.bookingConfirmed)} />
       <ScrollView contentContainerStyle={bookingStyles.confirmationContainer}>
         <View style={bookingStyles.confirmationCard} ref={confirmationRef} collapsable={false}>
           <View style={bookingStyles.confirmationHeader}>
@@ -44,32 +47,32 @@ export default function BookingConfirmationScreen() {
           <View style={bookingStyles.successIcon}>
             <Text style={bookingStyles.successIconText}>✓</Text>
           </View>
-          <Text style={bookingStyles.confirmationTitle}>We received your booking!</Text>
-          <Text style={bookingStyles.confirmationSubtitle}>Here are your booking details:</Text>
+          <Text style={bookingStyles.confirmationTitle}>{t(L10n.booking.weReceived)}</Text>
+          <Text style={bookingStyles.confirmationSubtitle}>{t(L10n.booking.hereAreDetails)}</Text>
           <View style={bookingStyles.bookingDetails}>
             <View style={bookingStyles.detailRow}>
-              <Text style={bookingStyles.detailLabel}>Property:</Text>
+              <Text style={bookingStyles.detailLabel}>{t(L10n.booking.property)}</Text>
               <Text style={bookingStyles.detailValue}>{propertyTitle}</Text>
             </View>
             <View style={bookingStyles.detailRow}>
-              <Text style={bookingStyles.detailLabel}>Name:</Text>
+              <Text style={bookingStyles.detailLabel}>{t(L10n.booking.name)}</Text>
               <Text style={bookingStyles.detailValue}>{form?.name} {form?.surname}</Text>
             </View>
             <View style={bookingStyles.detailRow}>
-              <Text style={bookingStyles.detailLabel}>Email:</Text>
+              <Text style={bookingStyles.detailLabel}>{t(L10n.booking.email)}</Text>
               <Text style={bookingStyles.detailValue}>{form?.email}</Text>
             </View>
             <View style={bookingStyles.detailRow}>
-              <Text style={bookingStyles.detailLabel}>Phone:</Text>
+              <Text style={bookingStyles.detailLabel}>{t(L10n.booking.phoneNumber)}</Text>
               <Text style={bookingStyles.detailValue}>{form?.phoneNumber}</Text>
             </View>
             <View style={bookingStyles.detailRow}>
-              <Text style={bookingStyles.detailLabel}>Check-in:</Text>
-              <Text style={bookingStyles.detailValue}>{localStartDate ? localStartDate.toLocaleDateString() : 'Not selected'}</Text>
+              <Text style={bookingStyles.detailLabel}>{t(L10n.booking.checkIn)}</Text>
+              <Text style={bookingStyles.detailValue}>{localStartDate ? localStartDate.toLocaleDateString() : t(L10n.booking.notSelected)}</Text>
             </View>
             <View style={[bookingStyles.detailRow, { borderBottomWidth: 0 }]}> 
-              <Text style={bookingStyles.detailLabel}>Check-out:</Text>
-              <Text style={bookingStyles.detailValue}>{localEndDate ? localEndDate.toLocaleDateString() : 'Not selected'}</Text>
+              <Text style={bookingStyles.detailLabel}>{t(L10n.booking.checkOut)}</Text>
+              <Text style={bookingStyles.detailValue}>{localEndDate ? localEndDate.toLocaleDateString() : t(L10n.booking.notSelected)}</Text>
             </View>
           </View>
         </View>
@@ -79,7 +82,7 @@ export default function BookingConfirmationScreen() {
             resetForm();
             router.replace('/');
           }}>
-            <ThemedText style={bookingStyles.doneButtonText}>Done</ThemedText>
+            <ThemedText style={bookingStyles.doneButtonText}>{t(L10n.booking.done)}</ThemedText>
           </TouchableOpacity>
         </View>
       </ScrollView>

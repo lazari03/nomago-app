@@ -1,3 +1,6 @@
+
+// Ensure i18n is initialized before any React code
+import '@/i18n';
 import { useFonts } from 'expo-font';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
