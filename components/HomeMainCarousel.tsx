@@ -83,7 +83,7 @@ export function HomeMainCarousel() {
               <View style={styles.textContainer}>
                 <Text style={styles.title}>{activeItem?.title || ''}</Text>
                 <Text style={styles.subtitle}>{activeItem?.subtitle || ''}</Text>
-                <Text style={styles.price}>{activeItem?.price != null ? `$${activeItem.price}` : ''}</Text>
+                <Text style={styles.price}>{activeItem?.price != null ? `from ${activeItem.price} ALL` : ''}</Text>
                 <TouchableOpacity
                   style={styles.reserveBtnNearText}
                   onPress={() => router.push({ pathname: '/property/[id]', params: { id: activeItem.id } })}

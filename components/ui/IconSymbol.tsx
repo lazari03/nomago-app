@@ -1,12 +1,20 @@
 // Fallback for using MaterialIcons on Android and web.
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { SymbolViewProps, SymbolWeight } from 'expo-symbols';
+import { SymbolWeight } from 'expo-symbols';
 import { ComponentProps } from 'react';
 import { OpaqueColorValue, type StyleProp, type TextStyle } from 'react-native';
 
-type IconMapping = Record<SymbolViewProps['name'], ComponentProps<typeof MaterialIcons>['name']>;
-type IconSymbolName = keyof typeof MAPPING;
+type IconSymbolName =
+  | 'house.fill'
+  | 'paperplane.fill'
+  | 'chevron.left.forwardslash.chevron.right'
+  | 'chevron.right'
+  | 'magnifyingglass'
+  | 'dots-horizontal'
+  | 'gearshape.fill';
+
+type IconMapping = Record<IconSymbolName, ComponentProps<typeof MaterialIcons>['name']>;
 
 /**
  * Add your SF Symbols to Material Icons mappings here.
@@ -19,6 +27,8 @@ const MAPPING = {
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
   'magnifyingglass': 'search',
+  'dots-horizontal': 'more-horiz',
+  'gearshape.fill': 'settings', // MaterialIcons gear icon
 } as IconMapping;
 
 /**

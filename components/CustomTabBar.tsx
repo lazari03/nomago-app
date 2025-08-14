@@ -20,6 +20,12 @@ const TABS = [
     label: 'Explore',
     route: '/explore'
   },
+  {
+    name: 'more',
+    icon: 'gearshape.fill', // Use a gear/settings icon
+    label: 'More',
+    route: '/more'
+  },
 ];
 
 export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {

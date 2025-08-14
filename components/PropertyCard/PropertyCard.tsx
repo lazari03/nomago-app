@@ -43,7 +43,7 @@ export function PropertyCard({ listing, onPress }: PropertyCardProps) {
 
           {/* Price */}
           <View style={styles.priceContainer}>
-            <ThemedText style={styles.priceLabel}>Price/Night</ThemedText>
+            <ThemedText style={styles.priceLabel}>starting from </ThemedText>
             <ThemedText style={styles.price}>{listing.price !== undefined ? String(listing.price) : ''}</ThemedText>
           </View>
         </View>
