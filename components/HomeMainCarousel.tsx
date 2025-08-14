@@ -1,99 +1,207 @@
 import { ThemeImage } from '@/components/ThemeImage';
+import { ColorTokens } from '@/constants/Colors';
 import { useCategoryStore } from '@/stores/useCategoryStore';
 import { useListingsStore } from '@/stores/useListingsStore';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, GestureResponderEvent, PanResponder, PanResponderGestureState, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 
 export function HomeMainCarousel() {
+  // All hooks must be called before any return
+
   const { currentCategoryListings, listings, categoryLoading, fetchListingsByCategory } = useListingsStore();
   const { category } = useCategoryStore();
+  const { useRouter } = require('expo-router');
+  const router = useRouter();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const screenWidth = Dimensions.get('window').width;
 
-  // Fetch listings for the selected category when it changes
   useEffect(() => {
     if (category) {
       fetchListingsByCategory(category);
     }
   }, [category, fetchListingsByCategory]);
 
-  if (categoryLoading) {
-    return (
-      <View style={[styles.container, styles.loadingContainer]}>
-        <ActivityIndicator size="large" color="#6C4DF6" />
-        <Text style={styles.loadingText}>Loading...</Text>
-      </View>
-    );
-  }
 
-  // Prefer category listings, fallback to all listings
+
+  // Ensure activeIndex is always valid when displayList changes
+
+  // Use category listings if available, otherwise all listings
   let displayList = (currentCategoryListings && currentCategoryListings.length > 0)
-    ? currentCategoryListings
-    : listings;
+    ? currentCategoryListings.filter(l => l.featured === true)
+    : listings.filter(l => l.featured === true);
 
-  // Filter to only listings with featured === true
-  displayList = displayList.filter(l => l.featured === true);
+    // Ensure activeIndex is always valid when displayList changes
+    useEffect(() => {
+      if (activeIndex > displayList.length - 1) {
+        setActiveIndex(0);
+      }
+    }, [displayList.length]);
 
-  if (!displayList || displayList.length === 0) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>No listings available.</Text>
-      </View>
-    );
-  }
+  // PanResponder for swipe gestures (must be before any return)
+  const panResponder = React.useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_evt: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+        // Only respond to horizontal swipes
+        return Math.abs(gestureState.dx) > 20 && Math.abs(gestureState.dy) < 20;
+      },
+      onPanResponderRelease: (_evt, gestureState) => {
+        if (gestureState.dx < -40) {
+          setActiveIndex(i => (i === displayList.length - 1 ? 0 : i + 1));
+        } else if (gestureState.dx > 40) {
+          setActiveIndex(i => (i === 0 ? displayList.length - 1 : i - 1));
+        }
+      },
+    })
+  ).current;
 
-  // Show the first listing (can be replaced with a FlatList/Carousel for multiple)
-  const displayListing = displayList[0];
-  // Use featuredImage if present, else fallback to first imageUrl
-  const featuredImageUrl = displayListing.featuredImageUrl || displayListing.imageUrls?.[0] || '';
-  const { useRouter } = require('expo-router');
-  const router = useRouter();
+  // Always keep space below the carousel consistent
+  // Always render the cell, overlay loading/empty state if needed
+  const showLoading = categoryLoading;
+  const showEmpty = !categoryLoading && (!displayList || displayList.length === 0);
+
+  // Show only the active item
+  const activeItem = displayList[activeIndex];
+  const featuredImageUrl = activeItem.featuredImageUrl || activeItem.imageUrls?.[0] || '';
 
   return (
-    <View style={styles.container}>
-      {/* Use ThemeImage for optimized loading */}
-      <ThemeImage
-        uri={featuredImageUrl}
-        width={400}
-        height={500}
-        style={styles.image}
-        quality={60}
-      />
-      {/* Gradient overlay covering bottom 40% */}
-      <LinearGradient
-        colors={['transparent', 'rgba(0,0,0,0.8)']}
-        style={styles.gradientOverlay}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-      />
-      <View style={styles.textContainer}>
-        <Text style={styles.title}>{String(displayListing.title ?? '')}</Text>
-        <Text style={styles.subtitle}>{String(displayListing.subtitle ?? '')}</Text>
-        <Text style={styles.price}>{displayListing.price != null ? `$${displayListing.price}` : ''}</Text>
+    <View style={{ alignItems: 'center', marginBottom: 16 }}>
+      <View
+        style={[styles.container, styles.carouselCell]}
+        {...panResponder.panHandlers}
+      >
+        {/* Progress bar inside the cell, at the top */}
+        <View style={styles.progressBarOverlay} pointerEvents="none">
+          {displayList.map((_, idx) => (
+            <View
+              key={idx}
+              style={[
+                styles.progressSegment,
+                idx === activeIndex ? styles.progressSegmentActive : null,
+              ]}
+            />
+          ))}
+        </View>
+        {/* Left arrow */}
+        {/* Left arrow (always visible, loops) */}
         <TouchableOpacity
-          style={styles.reserveBtnNearText}
-          onPress={() => {
-            router.push({
-              pathname: '/property/[id]',
-              params: { id: displayListing.id },
-            });
-          }}
+          style={styles.leftArrow}
+          onPress={() => setActiveIndex(i => (i === 0 ? displayList.length - 1 : i - 1))}
         >
-          <Text style={styles.reserveText}>BOOK NOW</Text>
+          <Text style={{ color: '#fff', fontSize: 28 }}>{'‹'}</Text>
         </TouchableOpacity>
+        {/* Right arrow (always visible, loops) */}
+        <TouchableOpacity
+          style={styles.rightArrow}
+          onPress={() => setActiveIndex(i => (i === displayList.length - 1 ? 0 : i + 1))}
+        >
+          <Text style={{ color: '#fff', fontSize: 28 }}>{'›'}</Text>
+        </TouchableOpacity>
+        {/* Show image cell or fallback card */}
+        {featuredImageUrl ? (
+          <>
+            <ThemeImage
+              uri={featuredImageUrl}
+              width={400}
+              height={500}
+              style={styles.image}
+              quality={60}
+            />
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.8)']}
+              style={styles.gradientOverlay}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+            />
+            <View style={styles.textContainer}>
+              <Text style={styles.title}>{String(activeItem.title ?? '')}</Text>
+              <Text style={styles.subtitle}>{String(activeItem.subtitle ?? '')}</Text>
+              <Text style={styles.price}>{activeItem.price != null ? `$${activeItem.price}` : ''}</Text>
+              <TouchableOpacity
+                style={styles.reserveBtnNearText}
+                onPress={() => {
+                  router.push({
+                    pathname: '/property/[id]',
+                    params: { id: activeItem.id },
+                  });
+                }}
+              >
+                <Text style={styles.reserveText}>BOOK NOW</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        ) : (
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#fff',
+              borderRadius: 16,
+              padding: 20,
+              width: '90%',
+              shadowColor: '#000',
+              shadowOpacity: 0.1,
+              shadowRadius: 8,
+              elevation: 2,
+              marginBottom: 12,
+              alignSelf: 'center',
+              marginTop: 40,
+            }}
+            onPress={() => {
+              router.push({
+                pathname: '/property/[id]',
+                params: { id: activeItem.id },
+              });
+            }}
+          >
+            <Text style={{ fontWeight: 'bold', fontSize: 18, color: '#222' }}>{String(activeItem.title ?? '')}</Text>
+            <Text style={{ color: '#666', marginTop: 4 }}>{String(activeItem.subtitle ?? '')}</Text>
+            <Text style={{ color: '#00FFB0', fontWeight: 'bold', marginTop: 6 }}>{activeItem.price != null ? `$${activeItem.price}` : ''}</Text>
+          </TouchableOpacity>
+        )}
       </View>
+  {/* Extra space below carousel for separation from bottom cards */}
+  <View style={{ height: 12 }} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  carouselCell: {
+    width: Dimensions.get('window').width - 32,
+  },
+  flatListContent: {
+    paddingHorizontal: 8,
+  },
   container: {
     borderRadius: 28,
     overflow: 'hidden',
     marginHorizontal: 8,
-    marginBottom: 16,
+    marginBottom: 0, // Remove bottom margin to align with cards
     backgroundColor: '#222',
     height: 500,
     justifyContent: 'center',
+  },
+  progressBarOverlay: {
+    position: 'absolute',
+    top: 12,
+    left: 16,
+    right: 16,
+    zIndex: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 8,
+    gap: 4,
+  },
+  progressSegment: {
+    flex: 1,
+    height: 4,
+    backgroundColor: '#E1BEE7', // lightPurple
+    borderRadius: 2,
+    marginHorizontal: 2,
+  },
+  progressSegmentActive: {
+    backgroundColor: ColorTokens.purple,
   },
   loadingContainer: {
     alignItems: 'center',
@@ -122,20 +230,26 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 12,
     top: '50%',
-    marginTop: -24,
+    marginTop: -28,
     backgroundColor: '#8888',
-    borderRadius: 20,
-    padding: 4,
+    borderRadius: 28,
+    width: 56,
+    height: 56,
+    justifyContent: 'center',
+    alignItems: 'center',
     zIndex: 2,
   },
   rightArrow: {
     position: 'absolute',
     right: 12,
     top: '50%',
-    marginTop: -24,
+    marginTop: -28,
     backgroundColor: '#8888',
-    borderRadius: 20,
-    padding: 4,
+    borderRadius: 28,
+    width: 56,
+    height: 56,
+    justifyContent: 'center',
+    alignItems: 'center',
     zIndex: 2,
   },
   reserveBtnNearText: {
