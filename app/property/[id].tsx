@@ -80,7 +80,7 @@ export default function PropertyDetailScreen() {
 
           {/* Description */}
           <View style={styles.descriptionSection}>
-            <ThemedText style={styles.sectionTitle}>About this place</ThemedText>
+            <ThemedText style={styles.sectionTitle}>About</ThemedText>
             <ThemedText style={styles.description}>
               {property.description || 'No description available.'}
             </ThemedText>
