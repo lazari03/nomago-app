@@ -22,7 +22,7 @@ const TABS = [
   },
   {
     name: 'more',
-    icon: 'gearshape.fill', // Use a gear/settings icon
+    icon: 'info.circle', // Use an info icon
     label: 'More',
     route: '/more'
   },

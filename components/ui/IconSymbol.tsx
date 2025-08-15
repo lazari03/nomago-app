@@ -12,7 +12,8 @@ type IconSymbolName =
   | 'chevron.right'
   | 'magnifyingglass'
   | 'dots-horizontal'
-  | 'gearshape.fill';
+  | 'gearshape.fill'
+  | 'info.circle';
 
 type IconMapping = Record<IconSymbolName, ComponentProps<typeof MaterialIcons>['name']>;
 
@@ -28,7 +29,8 @@ const MAPPING = {
   'chevron.right': 'chevron-right',
   'magnifyingglass': 'search',
   'dots-horizontal': 'more-horiz',
-  'gearshape.fill': 'settings', // MaterialIcons gear icon
+  'gearshape.fill': 'settings',
+  'info.circle': 'info', // MaterialIcons info icon
 } as IconMapping;
 
 /**
