@@ -1,4 +1,4 @@
-import apiClient from './apiClient';
+import { apiClient } from './apiClient';
 
 export interface User {
   id: string;
@@ -6,12 +6,21 @@ export interface User {
   email: string;
 }
 
+
 export const getUser = async (userId: string): Promise<User> => {
-  const response = await apiClient.get<User>(`/users/${userId}`);
+  const response = await apiClient['users']({
+    method: 'get',
+    url: `/users/${userId}`,
+  });
   return response.data;
 };
 
+
 export const createUser = async (userData: Partial<User>): Promise<User> => {
-  const response = await apiClient.post<User>('/users', userData);
+  const response = await apiClient['users']({
+    method: 'post',
+    data: userData,
+    url: '/users',
+  });
   return response.data;
 };

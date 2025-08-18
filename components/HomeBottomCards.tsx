@@ -1,23 +1,72 @@
+
 import { goToExplore } from '@/services/navigationService';
-import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useCategoryStore } from '@/stores/useCategoryStore';
+import { useHomeCardsStore } from '@/stores/useHomeCardsStore';
+import React, { useEffect } from 'react';
+import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 
 const HomeBottomCards = React.memo(() => {
-  // Hardcoded mock card for bottom section
+
+  const { leftCards, rightCards, loading, error, fetchLeftCards, fetchRightCards } = useHomeCardsStore();
+  const category = useCategoryStore((state) => state.category);
+
+  useEffect(() => {
+    fetchLeftCards();
+    fetchRightCards();
+  }, [fetchLeftCards, fetchRightCards]);
+
+  // Refetch left and right cards when the selected category changes
+  React.useEffect(() => {
+    fetchLeftCards();
+    fetchRightCards();
+  }, [category]);
+
+  if (loading) {
+    return <ActivityIndicator style={{ margin: 24 }} size="large" color="#6C4DF6" />;
+  }
+  if (error) {
+    return <Text style={{ color: 'red', margin: 24 }}>Error: {error}</Text>;
+  }
+
+
+  // Find left card matching the selected category in its categories array (case-insensitive)
+  const leftCard = leftCards.find(card =>
+    card.categories?.some((cat: { name?: string }) => cat.name?.toLowerCase() === category?.toLowerCase())
+  );
+  // Find right card matching the selected category in its categories array (case-insensitive)
+  const rightCard = rightCards.find(card =>
+    card.categories?.some((cat: { name?: string }) => cat.name?.toLowerCase() === category?.toLowerCase())
+  ) || rightCards[0];
+
   return (
     <View style={styles.container}>
       <View style={styles.row}>
         <TouchableOpacity
           style={styles.leftCard}
-          onPress={() => goToExplore('Apartments')}
+          onPress={() => goToExplore(leftCard?.link || 'Apartments')}
+          disabled={!leftCard}
         >
-          <Text style={styles.leftTitle}>Find a Studio Apartment</Text>
-          <Text style={styles.leftSubtitle}>from €900/mo</Text>
+          <Text style={styles.leftTitle}>
+            {leftCard ? leftCard.title : 'Hey there digital explorer'}
+          </Text>
+          {leftCard
+            ? <>
+                {leftCard.description && <Text style={styles.leftSubtitle}>{leftCard.description}</Text>}
+                {leftCard.subtitle && <Text style={styles.leftSubtitle}>{leftCard.subtitle}</Text>}
+              </>
+            : null}
         </TouchableOpacity>
         <View style={styles.rightCard}>
-          <Text style={styles.sponsor}>sponsor</Text>
-          <Image source={{ uri: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2' }} style={styles.scooterImg} />
-          <Text style={styles.rightText}>there is more to EXPLORE</Text>
+          {rightCard?.posterUrl && (
+            <Image source={{ uri: rightCard.posterUrl }} style={styles.rightCardImage} resizeMode="cover" />
+          )}
+          <View style={styles.rightCardOverlay}>
+            <Text style={styles.rightText}>{rightCard?.title || 'there is more to EXPLORE'}</Text>
+            {rightCard?.description && (
+              <Text style={styles.rightDesc}>{rightCard.description}</Text>
+            )}
+          </View>
         </View>
       </View>
     </View>
@@ -57,12 +106,28 @@ const styles = StyleSheet.create({
   },
   rightCard: {
     flex: 1,
-    backgroundColor: '#f3edff',
     borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
     minHeight: 170,
-    padding: 8,
+    overflow: 'hidden',
+    position: 'relative',
+    backgroundColor: '#f3edff',
+  },
+  rightCardImage: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
+    borderRadius: 20,
+  },
+  rightCardOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    padding: 12,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    alignItems: 'flex-start',
   },
   sponsor: {
     color: '#6C4DF6',
@@ -82,5 +147,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     marginTop: 8,
+  },
+  rightDesc: {
+    color: '#6C4DF6',
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 2,
+    opacity: 0.8,
   },
 });

@@ -108,7 +108,3 @@ This project is organized for scalability and maintainability. Here’s how to c
 - Use hooks for logic reuse.
 - Handle errors gracefully and provide user feedback.
 - Write clear, concise comments for complex logic.
-
----
-
-For questions or contributions, open an issue or pull request. Happy coding!
