@@ -31,7 +31,7 @@ export default function MoreScreen() {
               title={item.title}
               imageUrl={item.thumbnailUrl}
               date={item.publishedAt && new Date(item.publishedAt).toLocaleDateString()}
-              onPress={() => router.push({ pathname: './blogDetail', params: { id: item.id } })}
+              onPress={() => router.push({ pathname: '/blog/blogDetail', params: { id: item.id } })}
             />
           ))}
         </ScrollView>

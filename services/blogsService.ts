@@ -18,22 +18,22 @@ export async function fetchBlogs(): Promise<Blog[]> {
     }
   });
   return response.data.data.map((item: any) => {
-    const attrs = item.attributes || {};
     let thumbnailUrl;
-    // Support both direct thumbnail and formats.thumbnail
-    if (attrs.thumbnail && attrs.thumbnail.formats && attrs.thumbnail.formats.thumbnail && attrs.thumbnail.formats.thumbnail.url) {
-      thumbnailUrl = attrs.thumbnail.formats.thumbnail.url;
-    } else if (attrs.thumbnail && attrs.thumbnail.url) {
-      thumbnailUrl = attrs.thumbnail.url;
+    if (item.thumbnail && item.thumbnail.formats && item.thumbnail.formats.thumbnail && item.thumbnail.formats.thumbnail.url) {
+      thumbnailUrl = item.thumbnail.formats.thumbnail.url;
+    } else if (item.thumbnail && item.thumbnail.url) {
+      thumbnailUrl = item.thumbnail.url;
     }
-    // If the URL is relative, prepend the API host
     if (thumbnailUrl && thumbnailUrl.startsWith('/')) {
       thumbnailUrl = 'http://xgs8swck0g8cgs8gcososwg8.168.231.78.121.sslip.io' + thumbnailUrl;
     }
     return {
       id: item.id,
-      ...attrs,
+      title: item.title,
+      content: item.content,
+      publishedAt: item.publishedAt,
       thumbnailUrl,
+      // add other fields as needed
     };
   });
 }

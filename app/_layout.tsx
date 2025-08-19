@@ -35,10 +35,10 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ThemeProvider value={DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="property/[id]" options={{ headerShown: false }} />
-          <Stack.Screen name="booking/[propertyId]" options={{ headerShown: false }} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="property/[id]" />
+          <Stack.Screen name="booking/[propertyId]" />
           <Stack.Screen name="+not-found" />
         </Stack>
         {/* Force white background and dark status bar icons globally */}

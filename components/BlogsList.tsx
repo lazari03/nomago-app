@@ -1,6 +1,6 @@
 import { useBlogsStore } from '@/stores/useBlogsStore';
 import React, { useEffect } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from 'react-native';
 
 const BlogsList = () => {
   const { blogs, loading, error, fetchBlogs } = useBlogsStore();
@@ -23,9 +23,10 @@ const BlogsList = () => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.blogCard}>
+            {item.thumbnailUrl && (
+              <Image source={{ uri: item.thumbnailUrl }} style={styles.thumbnail} />
+            )}
             <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.content}>{item.content}</Text>
-            {item.publishedAt && <Text style={styles.date}>{item.publishedAt}</Text>}
           </View>
         )}
         ListEmptyComponent={<Text>No blogs found.</Text>}
@@ -45,21 +46,19 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
   },
+  thumbnail: {
+    width: '100%',
+    height: 140,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    marginBottom: 8,
+    backgroundColor: '#e0e0e0',
+  },
   title: {
     fontWeight: 'bold',
     fontSize: 18,
-    marginBottom: 6,
     color: '#6C4DF6',
-  },
-  content: {
-    fontSize: 14,
-    color: '#333',
-    marginBottom: 4,
-  },
-  date: {
-    fontSize: 12,
-    color: '#888',
-    textAlign: 'right',
+    marginBottom: 6,
   },
 });
 

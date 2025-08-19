@@ -1,7 +1,6 @@
 import { HeaderNavigation } from '@/components/HeaderNavigation';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 import { ThemeImage } from '@/components/ThemeImage';
 import { useDateFilterStore } from '@/stores/useDateFilterStore';
 import { useListingsStore } from '@/stores/useListingsStore';
@@ -45,8 +44,8 @@ export default function PropertyDetailScreen() {
   const galleryImages = property.imageUrls?.filter(url => !!url) ?? [];
 
   return (
-    <ThemedView style={styles.container}>
-      <View style={[styles.headerOverlaySafe, { paddingTop: insets.top }]}>
+    <>
+      <View style={[styles.headerOverlaySafe, { paddingTop: insets.top }]}> 
         <HeaderNavigation showBack title={property.title} />
       </View>
       <ParallaxScrollView
@@ -71,58 +70,52 @@ export default function PropertyDetailScreen() {
         withTabBarPadding={false}
       >
         <View style={styles.contentWrapper}>
-          {/* Location only (title moved to header) */}
           <View style={styles.titleSection}>
             <View style={styles.locationRow}>
               <ThemedText style={styles.location}>{property.location}</ThemedText>
             </View>
           </View>
-
-          {/* Description */}
           <View style={styles.descriptionSection}>
             <ThemedText style={styles.sectionTitle}>About</ThemedText>
             <ThemedText style={styles.description}>
               {property.description || 'No description available.'}
             </ThemedText>
           </View>
-
-      {/* Gallery Carousel */}
-      <View style={styles.gallerySection}>
-        <ThemedText style={styles.sectionTitle}>Gallery</ThemedText>
-        {galleryImages.length > 0 ? (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.galleryScroll}
-            contentContainerStyle={styles.galleryScrollContent}
-          >
-            {galleryImages.map((imgUrl, idx) => (
-              <TouchableOpacity
-                key={idx}
-                onPress={() => {
-                  setSelectedIndex(idx);
-                  setLightboxVisible(true);
-                }}
+          <View style={styles.gallerySection}>
+            <ThemedText style={styles.sectionTitle}>Gallery</ThemedText>
+            {galleryImages.length > 0 ? (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.galleryScroll}
+                contentContainerStyle={styles.galleryScrollContent}
               >
-                <ThemeImage
-                  uri={imgUrl}
-                  width={180}
-                  height={180}
-                  style={styles.galleryImage}
-                  quality={60}
-                />
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        ) : (
-          <View style={styles.noGalleryImage}>
-            <ThemedText style={styles.noGalleryImageText}>
-              No images available
-            </ThemedText>
+                {galleryImages.map((imgUrl, idx) => (
+                  <TouchableOpacity
+                    key={idx}
+                    onPress={() => {
+                      setSelectedIndex(idx);
+                      setLightboxVisible(true);
+                    }}
+                  >
+                    <ThemeImage
+                      uri={imgUrl}
+                      width={180}
+                      height={180}
+                      style={styles.galleryImage}
+                      quality={60}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            ) : (
+              <View style={styles.noGalleryImage}>
+                <ThemedText style={styles.noGalleryImageText}>
+                  No images available
+                </ThemedText>
+              </View>
+            )}
           </View>
-        )}
-      </View>
-
           <View style={styles.bottomSpacer} />
         </View>
       </ParallaxScrollView>
@@ -184,6 +177,6 @@ export default function PropertyDetailScreen() {
           <ThemedText style={styles.bookButtonText}>Book Now</ThemedText>
         </TouchableOpacity>
       </View>
-    </ThemedView>
+    </>
   );
 }

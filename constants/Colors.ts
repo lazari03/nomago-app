@@ -56,6 +56,7 @@ export const Colors = {
   info: ColorTokens.lightBlue,
   buttonColor: ColorTokens.purple,
   white: ColorTokens.white,
+  darkGray: ColorTokens.darkGray,
 };
 
 export default Colors;
