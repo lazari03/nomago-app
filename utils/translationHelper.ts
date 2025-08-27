@@ -7,7 +7,11 @@ export type TranslationKeys =
   | `HP_02.${keyof EnType['HP_02']}`
   | `explore.${keyof EnType['explore']}`
   | `booking.${keyof EnType['booking']}`
-  | `homeHeader.${keyof EnType['homeHeader']}`;
+  | `homeHeader.${keyof EnType['homeHeader']}`
+  | `booking.startDate`
+  | `booking.endDate`
+  | `common.perNight`
+  | `common.from`;
 
 // Create a type-safe translation object similar to SwiftGen's L10n
 export const L10n = {
@@ -19,6 +23,8 @@ export const L10n = {
     retry: 'common.retry' as const,
     cancel: 'common.cancel' as const,
     nomagoLogo: 'common.nomagoLogo' as const,
+    perNight: 'common.perNight' as const,
+    from: 'common.from' as const,
   },
   HP_01: {
     title: 'HP_01.title' as const,
@@ -63,10 +69,12 @@ export const L10n = {
     notSelected: 'booking.notSelected' as const,
     success: 'booking.success' as const,
     confirmationSaved: 'booking.confirmationSaved' as const,
-    permissionDenied: 'booking.permissionDenied' as const,
-    permissionRequired: 'booking.permissionRequired' as const,
-    errorSaving: 'booking.errorSaving' as const,
-    failedToSave: 'booking.failedToSave' as const,
+  permissionDenied: 'booking.permissionDenied' as const,
+  permissionRequired: 'booking.permissionRequired' as const,
+  errorSaving: 'booking.errorSaving' as const,
+  failedToSave: 'booking.failedToSave' as const,
+  startDate: 'booking.startDate' as const,
+  endDate: 'booking.endDate' as const,
   },
   homeHeader: {
     title: 'homeHeader.title' as const,

@@ -185,13 +185,13 @@ const BookingForm: React.FC<BookingFormProps> = ({ visible, onClose, propertyTit
                       <Text style={styles.detailValue}>{form.phoneNumber}</Text>
                     </View>
                     <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>{t(L10n.booking.checkIn)}</Text>
+                      <Text style={styles.detailLabel}>{t(L10n.booking.startDate)}</Text>
                       <Text style={styles.detailValue}>
                         {localStartDate?.toLocaleDateString() || t(L10n.booking.notSelected)}
                       </Text>
                     </View>
                     <View style={[styles.detailRow, { borderBottomWidth: 0 }]}>
-                      <Text style={styles.detailLabel}>{t(L10n.booking.checkOut)}</Text>
+                      <Text style={styles.detailLabel}>{t(L10n.booking.endDate)}</Text>
                       <Text style={styles.detailValue}>
                         {localEndDate?.toLocaleDateString() || t(L10n.booking.notSelected)}
                       </Text>

@@ -10,7 +10,7 @@ import { useListingsStore } from '@/stores/useListingsStore';
 import { L10n } from '@/utils/translationHelper';
 import { usePullToRefresh } from '@/utils/usePullToRefresh';
 import React, { useRef } from 'react';
-import { Animated, RefreshControl, StyleSheet } from 'react-native';
+import { Animated, RefreshControl, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
@@ -52,9 +52,9 @@ export default function ExplorePage() {
         <HomeTabBar />
         <Animated.ScrollView
           contentContainerStyle={{ 
-            paddingTop: 0, 
             paddingHorizontal: 16, 
-            paddingBottom: Math.max(insets.bottom + 100, 140)  // Account for safe area + tab bar height
+            paddingTop: 5, // Reduce top whitespace to 5px
+            paddingBottom: Math.max(insets.bottom + 100, 140)
           }}
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -63,7 +63,7 @@ export default function ExplorePage() {
           scrollEventThrottle={16}
           refreshControl={<RefreshControl {...refreshControlProps} />}
         >
-          <ThemedView style={styles.stepContainer}>
+          <View style={styles.stepContainer}>
             {categoryLoading ? (
               <>
                 {[...Array(3)].map((_, idx) => (
@@ -90,7 +90,7 @@ export default function ExplorePage() {
             ) : (
               <ThemedText>{t(L10n.explore.noListings, { category })}</ThemedText>
             )}
-          </ThemedView>
+          </View>
         </Animated.ScrollView>
     </ThemedView>
   );
@@ -114,8 +114,6 @@ const styles = StyleSheet.create({
   stickyHeader: {
     position: 'absolute',
     top: 0,
-    left: 0,
-    right: 0,
     zIndex: 10,
     backgroundColor: '#fff',
     height: 120,
@@ -129,8 +127,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   stepContainer: {
-    gap: 4,  // Reduced from 8 to 4
-    marginBottom: 8,
+    // No gap or margin to remove extra space above first card
   },
    tabBar: {
     position: 'absolute',

@@ -7,7 +7,7 @@ export const listingCardStyles = StyleSheet.create({
     marginBottom: 20,
   },
   carousel: {
-    height: 320,
+    height: 120,
   },
   card: {
     width: width - 16, // Small margin for visual breathing room

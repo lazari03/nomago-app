@@ -1,6 +1,6 @@
 import { useCategoryStore } from '@/stores/useCategoryStore';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CategorySkeleton from './skeleton/CategorySkeleton';
 
 export function HomeTabBar() {
@@ -30,41 +30,55 @@ export function HomeTabBar() {
 
   return (
     <View style={styles.container}>
-      {tabsToShow.map((tab) => (
-        <TouchableOpacity
-          key={tab.id || tab.name}
-          style={[styles.tab, category === tab.name && styles.activeTab]}
-          onPress={() => setCategory(tab.name)}
-        >
-          <Text style={[styles.tabText, category === tab.name && styles.activeTabText]}>
-            {tab.name}
-          </Text>
-        </TouchableOpacity>
-      ))}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {tabsToShow.map((tab, idx) => (
+          <TouchableOpacity
+            key={tab.id || tab.name}
+            style={[
+              styles.tab,
+              category === tab.name && styles.activeTab,
+              idx === 0 && { marginLeft: 8 },
+              idx === tabsToShow.length - 1 && { marginRight: 8 }
+            ]}
+            onPress={() => setCategory(tab.name)}
+          >
+            <Text style={[styles.tabText, category === tab.name && styles.activeTabText]}>
+              {tab.name}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scrollContent: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
     alignItems: 'center',
+    paddingVertical: 0,
+  },
+  container: {
     backgroundColor: '#F7F7F7',
     borderRadius: 20,
     marginHorizontal: 16,
     marginBottom: 12,
     paddingVertical: 6,
+    overflow: 'hidden', // Clip children to bounds
   },
   tab: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
+    marginHorizontal: 0, // Less space between tabs
   },
   activeTab: {
     backgroundColor: '#f3edff',
-    paddingHorizontal: 1, // less horizontal padding for compact bg
-    borderRadius: 12, // more round for pill look
+    borderRadius: 12,
   },
   tabText: {
     color: '#888',

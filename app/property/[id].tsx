@@ -2,8 +2,10 @@ import { HeaderNavigation } from '@/components/HeaderNavigation';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemeImage } from '@/components/ThemeImage';
+import { useTranslations } from '@/hooks/useTranslation';
 import { useDateFilterStore } from '@/stores/useDateFilterStore';
 import { useListingsStore } from '@/stores/useListingsStore';
+import { PropertyCategory } from '@/utils/PropertyCategory';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Dimensions, ScrollView, TouchableOpacity, View } from 'react-native';
@@ -31,6 +33,8 @@ export default function PropertyDetailScreen() {
   if (!property && listings && listings.length > 0) {
     property = listings.find((l) => String(l.id) === String(id)) || null;
   }
+
+  const { t, L10n } = useTranslations();
 
   if (!property) {
     return (
@@ -160,11 +164,34 @@ export default function PropertyDetailScreen() {
       {/* Bottom Booking Bar */}
       <View style={styles.bottomBar}>
         <View style={styles.priceInfo}>
-          <ThemedText style={styles.priceText}>{property.price}</ThemedText>
-          <ThemedText style={styles.priceLabel}>per night</ThemedText>
+          {(() => {
+            const category = property.categoryName?.toLowerCase() || '';
+            const isApartment = category === PropertyCategory.Apartment || category === PropertyCategory.Apartments;
+            const isRestaurant = category === PropertyCategory.Restaurant || category === PropertyCategory.Restaurants;
+            const isResidence = category === PropertyCategory.Residence || category === PropertyCategory.Residences;
+            const isTransport = category === PropertyCategory.Transport || category === PropertyCategory.Transports;
+
+            if (isApartment) {
+              return (
+                <>
+                  <ThemedText style={styles.priceText}>{property.price} ALL</ThemedText>
+                  <ThemedText style={styles.priceLabel}>{t(L10n.common.perNight)}</ThemedText>
+                </>
+              );
+            } else if (isRestaurant || isResidence || isTransport) {
+              return (
+                <ThemedText style={styles.priceText}>
+                  {t(L10n.common.from)} {property.price} ALL
+                </ThemedText>
+              );
+            } else {
+              return (
+                <ThemedText style={styles.priceText}>{property.price} ALL</ThemedText>
+              );
+            }
+          })()}
         </View>
         <TouchableOpacity style={styles.bookButton} onPress={() => {
-          console.log('Book Now button pressed, navigating to booking page');
           router.push({
             pathname: '/booking/[propertyId]',
             params: {
@@ -174,7 +201,7 @@ export default function PropertyDetailScreen() {
             }
           });
         }}>
-          <ThemedText style={styles.bookButtonText}>Book Now</ThemedText>
+          <ThemedText style={styles.bookButtonText}>{t(L10n.booking.bookNow)}</ThemedText>
         </TouchableOpacity>
       </View>
     </>
