@@ -45,7 +45,6 @@ export default function MoreScreen() {
               key={item.id}
               title={item.title}
               imageUrl={item.thumbnailUrl}
-              date={item.publishedAt && new Date(item.publishedAt).toLocaleDateString()}
               onPress={() => router.push({ pathname: '/blog/blogDetail', params: { id: item.id } })}
             />
           ))}

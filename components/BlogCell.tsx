@@ -4,12 +4,11 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 interface BlogCellProps {
   title: string;
   imageUrl?: string;
-  date?: string;
   isHeadline?: boolean;
   onPress: () => void;
 }
 
-const BlogCell: React.FC<BlogCellProps> = ({ title, imageUrl, date, isHeadline, onPress }) => (
+const BlogCell: React.FC<BlogCellProps> = ({ title, imageUrl, isHeadline, onPress }) => (
   <TouchableOpacity
     style={[styles.cell, isHeadline && styles.headlineCell]}
     onPress={onPress}
@@ -22,7 +21,6 @@ const BlogCell: React.FC<BlogCellProps> = ({ title, imageUrl, date, isHeadline, 
     )}
     <View style={[styles.overlay, isHeadline && styles.headlineOverlay]}>
       <Text style={[styles.title, isHeadline && styles.headlineTitle]} numberOfLines={2}>{title}</Text>
-      {date && <Text style={[styles.date, isHeadline && styles.headlineDate]}>{date}</Text>}
     </View>
   </TouchableOpacity>
 );

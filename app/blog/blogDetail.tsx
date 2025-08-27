@@ -139,7 +139,7 @@ function BlogDetail() {
                             ))}
                         </Text>
                     ))}
-                    {blog.publishedAt && <Text style={styles.date}>{blog.publishedAt}</Text>}
+                    {/* Removed publishedAt timestamp from the end of the blog detail */}
                 </View>
             </ParallaxScrollView>
         </>
