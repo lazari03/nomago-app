@@ -63,6 +63,8 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     backgroundColor: '#f3edff',
+    paddingHorizontal: 1, // less horizontal padding for compact bg
+    borderRadius: 12, // more round for pill look
   },
   tabText: {
     color: '#888',
