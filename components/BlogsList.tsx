@@ -1,6 +1,7 @@
 import { useBlogsStore } from '@/stores/useBlogsStore';
 import React, { useEffect } from 'react';
-import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
+import BlogSkeleton from './skeleton/BlogSkeleton';
 
 const BlogsList = () => {
   const { blogs, loading, error, fetchBlogs } = useBlogsStore();
@@ -10,7 +11,7 @@ const BlogsList = () => {
   }, [fetchBlogs]);
 
   if (loading) {
-    return <ActivityIndicator style={{ margin: 24 }} size="large" color="#6C4DF6" />;
+    return <BlogSkeleton />;
   }
   if (error) {
     return <Text style={{ color: 'red', margin: 24 }}>Error: {error}</Text>;

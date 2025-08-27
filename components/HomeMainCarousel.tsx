@@ -1,47 +1,48 @@
+import HomeMainCarouselSkeleton from '@/components/skeleton/HomeMainCarouselSkeleton';
 import { ThemeImage } from '@/components/ThemeImage';
 import { ColorTokens } from '@/constants/Colors';
 import { useCategoryStore } from '@/stores/useCategoryStore';
 import { useListingsStore } from '@/stores/useListingsStore';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Dimensions, PanResponder, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export function HomeMainCarousel() {
-  const { currentCategoryListings, listings, categoryLoading, fetchListingsByCategory } = useListingsStore();
+  const { currentCategoryListings, listings, categoryLoading, fetchListingsByCategory, activeIndex, setActiveIndex } = useListingsStore();
   const { category } = useCategoryStore();
   const router = useRouter();
-  const [activeIndex, setActiveIndex] = useState(0);
   const screenWidth = Dimensions.get('window').width;
 
-  useEffect(() => {
-    if (category) fetchListingsByCategory(category);
-  }, [category, fetchListingsByCategory]);
-
   const displayList = category
-    ? (currentCategoryListings || []).filter(l => l.featured)
+    ? listings.filter(l => l.featured && l.categoryName === category)
     : listings.filter(l => l.featured);
 
   useEffect(() => {
-    if (activeIndex > displayList.length - 1) setActiveIndex(0);
-  }, [displayList.length]);
+    if (activeIndex > displayList.length - 1 && displayList.length > 0) setActiveIndex(0);
+  }, [displayList.length, activeIndex, setActiveIndex]);
 
   const panResponder = useRef(
     displayList.length > 1
       ? PanResponder.create({
           onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 20 && Math.abs(g.dy) < 20,
           onPanResponderRelease: (_, g) => {
-            if (g.dx < -40) setActiveIndex(i => (i === displayList.length - 1 ? 0 : i + 1));
-            else if (g.dx > 40) setActiveIndex(i => (i === 0 ? displayList.length - 1 : i - 1));
+            if (g.dx < -40) setActiveIndex(activeIndex === displayList.length - 1 ? 0 : activeIndex + 1);
+            else if (g.dx > 40) setActiveIndex(activeIndex === 0 ? displayList.length - 1 : activeIndex - 1);
           },
         })
       : { panHandlers: {} }
   ).current;
 
-  const showLoading = categoryLoading;
+  const showSkeleton = categoryLoading && displayList.length === 0;
+  const showOverlay = categoryLoading && displayList.length > 0;
   const showEmpty = !categoryLoading && displayList.length === 0;
   const activeItem = displayList[activeIndex];
   const featuredImageUrl = activeItem?.featuredImageUrl || activeItem?.imageUrls?.[0] || '';
+
+  if (showSkeleton) {
+    return <HomeMainCarouselSkeleton />;
+  }
 
   return (
     <View style={{ alignItems: 'center', marginBottom: 16 }}>
@@ -54,19 +55,13 @@ export function HomeMainCarousel() {
 
         {!showEmpty && displayList.length > 1 && (
           <>
-            <TouchableOpacity style={styles.leftArrow} onPress={() => setActiveIndex(i => (i === 0 ? displayList.length - 1 : i - 1))}>
+            <TouchableOpacity style={styles.leftArrow} onPress={() => setActiveIndex(activeIndex === 0 ? displayList.length - 1 : activeIndex - 1)}>
               <Text style={styles.arrowText}>‹</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.rightArrow} onPress={() => setActiveIndex(i => (i === displayList.length - 1 ? 0 : i + 1))}>
+            <TouchableOpacity style={styles.rightArrow} onPress={() => setActiveIndex(activeIndex === displayList.length - 1 ? 0 : activeIndex + 1)}>
               <Text style={styles.arrowText}>›</Text>
             </TouchableOpacity>
           </>
-        )}
-
-        {showLoading && (
-          <View style={styles.overlayContainer}>
-            <Text style={styles.loadingText}>Loading featured listings...</Text>
-          </View>
         )}
 
         {showEmpty && (
@@ -75,7 +70,7 @@ export function HomeMainCarousel() {
           </View>
         )}
 
-        {!showEmpty && !showLoading && (
+        {!showEmpty && (
           featuredImageUrl ? (
             <>
               <ThemeImage uri={featuredImageUrl} width={400} height={500} style={styles.image} quality={60} />
@@ -99,6 +94,9 @@ export function HomeMainCarousel() {
               <Text style={styles.fallbackPrice}>{activeItem?.price != null ? `$${activeItem.price}` : ''}</Text>
             </TouchableOpacity>
           )
+        )}
+        {showOverlay && (
+          <HomeMainCarouselSkeleton style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, zIndex: 10, opacity: 0.7 }} />
         )}
       </View>
       <View style={{ height: 12 }} />

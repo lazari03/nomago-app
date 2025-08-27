@@ -2,7 +2,8 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useCategoryStore } from '@/stores/useCategoryStore';
 import React, { useEffect } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import CategoriesSkeleton from './CategoriesSkeleton';
 
 export function CategoriesComponent() {
     const { categories, loading, error, fetchCategories, category, setCategory } = useCategoryStore();
@@ -11,14 +12,9 @@ export function CategoriesComponent() {
         fetchCategories();
     }, [fetchCategories]);
 
-    if (loading) {
-        return (
-            <ThemedView style={styles.loadingContainer}>
-                <ActivityIndicator size="small" color="#0066CC" />
-                <ThemedText style={styles.loadingText}>Loading categories...</ThemedText>
-            </ThemedView>
-        );
-    }
+  if (loading) {
+    return <CategoriesSkeleton />;
+  }
 
     if (error) {
         return (

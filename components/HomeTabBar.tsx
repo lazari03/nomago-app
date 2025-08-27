@@ -1,6 +1,7 @@
 import { useCategoryStore } from '@/stores/useCategoryStore';
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import CategorySkeleton from './skeleton/CategorySkeleton';
 
 export function HomeTabBar() {
   const { category, setCategory, categories, loading, fetchCategories, error } = useCategoryStore();
@@ -24,12 +25,7 @@ export function HomeTabBar() {
   }, [category, setCategory, categories]);
 
   if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="small" color="#6C4DF6" />
-        <Text style={styles.loadingText}>Loading...</Text>
-      </View>
-    );
+    return <CategorySkeleton />;
   }
 
   return (

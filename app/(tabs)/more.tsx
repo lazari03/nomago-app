@@ -2,17 +2,21 @@ import BlogCell from '@/components/BlogCell';
 import { HeaderNavigation } from '@/components/HeaderNavigation';
 import { ThemedView } from '@/components/ThemedView';
 import { useBlogsStore } from '@/stores/useBlogsStore';
+import { usePullToRefresh } from '@/utils/usePullToRefresh';
 import { useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text } from 'react-native';
+import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text } from 'react-native';
 
 export default function MoreScreen() {
   const { blogs, loading, error, fetchBlogs } = useBlogsStore();
   const router = useRouter();
 
+
   useEffect(() => {
     fetchBlogs();
   }, [fetchBlogs]);
+
+  const { refreshControlProps } = usePullToRefresh(fetchBlogs);
 
   return (
     <ThemedView style={{ flex: 1 }}>
@@ -24,7 +28,10 @@ export default function MoreScreen() {
       ) : blogs.length === 0 ? (
         <Text>No blogs found.</Text>
       ) : (
-        <ScrollView contentContainerStyle={styles.listContainer}>
+        <ScrollView
+          contentContainerStyle={styles.listContainer}
+          refreshControl={<RefreshControl {...refreshControlProps} />}
+        >
           {blogs.map((item) => (
             <BlogCell
               key={item.id}

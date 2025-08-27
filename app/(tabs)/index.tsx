@@ -3,6 +3,8 @@ import { HomeLogo } from '@/components/HomeLogo';
 import { HomeMainCarousel } from '@/components/HomeMainCarousel';
 import { HomeTabBar } from '@/components/HomeTabBar';
 import { ThemedView } from '@/components/ThemedView';
+import { useCategoryStore } from '@/stores/useCategoryStore';
+import { useHomeCardsStore } from '@/stores/useHomeCardsStore';
 import { useListingsStore } from '@/stores/useListingsStore';
 import { usePullToRefresh } from '@/utils/usePullToRefresh';
 import { useRef } from 'react';
@@ -12,7 +14,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export default function HomeScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const { fetchListings } = useListingsStore();
-  const { refreshControlProps } = usePullToRefresh(fetchListings);
+  const { fetchLeftCards, fetchRightCards } = useHomeCardsStore();
+  const { fetchCategories } = useCategoryStore();
+  const { refreshControlProps } = usePullToRefresh(async () => {
+    await Promise.all([
+      fetchListings(),
+      fetchLeftCards(),
+      fetchRightCards(),
+      fetchCategories(),
+    ]);
+  });
   const insets = useSafeAreaInsets();
 
   // Fade out header between 0 and 80px of scroll

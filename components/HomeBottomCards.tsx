@@ -2,8 +2,8 @@
 import { goToExplore } from '@/services/navigationService';
 import { useCategoryStore } from '@/stores/useCategoryStore';
 import { useHomeCardsStore } from '@/stores/useHomeCardsStore';
-import React, { useEffect } from 'react';
-import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 
 const HomeBottomCards = React.memo(() => {
@@ -11,20 +11,9 @@ const HomeBottomCards = React.memo(() => {
   const { leftCards, rightCards, loading, error, fetchLeftCards, fetchRightCards } = useHomeCardsStore();
   const category = useCategoryStore((state) => state.category);
 
-  useEffect(() => {
-    fetchLeftCards();
-    fetchRightCards();
-  }, [fetchLeftCards, fetchRightCards]);
+  // Removed per-category fetching for smooth tab switching. Data is preloaded globally.
 
-  // Refetch left and right cards when the selected category changes
-  React.useEffect(() => {
-    fetchLeftCards();
-    fetchRightCards();
-  }, [category]);
-
-  if (loading) {
-    return <ActivityIndicator style={{ margin: 24 }} size="large" color="#6C4DF6" />;
-  }
+  const showSkeleton = loading && leftCards.length === 0 && rightCards.length === 0;
   if (error) {
     return <Text style={{ color: 'red', margin: 24 }}>Error: {error}</Text>;
   }

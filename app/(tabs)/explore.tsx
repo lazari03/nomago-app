@@ -1,6 +1,8 @@
 import { HeaderNavigation } from '@/components/HeaderNavigation';
 import { HomeTabBar } from '@/components/HomeTabBar';
 import { PropertyCard } from '@/components/PropertyCard/PropertyCard';
+import ListingSkeleton from '@/components/skeleton/ListingSkeleton';
+import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useTranslations } from '@/hooks/useTranslation';
 import { useCategoryStore } from '@/stores/useCategoryStore';
@@ -8,7 +10,7 @@ import { useListingsStore } from '@/stores/useListingsStore';
 import { L10n } from '@/utils/translationHelper';
 import { usePullToRefresh } from '@/utils/usePullToRefresh';
 import React, { useRef } from 'react';
-import { Animated, RefreshControl, StyleSheet, Text } from 'react-native';
+import { Animated, RefreshControl, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
@@ -63,9 +65,9 @@ export default function ExplorePage() {
         >
           <ThemedView style={styles.stepContainer}>
             {categoryLoading ? (
-              <Text>{t(L10n.explore.loading)}</Text>
+              <ListingSkeleton />
             ) : error ? (
-              <Text>{t(L10n.explore.error)}: {error}</Text>
+              <ThemedText>{t(L10n.explore.error)}: {error}</ThemedText>
             ) : currentCategoryListings.length > 0 ? (
               currentCategoryListings.map((item) => (
                 <PropertyCard
@@ -82,7 +84,7 @@ export default function ExplorePage() {
                 />
               ))
             ) : (
-              <Text>{t(L10n.explore.noListings, { category })}</Text>
+              <ThemedText>{t(L10n.explore.noListings, { category })}</ThemedText>
             )}
           </ThemedView>
         </Animated.ScrollView>

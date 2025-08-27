@@ -10,6 +10,8 @@ interface ListingsState {
   categoryLoading: boolean;
   error: string | null;
   categoryError: string | null;
+  activeIndex: number;
+  setActiveIndex: (index: number) => void;
   setSelectedProperty: (property: MappedListing | null) => void;
   fetchListings: () => Promise<void>;
   fetchListingsByCategory: (categoryName: string) => Promise<void>;
@@ -24,6 +26,8 @@ export const useListingsStore = create<ListingsState>((set) => ({
   categoryLoading: false,
   error: null,
   categoryError: null,
+  activeIndex: 0,
+  setActiveIndex: (index) => set({ activeIndex: index }),
 
   setSelectedProperty: (property) => set({ selectedProperty: property }),
 
@@ -40,13 +44,12 @@ export const useListingsStore = create<ListingsState>((set) => ({
     }
   },
 
-
   fetchListingsByCategory: async (categoryName: string) => {
     set({ categoryLoading: true, categoryError: null });
     try {
       const currentCategoryListings = await fetchListings(categoryName);
       console.log('useListingsStore fetched listings:', currentCategoryListings.map(l => ({ id: l.id, title: l.title })));
-      set({ currentCategoryListings, categoryLoading: false });
+      set({ currentCategoryListings, categoryLoading: false, activeIndex: 0 }); // Reset activeIndex on category change
     } catch (err) {
       set({
         categoryError: err instanceof Error ? err.message : 'Failed to fetch category listings',
