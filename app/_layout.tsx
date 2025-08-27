@@ -4,13 +4,14 @@ import '@/i18n';
 import { useFonts } from 'expo-font';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { useBlogsStore } from '@/stores/useBlogsStore';
 import { useCategoryStore } from '@/stores/useCategoryStore';
 import { useHomeCardsStore } from '@/stores/useHomeCardsStore';
 import { useListingsStore } from '@/stores/useListingsStore';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
@@ -26,13 +27,28 @@ export default function RootLayout() {
   const fetchListings = useListingsStore((state) => state.fetchListings);
   const fetchLeftCards = useHomeCardsStore((state) => state.fetchLeftCards);
   const fetchRightCards = useHomeCardsStore((state) => state.fetchRightCards);
+  const fetchBlogs = useBlogsStore((state) => state.fetchBlogs);
+  const pollingRef = useRef<number | null>(null);
 
   useEffect(() => {
     fetchCategories();
     fetchListings();
     fetchLeftCards();
     fetchRightCards();
-  }, [fetchCategories, fetchListings, fetchLeftCards, fetchRightCards]);
+    fetchBlogs();
+
+    // Poll every 15 minutes (900,000 ms)
+  pollingRef.current = setInterval(() => {
+      fetchCategories();
+      fetchListings();
+      fetchLeftCards();
+      fetchRightCards();
+      fetchBlogs();
+    }, 900000);
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, [fetchCategories, fetchListings, fetchLeftCards, fetchRightCards, fetchBlogs]);
 
   if (!loaded) {
     // Async font loading only occurs in development.
