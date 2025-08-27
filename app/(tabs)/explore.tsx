@@ -65,7 +65,11 @@ export default function ExplorePage() {
         >
           <ThemedView style={styles.stepContainer}>
             {categoryLoading ? (
-              <ListingSkeleton />
+              <>
+                {[...Array(3)].map((_, idx) => (
+                  <ListingSkeleton key={idx} />
+                ))}
+              </>
             ) : error ? (
               <ThemedText>{t(L10n.explore.error)}: {error}</ThemedText>
             ) : currentCategoryListings.length > 0 ? (

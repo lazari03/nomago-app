@@ -1,11 +1,12 @@
 import BlogCell from '@/components/BlogCell';
 import { HeaderNavigation } from '@/components/HeaderNavigation';
+import BlogSkeleton from '@/components/skeleton/BlogSkeleton';
 import { ThemedView } from '@/components/ThemedView';
 import { useBlogsStore } from '@/stores/useBlogsStore';
 import { usePullToRefresh } from '@/utils/usePullToRefresh';
 import { useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
-import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, Text } from 'react-native';
 
 export default function MoreScreen() {
   const { blogs, loading, error, fetchBlogs } = useBlogsStore();
@@ -22,7 +23,14 @@ export default function MoreScreen() {
     <ThemedView style={{ flex: 1 }}>
       <HeaderNavigation title="More" showBack={true} />
       {loading ? (
-        <ActivityIndicator style={{ margin: 24 }} size="large" color="#6C4DF6" />
+        <ScrollView
+          contentContainerStyle={styles.listContainer}
+          refreshControl={<RefreshControl {...refreshControlProps} />}
+        >
+          {[...Array(3)].map((_, idx) => (
+            <BlogSkeleton key={idx} />
+          ))}
+        </ScrollView>
       ) : error ? (
         <Text style={{ color: 'red', margin: 24 }}>Error: {error}</Text>
       ) : blogs.length === 0 ? (
