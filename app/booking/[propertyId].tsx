@@ -8,6 +8,7 @@ import { IS_ANDROID, PLATFORM_STYLES } from '@/constants/Platform';
 import { useTranslations } from '@/hooks/useTranslation';
 import { useBookingStore } from '@/stores/useBookingStore';
 import { useDateFilterStore } from '@/stores/useDateFilterStore';
+import { useListingsStore } from '@/stores/useListingsStore';
 import { L10n } from '@/utils/translationHelper';
 import * as MediaLibrary from 'expo-media-library';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -69,16 +70,27 @@ const useBookingFormStore = create<BookingFormState>((set) => ({
   }),
 }));
 
+// BookingScreen component
 export default function BookingScreen() {
-  const { t } = useTranslations();
-
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
+  // Get property context for categoryName
   const { propertyId, propertyDocumentId, propertyTitle } = useLocalSearchParams<{
     propertyId: string;
     propertyDocumentId: string;
     propertyTitle: string;
   }>();
+  const { selectedProperty, listings } = useListingsStore();
+  // Now that propertyId is available, do the lookup
+  let property = selectedProperty && String(selectedProperty.id) === String(propertyId)
+    ? selectedProperty
+    : null;
+  if (!property && listings && listings.length > 0) {
+    property = listings.find((l) => String(l.id) === String(propertyId)) || null;
+  }
+  const categoryName = property?.categoryName;
+  const { t } = useTranslations();
+
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const { fromDate, toDate } = useDateFilterStore();
   const {
@@ -115,7 +127,13 @@ export default function BookingScreen() {
       Alert.alert(t(L10n.booking.pleaseFillAllFields));
       return;
     }
-    if (!localStartDate || !localEndDate) {
+    if (!localStartDate) {
+      Alert.alert(t(L10n.booking.pleaseSelectDates));
+      return;
+    }
+    // Only require endDate for apartments
+    const isApartment = categoryName === 'apartment' || categoryName === 'apartments';
+    if (isApartment && !localEndDate) {
       Alert.alert(t(L10n.booking.pleaseSelectDates));
       return;
     }
@@ -126,7 +144,7 @@ export default function BookingScreen() {
     book({
       ...form,
       startDate: localStartDate,
-      endDate: localEndDate,
+      endDate: isApartment ? localEndDate : null,
       listing: propertyDocumentId,
     });
   };
@@ -156,10 +174,10 @@ export default function BookingScreen() {
         quality: 1,
       });
       await MediaLibrary.createAssetAsync(uri);
-  Alert.alert(t(L10n.booking.success), t(L10n.booking.confirmationSaved));
+      Alert.alert(t(L10n.booking.success), t(L10n.booking.confirmationSaved));
     } catch (error) {
       console.error('Error saving booking confirmation image:', error);
-  Alert.alert(t(L10n.booking.errorSaving), t(L10n.booking.failedToSave));
+      Alert.alert(t(L10n.booking.errorSaving), t(L10n.booking.failedToSave));
     } finally {
       setIsSaving(false);
     }
@@ -220,10 +238,17 @@ export default function BookingScreen() {
                   <Text style={bookingStyles.detailLabel}>{t(L10n.booking.checkIn)}</Text>
                   <Text style={bookingStyles.detailValue}>{localStartDate?.toLocaleDateString() || t(L10n.booking.notSelected)}</Text>
                 </View>
-                <View style={[bookingStyles.detailRow, { borderBottomWidth: 0 }]}> 
-                  <Text style={bookingStyles.detailLabel}>{t(L10n.booking.checkOut)}</Text>
-                  <Text style={bookingStyles.detailValue}>{localEndDate?.toLocaleDateString() || t(L10n.booking.notSelected)}</Text>
-                </View>
+                { (categoryName === 'apartment' || categoryName === 'apartments') ? (
+                  <View style={[bookingStyles.detailRow, { borderBottomWidth: 0 }]}> 
+                    <Text style={bookingStyles.detailLabel}>{t(L10n.booking.checkOut)}</Text>
+                    <Text style={bookingStyles.detailValue}>{localEndDate?.toLocaleDateString() || t(L10n.booking.notSelected)}</Text>
+                  </View>
+                ) : (
+                  <View style={[bookingStyles.detailRow, { borderBottomWidth: 0 }]}> 
+                    <Text style={bookingStyles.detailLabel}>{t(L10n.booking.time)}</Text>
+                    <Text style={bookingStyles.detailValue}>{localStartDate ? localStartDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : t(L10n.booking.notSelected)}</Text>
+                  </View>
+                )}
               </View>
             </View>
             <View style={bookingStyles.confirmationButtons}>
@@ -289,6 +314,7 @@ export default function BookingScreen() {
                 endDate={localEndDate}
                 onStartDateChange={setLocalStartDate}
                 onEndDateChange={setLocalEndDate}
+                categoryName={categoryName}
               />
             </View>
             <View style={bookingStyles.buttonContainer}>
