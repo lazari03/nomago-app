@@ -168,6 +168,13 @@ export const bookingStyles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#e9ecef',
   },
+  detailRowNoBorder: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 0,
+  },
   detailLabel: {
     fontSize: 16,
     fontWeight: '600',

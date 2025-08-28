@@ -1,4 +1,3 @@
-import { DateRangePicker } from '@/components/DateRangePicker';
 import { HeaderNavigation } from '@/components/HeaderNavigation';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -6,18 +5,25 @@ import { BOOKING_DATES_HINT } from '@/constants/bookingFormStrings';
 import Colors from '@/constants/Colors';
 import { IS_ANDROID, PLATFORM_STYLES } from '@/constants/Platform';
 import { useTranslations } from '@/hooks/useTranslation';
+import type { MappedListing } from '@/services/listingsService';
 import { useBookingStore } from '@/stores/useBookingStore';
 import { useDateFilterStore } from '@/stores/useDateFilterStore';
 import { useListingsStore } from '@/stores/useListingsStore';
+import { PropertyCategory } from '@/utils/PropertyCategory';
 import { L10n } from '@/utils/translationHelper';
 import * as MediaLibrary from 'expo-media-library';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useRef } from 'react';
-import { ActivityIndicator, Alert, KeyboardAvoidingView, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { ActivityIndicator, Alert, KeyboardAvoidingView, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { captureRef } from 'react-native-view-shot';
 import { create } from 'zustand';
+import { BookingConfirmationDetails } from './BookingConfirmationDetails';
+import { BookingFormSection } from './BookingFormSection';
 import { bookingStyles } from './bookingStyles';
+// Helper to check if a category is an apartment
+const isApartmentCategory = (categoryName?: string) =>
+  categoryName === PropertyCategory.Apartment || categoryName === PropertyCategory.Apartments;
 
 type BookingFormState = {
   form: { name: string; surname: string; email: string; phoneNumber: string };
@@ -80,12 +86,15 @@ export default function BookingScreen() {
   }>();
   const { selectedProperty, listings } = useListingsStore();
   // Now that propertyId is available, do the lookup
-  let property = selectedProperty && String(selectedProperty.id) === String(propertyId)
-    ? selectedProperty
-    : null;
-  if (!property && listings && listings.length > 0) {
-    property = listings.find((l) => String(l.id) === String(propertyId)) || null;
-  }
+  const property: MappedListing | null = useMemo(() => {
+    if (selectedProperty && String(selectedProperty.id) === String(propertyId)) {
+      return selectedProperty;
+    }
+    if (listings && listings.length > 0) {
+      return listings.find((l) => String(l.id) === String(propertyId)) || null;
+    }
+    return null;
+  }, [selectedProperty, listings, propertyId]);
   const categoryName = property?.categoryName;
   const { t } = useTranslations();
 
@@ -122,7 +131,7 @@ export default function BookingScreen() {
     }
   }, [success, error, setShowConfirmation, reset]);
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (!form.name || !form.surname || !form.email || !form.phoneNumber) {
       Alert.alert(t(L10n.booking.pleaseFillAllFields));
       return;
@@ -132,7 +141,7 @@ export default function BookingScreen() {
       return;
     }
     // Only require endDate for apartments
-    const isApartment = categoryName === 'apartment' || categoryName === 'apartments';
+    const isApartment = isApartmentCategory(categoryName);
     if (isApartment && !localEndDate) {
       Alert.alert(t(L10n.booking.pleaseSelectDates));
       return;
@@ -147,15 +156,15 @@ export default function BookingScreen() {
       endDate: isApartment ? localEndDate : null,
       listing: propertyDocumentId,
     });
-  };
+  }, [form, localStartDate, localEndDate, t, categoryName, propertyDocumentId, book]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setShowConfirmation(false);
     resetForm();
     router.back();
-  };
+  }, [setShowConfirmation, resetForm, router]);
 
-  const handleSaveBookingData = async () => {
+  const handleSaveBookingData = useCallback(async () => {
     if (!confirmationRef.current) {
       Alert.alert(t(L10n.booking.errorSaving), t(L10n.booking.failedToSave));
       return;
@@ -181,7 +190,7 @@ export default function BookingScreen() {
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [confirmationRef, t, setIsSaving]);
 
   return (
     <ThemedView style={bookingStyles.fullScreenContainer}>
@@ -217,39 +226,14 @@ export default function BookingScreen() {
               </View>
               <Text style={bookingStyles.confirmationTitle}>{t(L10n.booking.weReceived)}</Text>
               <Text style={bookingStyles.confirmationSubtitle}>{t(L10n.booking.hereAreDetails)}</Text>
-              <View style={bookingStyles.bookingDetails}>
-                <View style={bookingStyles.detailRow}>
-                  <Text style={bookingStyles.detailLabel}>{t(L10n.booking.property)}</Text>
-                  <Text style={bookingStyles.detailValue}>{propertyTitle}</Text>
-                </View>
-                <View style={bookingStyles.detailRow}>
-                  <Text style={bookingStyles.detailLabel}>{t(L10n.booking.name)}</Text>
-                  <Text style={bookingStyles.detailValue}>{form.name} {form.surname}</Text>
-                </View>
-                <View style={bookingStyles.detailRow}>
-                  <Text style={bookingStyles.detailLabel}>{t(L10n.booking.email)}</Text>
-                  <Text style={bookingStyles.detailValue}>{form.email}</Text>
-                </View>
-                <View style={bookingStyles.detailRow}>
-                  <Text style={bookingStyles.detailLabel}>{t(L10n.booking.phoneNumber)}</Text>
-                  <Text style={bookingStyles.detailValue}>{form.phoneNumber}</Text>
-                </View>
-                <View style={bookingStyles.detailRow}>
-                  <Text style={bookingStyles.detailLabel}>{t(L10n.booking.checkIn)}</Text>
-                  <Text style={bookingStyles.detailValue}>{localStartDate?.toLocaleDateString() || t(L10n.booking.notSelected)}</Text>
-                </View>
-                { (categoryName === 'apartment' || categoryName === 'apartments') ? (
-                  <View style={[bookingStyles.detailRow, { borderBottomWidth: 0 }]}> 
-                    <Text style={bookingStyles.detailLabel}>{t(L10n.booking.checkOut)}</Text>
-                    <Text style={bookingStyles.detailValue}>{localEndDate?.toLocaleDateString() || t(L10n.booking.notSelected)}</Text>
-                  </View>
-                ) : (
-                  <View style={[bookingStyles.detailRow, { borderBottomWidth: 0 }]}> 
-                    <Text style={bookingStyles.detailLabel}>{t(L10n.booking.time)}</Text>
-                    <Text style={bookingStyles.detailValue}>{localStartDate ? localStartDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : t(L10n.booking.notSelected)}</Text>
-                  </View>
-                )}
-              </View>
+              <BookingConfirmationDetails
+                propertyTitle={propertyTitle}
+                form={form}
+                localStartDate={localStartDate}
+                localEndDate={localEndDate}
+                categoryName={categoryName}
+                t={t}
+              />
             </View>
             <View style={bookingStyles.confirmationButtons}>
               <TouchableOpacity style={bookingStyles.saveButton} onPress={handleSaveBookingData} disabled={isSaving}>
@@ -265,70 +249,22 @@ export default function BookingScreen() {
             </View>
           </ScrollView>
         ) : (
-          <ScrollView contentContainerStyle={bookingStyles.formBox}>
-            <ThemedText style={bookingStyles.formTitle}>{t(L10n.booking.bookProperty, { propertyTitle })}</ThemedText>
-            <View style={bookingStyles.inputRow}>
-        <TextInput
-          style={[bookingStyles.inputHalf, bookingStyles.inputLeft]}
-          placeholder={t(L10n.booking.name)}
-           placeholderTextColor="#888"
-          value={form.name}
-          onChangeText={text => setForm({ name: text })}
-          autoCapitalize="words"
-          returnKeyType="next"
-        />
-        <TextInput
-          style={[bookingStyles.inputHalf, bookingStyles.inputRight]}
-          placeholder={t(L10n.booking.surname)}
-           placeholderTextColor="#888"
-          value={form.surname}
-          onChangeText={text => setForm({ surname: text })}
-          autoCapitalize="words"
-          returnKeyType="next"
-        />
-            </View>
-              <TextInput
-                style={bookingStyles.input}
-                placeholder={t(L10n.booking.email)}
-                 placeholderTextColor="#888"
-                value={form.email}
-                onChangeText={text => setForm({ email: text })}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                returnKeyType="next"
-              />
-              <TextInput
-                style={bookingStyles.input}
-                placeholder={t(L10n.booking.phoneNumber)}
-                 placeholderTextColor="#888"
-                value={form.phoneNumber}
-                onChangeText={text => setForm({ phoneNumber: text })}
-                keyboardType="phone-pad"
-                returnKeyType="done"
-              />
-            <View style={bookingStyles.datesSection}>
-              <ThemedText style={bookingStyles.formLabel}>{t(L10n.booking.dates)}</ThemedText>
-              <ThemedText style={bookingStyles.formValueHint}>{BOOKING_DATES_HINT}</ThemedText>
-              <DateRangePicker
-                startDate={localStartDate}
-                endDate={localEndDate}
-                onStartDateChange={setLocalStartDate}
-                onEndDateChange={setLocalEndDate}
-                categoryName={categoryName}
-              />
-            </View>
-            <View style={bookingStyles.buttonContainer}>
-              <TouchableOpacity style={bookingStyles.cancelButton} onPress={() => router.back()} disabled={loading}>
-                <ThemedText style={bookingStyles.cancelButtonText}>{t(L10n.booking.cancel)}</ThemedText>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={bookingStyles.submitButton}
-                onPress={handleSubmit}
-                disabled={loading}
-              >
-                {loading ? <ActivityIndicator color="#fff" /> : <ThemedText style={bookingStyles.submitButtonText}>{t(L10n.booking.bookNow)}</ThemedText>}
-              </TouchableOpacity>
-            </View>
+          <ScrollView>
+            <BookingFormSection
+              form={form}
+              setForm={setForm}
+              localStartDate={localStartDate}
+              setLocalStartDate={setLocalStartDate}
+              localEndDate={localEndDate}
+              setLocalEndDate={setLocalEndDate}
+              t={t}
+              propertyTitle={propertyTitle}
+              BOOKING_DATES_HINT={BOOKING_DATES_HINT}
+              categoryName={categoryName}
+              loading={loading}
+              handleSubmit={handleSubmit}
+              router={router}
+            />
           </ScrollView>
         )}
       </KeyboardAvoidingView>
