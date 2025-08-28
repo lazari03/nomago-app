@@ -6,6 +6,7 @@ import { useTranslations } from '@/hooks/useTranslation';
 import { useDateFilterStore } from '@/stores/useDateFilterStore';
 import { useListingsStore } from '@/stores/useListingsStore';
 import { PropertyCategory } from '@/utils/PropertyCategory';
+import * as Linking from 'expo-linking';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Dimensions, ScrollView, TouchableOpacity, View } from 'react-native';
@@ -119,6 +120,18 @@ export default function PropertyDetailScreen() {
                 </ThemedText>
               </View>
             )}
+            {/* Show in Maps Button */}
+            {property.locationLink ? (
+              <TouchableOpacity
+                style={styles.showInMapsButton}
+                onPress={() => {
+                  const url = String(property.locationLink);
+                  Linking.openURL(url);
+                }}
+              >
+                <ThemedText style={styles.showInMapsButtonText}>Show in Maps</ThemedText>
+              </TouchableOpacity>
+            ) : null}
           </View>
           <View style={styles.bottomSpacer} />
         </View>
@@ -160,7 +173,7 @@ export default function PropertyDetailScreen() {
           </ScrollView>
         </View>
       )}
-
+    {/* show maps button  */}
       {/* Bottom Booking Bar */}
       <View style={styles.bottomBar}>
         <View style={styles.priceInfo}>

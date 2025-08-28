@@ -2,6 +2,19 @@ import Colors from '@/constants/Colors';
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
+    showInMapsButton: {
+        marginTop: 18,
+        backgroundColor: '#6C4DF6',
+        borderRadius: 10,
+        paddingVertical: 14,
+        alignItems: 'center',
+    },
+    showInMapsButtonText: {
+        color: '#fff',
+        fontWeight: '600',
+        fontSize: 16,
+        letterSpacing: 0.5,
+    },
     headerOverlaySafe: {
         position: 'absolute',
         top: 0,

@@ -119,5 +119,8 @@ export async function fetchListings(categoryName?: string): Promise<MappedListin
   );
 
   const response = await apiClient.listings({ method: 'get', url: `/listings?${query}` });
+  // Pretty print the fetched data for debugging
+  // eslint-disable-next-line no-console
+  console.log('Fetched listings:', JSON.stringify(response.data, null, 2));
   return response.data.data.map(mapListing);
 }

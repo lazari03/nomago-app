@@ -44,7 +44,6 @@
     "react-native": "0.79.5",
     "react-native-calendars": "^1.1312.1",
     "react-native-daterange": "^2.3.17",
-    "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-reanimated": "~3.17.4",
