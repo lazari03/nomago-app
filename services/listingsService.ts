@@ -53,6 +53,7 @@ export interface MappedListing {
   featured: boolean;
   imageUrls: string[];
   featuredImageUrl?: string;
+  locationLink?: string;
   categoryId?: number;
   categoryName?: string;
 }
@@ -96,6 +97,7 @@ function mapListing(listing: Listing): MappedListing {
     featured: listing.isFeatured === true,
     imageUrls,
     featuredImageUrl,
+    locationLink: (listing as any).locationLink,
     categoryId: listing.category?.id ?? listing.category?.data?.id,
     categoryName: listing.category?.name ?? listing.category?.data?.attributes?.name,
   };

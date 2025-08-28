@@ -259,7 +259,20 @@ export const bookingStyles = StyleSheet.create({
   marginBottom: 4,
   },
   dateCol: {
-  flex: 1,
-  alignItems: 'stretch',
+    flex: 1,
+    alignItems: 'stretch',
+  },
+  getLocationButton: {
+    marginTop: 20,
+    backgroundColor: '#5A4FCF',
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  getLocationButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+    letterSpacing: 0.5,
   },
 });

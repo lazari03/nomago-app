@@ -40,6 +40,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
     if (!showEnd) setTempEnd(endDate || null);
   }, [endDate, showEnd]);
 
+  // --- APARTMENT: Date range only (no time) ---
   if (isApartment) {
     // Show start and end date pickers (no time)
     return (
@@ -192,7 +193,11 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
     );
   }
 
-  // For non-apartments: show only date+time picker (no end date)
+  // --- NON-APARTMENT: Date + Time (Android workaround: separate pickers) ---
+  const [showAndroidDate, setShowAndroidDate] = React.useState(false);
+  const [showAndroidTime, setShowAndroidTime] = React.useState(false);
+  const [androidPickedDate, setAndroidPickedDate] = React.useState<Date | null>(null);
+
   return (
     <View>
       <ThemedText style={styles.label}>Date & Time:</ThemedText>
@@ -208,20 +213,47 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
         />
       ) : Platform.OS === 'android' ? (
         <>
-          <TouchableOpacity style={styles.button} onPress={() => setShowAndroidStart(true)}>
+          <TouchableOpacity style={styles.button} onPress={() => setShowAndroidDate(true)}>
             <ThemedText style={styles.buttonText}>
               {startDate ? startDate.toLocaleString() : 'Select date & time'}
             </ThemedText>
           </TouchableOpacity>
-          {showAndroidStart && (
+          {showAndroidDate && (
             <DateTimePicker
               value={startDate || new Date()}
-              mode="datetime"
+              mode="date"
               display="default"
               textColor="#000"
               onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-                setShowAndroidStart(false);
-                if (event.type === 'set' && selectedDate) onStartDateChange(selectedDate);
+                setShowAndroidDate(false);
+                if (event.type === 'set' && selectedDate) {
+                  setAndroidPickedDate(selectedDate);
+                  setShowAndroidTime(true);
+                }
+              }}
+            />
+          )}
+          {showAndroidTime && (
+            <DateTimePicker
+              value={androidPickedDate || startDate || new Date()}
+              mode="time"
+              display="default"
+              textColor="#000"
+              onChange={(event: DateTimePickerEvent, selectedTime?: Date) => {
+                setShowAndroidTime(false);
+                if (event.type === 'set' && selectedTime) {
+                  // Combine picked date and picked time
+                  const date = androidPickedDate || startDate || new Date();
+                  const combined = new Date(date);
+                  combined.setHours(selectedTime.getHours());
+                  combined.setMinutes(selectedTime.getMinutes());
+                  combined.setSeconds(0);
+                  combined.setMilliseconds(0);
+                  onStartDateChange(combined);
+                  setAndroidPickedDate(null);
+                } else {
+                  setAndroidPickedDate(null);
+                }
               }}
             />
           )}

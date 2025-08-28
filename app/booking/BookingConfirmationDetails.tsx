@@ -1,7 +1,7 @@
 import { PropertyCategory } from '@/utils/PropertyCategory';
 import { L10n } from '@/utils/translationHelper';
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Linking, Text, TouchableOpacity, View } from 'react-native';
 import { bookingStyles } from './bookingStyles';
 
 interface BookingConfirmationDetailsProps {
@@ -11,11 +11,11 @@ interface BookingConfirmationDetailsProps {
   localEndDate: Date | null;
   categoryName?: string;
   t: (key: any, params?: any) => string;
+  locationLink?: string;
 }
 
 const isApartmentCategory = (categoryName?: string) =>
   categoryName === PropertyCategory.Apartment || categoryName === PropertyCategory.Apartments;
-
 
 export const BookingConfirmationDetails: React.FC<BookingConfirmationDetailsProps> = ({
   propertyTitle,
@@ -24,9 +24,15 @@ export const BookingConfirmationDetails: React.FC<BookingConfirmationDetailsProp
   localEndDate,
   categoryName,
   t,
+  locationLink,
 }) => {
   const isApartment = isApartmentCategory(categoryName);
   const showCheckOut = isApartment || (!isApartment && localEndDate);
+  const handleOpenMaps = () => {
+    if (locationLink) {
+      Linking.openURL(locationLink);
+    }
+  };
   return (
     <View style={bookingStyles.bookingDetails}>
       <View style={bookingStyles.detailRow}>
@@ -49,7 +55,7 @@ export const BookingConfirmationDetails: React.FC<BookingConfirmationDetailsProp
         <Text style={bookingStyles.detailLabel}>{t(L10n.booking.checkIn)}</Text>
         <Text style={bookingStyles.detailValue}>{localStartDate?.toLocaleDateString() || t(L10n.booking.notSelected)}</Text>
       </View>
-      {showCheckOut ? (
+  {showCheckOut ? (
         <View style={bookingStyles.detailRowNoBorder}>
           <Text style={bookingStyles.detailLabel}>{t(L10n.booking.checkOut)}</Text>
           <Text style={bookingStyles.detailValue}>{localEndDate?.toLocaleDateString() || t(L10n.booking.notSelected)}</Text>
@@ -60,6 +66,14 @@ export const BookingConfirmationDetails: React.FC<BookingConfirmationDetailsProp
           <Text style={bookingStyles.detailValue}>{localStartDate ? localStartDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : t(L10n.booking.notSelected)}</Text>
         </View>
       )}
+      {locationLink ? (
+        <TouchableOpacity
+          style={bookingStyles.getLocationButton}
+          onPress={handleOpenMaps}
+        >
+          <Text style={bookingStyles.getLocationButtonText}>Open in Maps</Text>
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 };
