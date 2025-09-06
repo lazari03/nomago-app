@@ -1,8 +1,8 @@
 // apiClient.ts
-import { API_HOST, DEFAULT_PORT } from '@/constants/Platform';
+import { API_HOST } from '@/constants/Platform';
 import axios from 'axios';
 
-const BASE_URL = `http://${API_HOST}:${DEFAULT_PORT}/api`;
+const BASE_URL = `https://${API_HOST}/api`;
 const AUTH_HEADER = 'Bearer 3cc4fcdc4e832666d02e71cbb307a6f573e38b61b524945757171b5fca48e991cf133f562a550b5862c0aa516184d393b88f76886a2f31045a244af71c97a67841cc25866438be2bc452732b340f9fd1550595640f668efed4040075ac7a295f72d237b160ee88afc8942e93e19b277bb303593a2bf6ff9ccc8ef1fb51889325';
 
 // Add error handling and logging for debugging

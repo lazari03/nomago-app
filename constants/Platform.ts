@@ -10,5 +10,5 @@ export const PLATFORM_STYLES = {
 } as const;
 
 // Android network configuration
-export const API_HOST = 'xgs8swck0g8cgs8gcososwg8.168.231.78.121.sslip.io';
+export const API_HOST = 'management.nomago.al';
 export const DEFAULT_PORT = '1337';

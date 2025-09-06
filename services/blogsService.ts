@@ -1,6 +1,7 @@
+import { API_HOST } from '@/constants/Platform';
 import axios from 'axios';
 
-const BLOGS_API_URL = 'http://xgs8swck0g8cgs8gcososwg8.168.231.78.121.sslip.io/api/blogs?populate=thumbnail';
+const BLOGS_API_URL = `https://${API_HOST}/api/blogs?populate=thumbnail`;
 
 export interface Blog {
   id: number;
@@ -25,7 +26,7 @@ export async function fetchBlogs(): Promise<Blog[]> {
       thumbnailUrl = item.thumbnail.url;
     }
     if (thumbnailUrl && thumbnailUrl.startsWith('/')) {
-      thumbnailUrl = 'http://xgs8swck0g8cgs8gcososwg8.168.231.78.121.sslip.io' + thumbnailUrl;
+      thumbnailUrl = `https://${API_HOST}}` + thumbnailUrl;
     }
     return {
       id: item.id,
